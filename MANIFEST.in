@@ -1,0 +1,4 @@
+include LICENSE
+recursive-include logs/static *
+recursive-include logs/templates *
+recursive-exclude logs/migrations *
