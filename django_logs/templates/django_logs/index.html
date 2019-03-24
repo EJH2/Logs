@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Discord Log Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.css">
+    <link rel="stylesheet" href="{% static 'django_logs/main.css' %}">
+    <link rel="shortcut icon" href="{% static 'django_logs/favicon.png' %}">
+
+</head>
+<body>
+    <h1>Discord Log Viewer</h1>
+    <p>This website can be used to view logs uploaded to different services as they would appear on Discord.</p>
+    <p>Services we provide support for include:</p>
+    <ul class="bowser-default">
+        <li>
+            Rowboat:
+            <ul class="browser-default">
+                <li><a href="https://rowboat.party">Rowboat</a><span class="og-tag">OG</span><span class="private-tag">Private</span>
+                </li>
+                <li><a href="https://aetherya.stream">Airplane</a><span class="private-tag">Private</span></li>
+                <li><a href="https://aperturebot.science/docs">Aperture</a></li>
+                <li><a href="https://flyg-docs.farkasdev.com">Flygbåt</a><span class="private-tag">Private</span></li>
+                <li><a href="https://docs.warframe.gg/">Heimdallr</a><span class="private-tag">Private</span></li>
+                <li><a href="https://hepboat.imjake.me">HepBoat</a></li>
+                <li><a href="https://docs.jetski.ga">Jetski</a><span class="private-tag">Private</span></li>
+                <li><a href="https://discord.gg/LTT">LMG Showboat</a><span class="private-tag">Private</span></li>
+                <li><a href="https://rawgo.at/docs">Rawgoat</a><span class="private-tag">Private</span></li>
+                <li><a href="https://rowdoc.swvn.io">Speedboat</a><span class="private-tag">Private</span></li>
+            </ul>
+        </li>
+    </ul>
+    <p>
+        To use Rowboat logs, the URL pattern is <a href="">{{ request.META.HTTP_HOST }}/rowboat/&lt;filename&gt;?type=&lt;type&gt;</a>
+        <br>
+        Examples:
+    </p>
+    <ul class="browser-default">
+        <li><a href="">{{ request.META.HTTP_HOST }}/2b0rn0t2-b3th-at15-th3q-u35t10n12345?type=flygbåt</a></li>
+        <li><a href="">{{ request.META.HTTP_HOST }}/l0r3m1p5-umd0-l0r5-174m-37c0n53c737u?type=lmg</a></li>
+    </ul>
+    <p>Alternatively, you can drop the URL in here, and we'll try and make the best of it.</p>
+    {% if messages %}
+        {% for message in messages %}
+            <p class="error">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form class="loading" action="{% url 'view' %}" method="get">
+        <input class="loading" type="text" name="url" title="URL" autocomplete="off">
+        <button class="btn waves-effect waves-light loading" onclick="return loading()">Submit</button>
+    </form>
+    <div class="progress loading" style="display: none;">
+        <div class="indeterminate"></div>
+    </div>
+    <script>
+        function loading() {
+            let load = document.getElementsByClassName('loading');
+            for (let l of load) {
+                if (l.style.display === "none") {
+                    l.style.display = "inherit";
+                } else {
+                    l.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

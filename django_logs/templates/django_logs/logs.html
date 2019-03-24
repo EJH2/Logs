@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Log Entry</title>
+    <meta charset="utf-8"/>
+    {% load static %}
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="og:title" content="Discord Log Viewer">
+    <meta name="og:description" content="Message Count: {{ log_entry.messages | length }}">
+    <meta name="og:image" content="https://{{ request.META.HTTP_HOST }}{% static 'django_logs/black_file.png' %}">
+    <link href="{% static "django_logs/logstyle.css" %}" rel="stylesheet">
+    <link id="theme" href="{% static "django_logs/logstyle_dark.css" %}" rel="stylesheet">
+    <link id="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'django_logs/favicon.png' %}">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+</head>
+<body>
+<br>
+<div class="info">
+    <div class="info__guild-icon-container">
+        <img class="info__guild-icon"
+            {% with 'django_logs/'|add:log_type|lower|add:'.png' as image_static %}
+                src="{% static image_static %}"
+            {% endwith %}
+             onerror="this.src='{% static 'django_logs/white_file.png' %}'"
+             alt="avatar">
+    </div>
+    <div class="info__metadata">
+        <div class="info__guild-name">
+            <span>Logs From {% if log_entry.type %}
+                {{ log_entry.type }}{% else %}
+                File{% endif %}</span>
+        </div>
+        {% if log_entry.generated_at %}
+            <div class="info__generated-at"><span>Generated:</span>
+                <b>{{ log_entry.human_generated_at }}</b></div>{% endif %}
+        <div class="info__channel-message-count"><span>Message Count:</span>
+            <b>{{ log_entry.messages | length }}</b></div>
+        <div class="info__user-list">
+            <span>User{% if log_entry.users|length > 1 %}s: {% else %}: {% endif %}</span>
+            <label class="material-icons info__user-toggle">
+                <input type="checkbox" style="display: none" onclick="return toggleUsers()">
+                arrow_right
+            </label>
+            <ul class="info__users">
+                {% for user in log_entry.users %}
+                    <li class="info__user tooltip">
+                        <span class="info__user-name"
+                              onclick="return copyID(this.parentElement)"><b>{{ user.name | escape }}</b>#{{ user.discriminator }}</span>
+                        <span class='tooltiptext pre pre--inline id'>{{ user.id }}</span>
+                    </li>
+                {% endfor %}
+                <li class="copyall" style="list-style: none">
+                    <span class="tooltip">
+                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)"
+                              style="opacity: 1;">Copy All IDs</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="info__toolbox">
+        <label for="toolbox-toggle" class="material-icons icon-large info__toolbox-toggle"
+               onclick="return toggleDrawer(this)">
+            settings
+        </label>
+        <input class="toggle-input" id="toolbox-toggle" type="checkbox">
+        <ul class="info__toolbox-tools">
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
+                    <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
+                </div>
+            </li>
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
+                    <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
+                </div>
+            </li>
+            {% if original_url %}
+                <li>
+                    <div class="tooltip">
+                        <a class="material-icons tool" href="{{ original_url }}" target="_blank">open_in_browser</a>
+                        <span class="tooltiptext pre pre--inline tool-text">Original URL</span>
+                    </div>
+                </li>
+            {% else %}
+                <li>
+                <span class="material-icons md-inactive tooltip tool">
+                    open_in_browser
+                    <span class="tooltiptext pre pre--inline tool-text">No Original URL</span>
+                </span>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<div class="chatlog">
+    {% for group in log_entry.message_groups %}
+        <div class="chatlog__message-group">
+            <div class="chatlog__author-avatar-container">
+                <img class="chatlog__author-avatar"
+                     src="{{ group.author.avatar_url }}"
+                     onerror="this.src='{{ group.author.default_avatar_url }}'"
+                     alt="avatar"/>
+            </div>
+            <div class="chatlog__messages">
+                <div class="chatlog__header">
+                    <span>
+                        <span class="chatlog__author-name" title="{{ group.author | stringformat:"s" | escape }}">{{ group.author.name | escape }}</span>
+                        {% if group.author.bot %}
+                            <span class="bot-tag">BOT</span>
+                        {% endif %}
+                    </span>
+                    {% if group.created_at %}
+                        <span class="chatlog__timestamp">{{ group.created_at }}</span>
+                    {% endif %}
+                </div>
+                {% for message in group.messages %}
+                    {% if message.content %}
+                        <div class="chatlog__content">
+                            {{ message.content | safe }}
+                            {% if message.edited %}
+                                <span class="chatlog__edited-timestamp">(edited)</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% for embed in message.embeds %}
+                        <div class="chatlog__embed">
+                            <div class="chatlog__embed-color-pill" style="background-color: {{ embed.color }}"></div>
+                            <div class="chatlog__embed-inner">
+                                <div class="chatlog__embed-content">
+                                    <div class="chatlog__embed-content-inner chatlog__content">
+                                        {% if embed.author %}
+                                            <div class="chatlog__embed-author">
+                                                {% if embed.author.icon_url %}
+                                                    <img alt class="chatlog__embed-author-icon"
+                                                         src="{{ embed.author.icon_url }}">
+                                                {% endif %}
+                                                {% if embed.author.name %}
+                                                    {% if embed.author.url %}
+                                                        <a class="chatlog__embed-author chatlog__embed-author-name-link chatlog__embed-link"
+                                                           href="{{ embed.author.url }}">{{ embed.author.name }}</a>
+                                                    {% else %}
+                                                        <span class="chatlog__embed-author-name">{{ embed.author.name }}</span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        {% if embed.title %}
+                                            <div class="chatlog__embed-margin">
+                                                {% if embed.url %}
+                                                    <a class="chatlog__embed-title chatlog__embed-link"
+                                                       href="{{ embed.url }}">{{ embed.title | safe }}</a>
+                                                {% else %}
+                                                    <span class="chatlog__embed-title">{{ embed.title | safe }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        {% if embed.description %}
+                                            <div class="chatlog__embed-description">{{ embed.description | safe }}</div>
+                                        {% endif %}
+                                        {% if embed.fields|length > 0 %}
+                                            <div class="chatlog__embed-fields">
+                                                {% for field in embed.fields %}
+                                                    <div class="chatlog__embed-field {% if field.inline %}chatlog__embed-field--inline{% endif %}">
+                                                        <div class="chatlog__embed-field-name">{{ field.name | safe }}</div>
+                                                        <div class="chatlog__embed-field-value">{{ field.value | safe }}</div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if embed.thumbnail %}
+                                        <img src="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail"
+                                             style="width: {{ embed.thumbnail.width | default:'80px' }}; height: {{ embed.thumbnail.height | default:'80px' }}">
+                                    {% endif %}
+                                </div>
+                                {% if embed.image %}
+                                    <img src="{{ embed.image.url }}"
+                                         class="chatlog__embed-image chatlog__embed-margin-large"
+                                         style="width: {{ embed.image.width | default:'128px' }}; height: {{ embed.image.height | default:'128px' }}">
+                                {% endif %}
+                                {% if embed.footer or embed.timestamp %}
+                                    {% if embed.footer and not embed.timestamp %}
+                                        <div class="chatlog__embed-footer">
+                                            {% if embed.footer.icon_url %}
+                                                <img class="chatlog__embed-footer-icon"
+                                                     src="{{ embed.footer.icon_url }}">
+                                            {% endif %}
+                                            <span class="chatlog__embed-footer-text">{{ embed.footer.text }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if embed.timestamp and not embed.footer %}
+                                        <div class="chatlog__embed-footer chatlog__embed-footer-text">{{ embed.human_timestamp }}</div>
+                                    {% endif %}
+                                    {% if embed.footer and embed.timestamp %}
+                                        <div class="chatlog__embed-footer">
+                                            {% if embed.footer.icon_url %}
+                                                <img class="chatlog__embed-footer-icon"
+                                                     src="{{ embed.footer.icon_url }}">
+                                            {% endif %}
+                                            <span class="chatlog__embed-footer-text">
+                                                {{ embed.footer.text }}
+                                                <span class="chatlog__embed-footer-separator">•</span>
+                                                {{ embed.human_timestamp }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% for attachment in message.attachments %}
+                        <div class="chatlog__attachment">
+                            <a href="{{ attachment.url }}">
+                                {% if attachment.is_image %}
+                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}"
+                                         alt="attachment"/>
+                                {% else %}
+                                    <div class="horizontal">
+                                        <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}"
+                                             alt="Attachment file type: unknown" title="unknown">
+                                        <div class="chatlog__attachment-inner">
+                                            <div class="filename-link">
+                                                <a class="filename-link-inner"
+                                                   href="{{ attachment.url }}">{{ attachment.filename }}</a>
+                                            </div>
+                                            <div class="chatlog__attachment-size">{{ attachment.size }}</div>
+                                        </div>
+                                        <a class="filename-link-inner" href="{{ attachment.url }}">
+                                            <svg name="Download" class="chatlog__attachment-download" width="24"
+                                                 height="24" viewBox="0 0 24 24">
+                                                <g fill="none" fill-rule="evenodd">
+                                                    <path d="M0 0h24v24H0z"></path>
+                                                    <path class="fill" fill="currentColor"
+                                                          d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                                                </g>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.pre--multiline').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+    });
+
+    for (let s of document.getElementsByClassName('chatlog__spoiler-box')) {
+        s.onclick = function () {
+            s.classList.toggle('chatlog__spoiler-hidden');
+        };
+        s.classList.add('chatlog__spoiler-hidden');
+    }
+
+    for (let s of document.getElementsByClassName('mention user')) {
+        s.onclick = function () {
+            return copyIDMention(s);
+        }
+    }
+
+    function toggleDrawer(element) {
+        element.classList.toggle('rotated');
+    }
+
+    function toggleTheme() {
+        let theme = document.getElementById('theme');
+        let hlTheme = document.getElementById('hl_theme');
+        let guildIcon = document.getElementsByClassName('info__guild-icon')[0];
+        if (theme.getAttribute('href').indexOf('dark') > -1) {
+            theme.setAttribute('href', '{% static 'django_logs/logstyle_light.css' %}');
+            hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-light.min.css');
+        } else {
+            theme.setAttribute('href', '{% static 'django_logs/logstyle_dark.css' %}');
+            hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css');
+        }
+        if (guildIcon.src.indexOf('white_file') > -1) {
+            guildIcon.src = "{% static 'django_logs/black_file.png' %}"
+        } else if (guildIcon.src.indexOf('black_file') > -1) {
+            guildIcon.src = "{% static 'django_logs/white_file.png' %}"
+        }
+    }
+
+    function toggleUsers() {
+        let list = document.getElementsByClassName('info__users')[0];
+        let check = document.getElementsByClassName('info__user-toggle')[0];
+        if (list.style.maxHeight === "0px" || list.style.maxHeight === "") {
+            list.style.maxHeight = list.scrollHeight + "px";
+        } else {
+            list.style.maxHeight = "0px";
+        }
+        check.classList.toggle('rotated');
+    }
+
+    function copyID(element) {
+        let copyText = element.children[1];
+        let textArea = document.createElement("textarea");
+        textArea.value = copyText.textContent;
+        document.body.appendChild(textArea);
+        copyText.classList.toggle('copied');
+        setTimeout(function () {
+            copyText.classList.toggle('copied');
+        }, 1000);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+    }
+
+    function copyIDMention(element) {
+        let textArea = document.createElement("textarea");
+        textArea.value = element.getAttribute('title');
+        document.body.appendChild(textArea);
+        element.classList.toggle('copied');
+        setTimeout(function () {
+            element.classList.toggle('copied');
+        }, 1000);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+    }
+
+    function copyAllMenu(element) {
+        let tooltip = element.children[0];
+        copyAll(tooltip);
+    }
+
+    function copyAll(element) {
+        let textArea = document.createElement("textarea");
+        let ids = document.getElementsByClassName('tooltiptext pre pre--inline id');
+        for (let id of ids) {
+            textArea.value = textArea.value + id.textContent + " ";
+        }
+        document.body.appendChild(textArea);
+        setTimeout(function () {
+            element.classList.toggle('copied');
+        }, 1000);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+        element.classList.toggle('copied');
+    }
+</script>
+</body>
+</html>

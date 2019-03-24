@@ -1,0 +1,200 @@
+/* === GENERAL === */
+
+body {
+    background-color: #2F3135;
+    color: #FFFFFFB3;
+}
+
+a, a.chatlog__embed-title {
+    color: #0096Cf;
+}
+
+.hljs.pre--multiline {
+    background-color: #2F3136;
+}
+
+.pre {
+    background-color: #2F3136;
+}
+
+.pre--multiline {
+    border-color: #282B30;
+    color: #839496;
+    max-width: 90%;
+}
+
+.mention {
+    background-color: rgba(114, 137, 218, .1);
+    color: #7289DA;
+}
+
+.mention:hover {
+    background-color: rgba(114, 137, 218, .7);
+    color: #FFF;
+}
+
+/* === INFO === */
+
+.tooltip .tooltiptext {
+    background-color: #555;
+    color: #FFF;
+}
+
+.material-icons.md-inactive, .material-icons.md-inactive:hover {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.info__guild-name {
+    color: #FFF;
+}
+
+.info__generated-at span {
+    color: #FFF;
+}
+
+.info__channel-message-count span {
+    color: #FFF;
+}
+
+.info__user-list {
+    color: #FFFFFF99;
+}
+
+.info__user-list span {
+    color: #FFF;
+}
+
+.info__toolbox-drawer {
+    color: #FFF;
+}
+
+.material-icons {
+    color: #C2C2C4;
+}
+
+.material-icons:hover {
+    color: white;
+}
+
+.copied {
+    animation: copied 1s ease-in-out;
+}
+
+.copied.mention {
+    animation: copiedMention 1s ease-in-out;
+}
+
+@keyframes copied {
+    0% {
+        background-color: #555
+    }
+    50% {
+        background-color: #3a0
+    }
+    100% {
+        background-color: #555
+    }
+}
+
+@keyframes copiedMention {
+    0% {
+        background-color: rgba(114, 137, 218, .7);
+        color: #FFF;
+    }
+    50% {
+        background-color: #3a0;
+        color: #FFF;
+    }
+    100% {
+        background-color: rgba(114, 137, 218, .7);
+        color: #FFF;
+    }
+}
+
+/* === CHATLOG === */
+
+.chatlog__message-group {
+    border-color: #FFFFFF0A;
+}
+
+.chatlog__author-name {
+    color: #FFF;
+}
+
+.chatlog__timestamp {
+    color: #FFFFFF33;
+}
+
+.chatlog__edited-timestamp {
+    color: #FFFFFF33;
+}
+
+.chatlog__attachment .horizontal {
+    background-color: rgba(47, 49, 54, .3);
+    border-color: rgba(47, 49, 54, .6);
+}
+
+.chatlog__attachment .filename-link {
+    color: rgba(0, 176, 244, .85);
+}
+
+.chatlog__attachment .filename-link-inner {
+    color: #00b0f4;
+}
+
+.chatlog__embed-inner {
+    background-color: rgba(46, 48, 54, .3);
+    border: 1px solid rgba(46, 48, 54, .6);
+}
+
+.chatlog__embed-author-name {
+    color: #FFF;
+}
+
+.chatlog__embed-author-name-link {
+    color: #FFF;
+}
+
+.chatlog__embed-title {
+    color: #FFF;
+}
+
+.chatlog__embed-description {
+    color: #FFFFFF99;
+}
+
+.chatlog__embed-field-name {
+    color: #FFF;
+}
+
+.chatlog__embed-field-value {
+    color: #FFFFFF99;
+}
+
+.chatlog__embed-footer {
+    color: #FFFFFF99;
+}
+
+.chatlog__embed-footer-separator {
+    color: #4F545C;
+}
+
+.chatlog__spoiler-box.chatlog__spoiler-hidden {
+    background-color: #202225;
+}
+
+.chatlog__spoiler-box.chatlog__spoiler-hidden:hover {
+    background-color: #24262A;
+}
+
+.chatlog__spoiler-box {
+    background-color: #FFFFFF03;
+}
+
+.chatlog__reaction {
+    background-color: #FFFFFF03;
+}
+
+.chatlog__reaction-count {
+    color: #FFFFFF4D;
+}
