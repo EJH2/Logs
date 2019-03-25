@@ -40,6 +40,13 @@ logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<time>[
             r'(?P<content>[\S\s]*?)(?: ======> Contains Embed)?(?: =====> Attachment: (?P<filename>[\w.]+):' \
             r'(?P<attach>(?:http(?:|s):.*)))?$'
 
+sajuukbot_detect_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ ' \
+                      r'(?P<uid>[\d]{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)' \
+                      r'(?: \((?P<attach>(?:http(?:|s):.*))\))?\n'
+
+sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
+               r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?$'
+
 
 class LogParser:
 
@@ -244,7 +251,29 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
             match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
         data = self._parse(data, match_data)
         data['type'] = 'Logger'
+
+        return data
+
+    def _parse_sajuukbot(self, content):
+        data = dict()
+        data['raw_content'] = content
+        data['messages'] = list()
+        lines = re.split('\n', content)
+        _matches = list()
+        for text in lines:
+            if re.match(sajuukbot_re, text):
+                _matches.append(text)
+            else:
+                _matches[len(_matches) - 1] = _matches[len(_matches) - 1] + f'\n\n{text}'
+
+        matches = list(re.match(sajuukbot_re, m) for m in _matches)
+        match_data = list(m.groupdict() for m in matches)
+        for match in match_data:
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
+        data = self._parse(data, match_data)
+        data['type'] = 'SajuukBot'
 
         return data
