@@ -107,6 +107,20 @@ img {
     flex-shrink: 0;
 }
 
+/* === NO JS === */
+
+.no-js .info__users {
+    max-height: initial;
+}
+
+.no-js .copyall {
+    display: none;
+}
+
+.no-js .material-icons:not(.tooltip):not(.icon-large) {
+    display: none;
+}
+
 /* === INFO === */
 
 .info {

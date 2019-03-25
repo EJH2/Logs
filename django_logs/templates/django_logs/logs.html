@@ -18,14 +18,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 </head>
-<body>
+<body class="no-js">
 <br>
 <div class="info">
     <div class="info__guild-icon-container">
         <img class="info__guild-icon"
-            {% with 'django_logs/'|add:log_type|lower|add:'.png' as image_static %}
-                src="{% static image_static %}"
-            {% endwith %}
+            {% if log_type %}
+                {% with 'django_logs/'|add:log_type|lower|add:'.png' as image_static %}
+                    src="{% static image_static %}"
+                {% endwith %}
+            {% else %}
+                src="{% static 'django_logs/white_file.png' %}"
+            {% endif %}
              onerror="this.src='{% static 'django_logs/white_file.png' %}'"
              alt="avatar">
     </div>
@@ -70,18 +74,6 @@
         </label>
         <input class="toggle-input" id="toolbox-toggle" type="checkbox">
         <ul class="info__toolbox-tools">
-            <li>
-                <div class="tooltip">
-                    <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
-                    <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
-                </div>
-            </li>
-            <li>
-                <div class="tooltip">
-                    <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
-                    <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
-                </div>
-            </li>
             {% if original_url %}
                 <li>
                     <div class="tooltip">
@@ -97,6 +89,18 @@
                 </span>
                 </li>
             {% endif %}
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
+                    <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
+                </div>
+            </li>
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
+                    <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
+                </div>
+            </li>
         </ul>
     </div>
 </div>
@@ -254,6 +258,8 @@
     {% endfor %}
 </div>
 <script>
+    document.body.classList.remove('no-js');
+
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.pre--multiline').forEach((block) => {
             hljs.highlightBlock(block);
