@@ -122,7 +122,7 @@
                         {% endif %}
                     </span>
                     {% if group.created_at %}
-                        <span class="chatlog__timestamp">{{ group.created_at }}</span>
+                        <time class="chatlog__timestamp" datetime="{{ group.created_at }}">{{ group.human_created_at }}</time>
                     {% endif %}
                 </div>
                 {% for message in group.messages %}
@@ -201,7 +201,7 @@
                                         </div>
                                     {% endif %}
                                     {% if embed.timestamp and not embed.footer %}
-                                        <div class="chatlog__embed-footer chatlog__embed-footer-text">{{ embed.human_timestamp }}</div>
+                                        <time class="chatlog__embed-footer chatlog__embed-footer-text" datetime="{{ embed.timestamp.isoformat }}">{{ embed.human_timestamp }}</time>
                                     {% endif %}
                                     {% if embed.footer and embed.timestamp %}
                                         <div class="chatlog__embed-footer">
@@ -212,7 +212,7 @@
                                             <span class="chatlog__embed-footer-text">
                                                 {{ embed.footer.text }}
                                                 <span class="chatlog__embed-footer-separator">•</span>
-                                                {{ embed.human_timestamp }}
+                                                <time datetime="{{ embed.timestamp.isoformat }}">{{ embed.human_timestamp }}</time>
                                             </span>
                                         </div>
                                     {% endif %}
@@ -265,6 +265,11 @@
             hljs.highlightBlock(block);
         });
     });
+
+    for (let t of document.getElementsByTagName('time')) {
+        let date = t.getAttribute('datetime');
+        t.textContent = moment(date).utc().calendar();
+    }
 
     for (let s of document.getElementsByClassName('chatlog__spoiler-box')) {
         s.onclick = function () {

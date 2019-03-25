@@ -220,6 +220,8 @@ class LogParser:
         matches = list(re.match(auttaja_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
         match_data.sort(key=sort_mid)
+        for match in match_data:
+            match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
         data = self._parse(data, match_data)
         data['type'] = 'Auttaja'
 
@@ -229,7 +231,7 @@ class LogParser:
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        content = re.sub('\r', '', content)
+        content = re.sub('\r\n', '\n', content)
         lines = re.split('\n', content)
         _matches = list()
         for text in lines:
@@ -240,6 +242,8 @@ class LogParser:
 
         matches = list(re.match(logger_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
+        for match in match_data:
+            match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
         data = self._parse(data, match_data)
         data['type'] = 'Logger'
 

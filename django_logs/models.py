@@ -11,30 +11,6 @@ from natural.size import filesize
 from django_logs.formatter import format_content_html, format_micro_content_html
 
 
-def discord_timestamp(t, now):
-    t = t.replace(tzinfo=pytz.UTC) if not t.tzinfo else t
-    assert isinstance(t, datetime)
-    now = now or datetime.now(tz=t.tzinfo)
-    days = (t - now).days
-
-    if days < -6:
-        return t.strftime('%m/%d/%Y at %H:%M')
-    if days < -1:
-        return f'Last {t.strftime("%A at %H:%M")}'
-    if days < 0:
-        return f'Yesterday at {t.strftime("%H:%M")}'
-    if days < 1:
-        return f'Today at {t.strftime("%H:%M")}'
-    if days < 2:
-        return f'Tomorrow at {t.strftime("%H:%M")}'
-    if days < 7:
-        return t.strftime("%A at %H:%M")
-    if days < 14:
-        return f'Next {t.strftime("%A at %H:%M")}'
-    else:
-        return t.strftime('%m/%d/%Y at %H:%M')
-
-
 class LogRoute(models.Model):
     url = models.TextField(editable=False)
     short_code = models.CharField(max_length=5, editable=False, unique=True)
@@ -108,6 +84,10 @@ class MessageGroup:
 
     @property
     def created_at(self):
+        return self.messages[0].ts
+
+    @property
+    def human_created_at(self):
         return self.messages[0].human_created_at
 
     @property
@@ -142,10 +122,11 @@ class Embed:
         self.url = data.get('url', None)
         self.type = data.get('type', 'rich')
         self.author = data.get('author', None)
-        ts = data.get('timestamp', None)
-        self.timestamp = ts if ts is None else dateutil.parser.parse(ts)
+        self.ts = data.get('timestamp', None)
+        self.timestamp = self.ts if self.ts is None else dateutil.parser.parse(self.ts)
         tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
-        self.human_timestamp = discord_timestamp(self.timestamp.replace(tzinfo=tz), tz) if ts is not None else None
+        self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
+            self.timestamp else None
         self.color = f'#{data.get("color", 5198940):06X}'  # default discord embed color
         self.image = data.get('image', None)
         self.thumbnail = data.get('thumbnail', None)
@@ -160,10 +141,11 @@ class Embed:
 class Message:
     def __init__(self, data):
         self.id = int(data['message_id']) if data.get('message_id') else None
-        self.created_at = dateutil.parser.parse(data['timestamp']) if data.get('timestamp', None) else None
+        self.ts = data.get('timestamp', None)
+        self.created_at = dateutil.parser.parse(self.ts) if self.ts else None
         tz = self.created_at.tzinfo if self.created_at else None
-        self.human_created_at = discord_timestamp(self.created_at.replace(tzinfo=tz) if not tz else
-                                                  self.created_at, tz) if self.created_at else None
+        self.human_created_at = duration(self.created_at.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
+            self.created_at else None
         self.raw_content = data['content']
         self.content = self.format_html_content(self.raw_content)
         self.attachments = [Attachment(a) for a in data['attachments']]
