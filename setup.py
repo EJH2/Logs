@@ -25,5 +25,5 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-    ], install_requires=['django', 'requests', 'python-dateutil', 'pytz', 'shortuuid', 'natural']
+    ], install_requires=['django', 'requests', 'python-dateutil', 'pytz', 'shortuuid', 'natural', 'emoji-unicode']
 )
