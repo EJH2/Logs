@@ -129,3 +129,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+# Discord Token, for fetching user avatars
+LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')
