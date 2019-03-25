@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'django_logs.apps.DjangoLogsConfig'
+    'django_logs'
 ]
 
 MIDDLEWARE = [
@@ -129,7 +129,3 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
-
-# Other stuff
-
-LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')

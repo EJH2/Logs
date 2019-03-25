@@ -1,4 +1,4 @@
 include LICENSE
-recursive-include logs/static *
-recursive-include logs/templates *
-recursive-exclude logs/migrations *
+recursive-include django_logs/static *
+recursive-include django_logs/templates *
+recursive-exclude django_logs/migrations *
