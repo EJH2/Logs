@@ -53,8 +53,12 @@
             <ul class="info__users">
                 {% for user in log_entry.users %}
                     <li class="info__user tooltip">
-                        <span class="info__user-name"
-                              onclick="return copyID(this.parentElement)"><b>{{ user.name | escape }}</b>#{{ user.discriminator }}</span>
+                        <span class="info__user-name" onclick="return copyID(this.parentElement)">
+                            <b>{{ user.name | escape }}</b>#{{ user.discriminator }}
+                            {% if user.bot %}
+                                <span class="bot-tag">BOT</span>
+                            {% endif %}
+                        </span>
                         <span class='tooltiptext pre pre--inline id'>{{ user.id }}</span>
                     </li>
                 {% endfor %}

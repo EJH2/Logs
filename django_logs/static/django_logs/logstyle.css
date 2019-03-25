@@ -280,7 +280,6 @@ a.material-icons {
 }
 
 .info__user-name:hover {
-    text-decoration: underline;
     cursor: pointer;
 }
 
