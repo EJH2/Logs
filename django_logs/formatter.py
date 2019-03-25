@@ -19,15 +19,6 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
                      encode_codeblock,
                      content)
 
-    content = html.escape(content)
-
-    def encode_inline_codeblock(m):
-        encoded = base64.b64encode(m.group(1).encode()).decode()
-        return '\x1AI' + encoded + '\x1AI'
-
-    # Encode inline codeblocks (`text`)
-    content = re.sub(r'`([^`]+)`', encode_inline_codeblock, content)
-
     # Encode links
     if masked_links:
         def encode_link(m):
@@ -45,10 +36,19 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
         return '\x1AU' + encoded + '\x1AU'
 
     # Encode URLs
-    content = re.sub(r'(\b(?:(?:https?|ftp|file)://|www\.|ftp\.)(?:\([-a-zA-Z0'
+    content = re.sub(r'(?:<)?(\b(?:(?:https?|ftp|file)://|www\.|ftp\.)(?:\([-a-zA-Z0'
                      r'-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,\.'
                      r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-z'
-                     r'A-Z0-9+&@#/%=~_|$]))', encode_url, content)
+                     r'A-Z0-9+&@#/%=~_|$]))(?:>)?', encode_url, content)
+
+    content = html.escape(content)
+
+    def encode_inline_codeblock(m):
+        encoded = base64.b64encode(m.group(1).encode()).decode()
+        return '\x1AI' + encoded + '\x1AI'
+
+    # Encode inline codeblocks (`text`)
+    content = re.sub(r'`([^`]+)`', encode_inline_codeblock, content)
 
     def is_jumboable(pattern, text):
         return (not re.sub(r'(\s)', '', re.sub(pattern, '', text))) and (len(re.findall(pattern, text)) < 28)
@@ -203,15 +203,6 @@ def format_micro_content_html(content: str) -> str:
                      encode_codeblock,
                      content)
 
-    content = html.escape(content)
-
-    def encode_inline_codeblock(m):
-        encoded = base64.b64encode(m.group(1).encode()).decode()
-        return '\x1AI' + encoded + '\x1AI'
-
-    # Encode inline codeblocks (`text`)
-    content = re.sub(r'`([^`]+)`', encode_inline_codeblock, content)
-
     def encode_url(m):
         encoded = base64.b64encode(m.group(1).encode()).decode()
         return '\x1AU' + encoded + '\x1AU'
@@ -221,6 +212,15 @@ def format_micro_content_html(content: str) -> str:
                      r'-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,\.'
                      r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-z'
                      r'A-Z0-9+&@#/%=~_|$]))', encode_url, content)
+
+    content = html.escape(content)
+
+    def encode_inline_codeblock(m):
+        encoded = base64.b64encode(m.group(1).encode()).decode()
+        return '\x1AI' + encoded + '\x1AI'
+
+    # Encode inline codeblocks (`text`)
+    content = re.sub(r'`([^`]+)`', encode_inline_codeblock, content)
 
     emoji_pattern = re.compile(emoji_unicode.RE_PATTERN_TEMPLATE)
 
