@@ -520,7 +520,7 @@ body {
 }
 
 .chatlog__attachment-size {
-    color: #72767d;
+    color: #72767D;
     margin-right: 8px;
     line-height: 16px;
     font-size: 12px;
@@ -637,7 +637,7 @@ body {
 .chatlog__embed-fields {
     -webkit-box-direction: normal;
     -webkit-box-orient: horizontal;
-    color: #36393f;
+    color: #36393F;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

@@ -2,11 +2,11 @@
 
 body {
     background-color: #2F3135;
-    color: #FFFFFFB3;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 a, a.chatlog__embed-title {
-    color: #0096Cf;
+    color: #0096CF;
 }
 
 .hljs.pre--multiline {
@@ -57,7 +57,7 @@ a, a.chatlog__embed-title {
 }
 
 .info__user-list {
-    color: #FFFFFF99;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .info__user-list span {
@@ -89,7 +89,7 @@ a, a.chatlog__embed-title {
         background-color: #555
     }
     50% {
-        background-color: #3a0
+        background-color: #3A0
     }
     100% {
         background-color: #555
@@ -102,7 +102,7 @@ a, a.chatlog__embed-title {
         color: #FFF;
     }
     50% {
-        background-color: #3a0;
+        background-color: #3A0;
         color: #FFF;
     }
     100% {
@@ -114,7 +114,7 @@ a, a.chatlog__embed-title {
 /* === CHATLOG === */
 
 .chatlog__message-group {
-    border-color: #FFFFFF0A;
+    border-color: rgba(255, 255, 255, 0.04);
 }
 
 .chatlog__author-name {
@@ -122,11 +122,11 @@ a, a.chatlog__embed-title {
 }
 
 .chatlog__timestamp {
-    color: #FFFFFF33;
+    color: rgba(255, 255, 255, 0.2);
 }
 
 .chatlog__edited-timestamp {
-    color: #FFFFFF33;
+    color: rgba(255, 255, 255, 0.2);
 }
 
 .chatlog__attachment .horizontal {
@@ -139,7 +139,7 @@ a, a.chatlog__embed-title {
 }
 
 .chatlog__attachment .filename-link-inner {
-    color: #00b0f4;
+    color: #00B0F4;
 }
 
 .chatlog__embed-inner {
@@ -160,7 +160,7 @@ a, a.chatlog__embed-title {
 }
 
 .chatlog__embed-description {
-    color: #FFFFFF99;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .chatlog__embed-field-name {
@@ -168,11 +168,11 @@ a, a.chatlog__embed-title {
 }
 
 .chatlog__embed-field-value {
-    color: #FFFFFF99;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .chatlog__embed-footer {
-    color: #FFFFFF99;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .chatlog__embed-footer-separator {
