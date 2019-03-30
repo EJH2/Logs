@@ -72,10 +72,15 @@ class LogParser:
             for url in attachments:
                 attach_info = {'id': url.rsplit('/', 2)[1], 'filename': url.rsplit('/', 2)[2], 'url': url, 'size': 0,
                                'is_image': False}
-                if '.' in url.rsplit('/', 1)[1]:  # Check if there's a mimetype
-                    head = requests.head(url).headers
-                    if head['Content-Type'].split('/')[0] == 'image':
+                try:
+                    req = requests.head(url)
+                except requests.exceptions.MissingSchema:
+                    req = requests.head('https://' + url)
+                if req.status_code == 200:
+                    if req.headers['Content-Type'].split('/')[0] == 'image':
                         attach_info['is_image'] = True
+                else:
+                    attach_info['error'] = True
                 attach.append(attach_info)
         return attach
 

@@ -225,36 +225,40 @@
                         </div>
                     {% endfor %}
                     {% for attachment in message.attachments %}
-                        <div class="chatlog__attachment">
-                            <a href="{{ attachment.url }}">
-                                {% if attachment.is_image %}
-                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}"
-                                         alt="attachment"/>
-                                {% else %}
-                                    <div class="horizontal">
-                                        <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}"
-                                             alt="Attachment file type: unknown" title="unknown">
-                                        <div class="chatlog__attachment-inner">
-                                            <div class="filename-link">
-                                                <a class="filename-link-inner"
-                                                   href="{{ attachment.url }}">{{ attachment.filename }}</a>
+                        {% if not attachment.error %}
+                            <div class="chatlog__attachment">
+                                <a href="{{ attachment.url }}">
+                                    {% if attachment.is_image %}
+                                        <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}"
+                                             alt="attachment"/>
+                                    {% else %}
+                                        <div class="horizontal">
+                                            <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}"
+                                                 alt="Attachment file type: unknown" title="unknown">
+                                            <div class="chatlog__attachment-inner">
+                                                <div class="filename-link">
+                                                    <a class="filename-link-inner"
+                                                       href="{{ attachment.url }}">{{ attachment.filename }}</a>
+                                                </div>
+                                                <div class="chatlog__attachment-size">{{ attachment.size }}</div>
                                             </div>
-                                            <div class="chatlog__attachment-size">{{ attachment.size }}</div>
+                                            <a class="filename-link-inner" href="{{ attachment.url }}">
+                                                <svg name="Download" class="chatlog__attachment-download" width="24"
+                                                     height="24" viewBox="0 0 24 24">
+                                                    <g fill="none" fill-rule="evenodd">
+                                                        <path d="M0 0h24v24H0z"></path>
+                                                        <path class="fill" fill="currentColor"
+                                                              d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                                                    </g>
+                                                </svg>
+                                            </a>
                                         </div>
-                                        <a class="filename-link-inner" href="{{ attachment.url }}">
-                                            <svg name="Download" class="chatlog__attachment-download" width="24"
-                                                 height="24" viewBox="0 0 24 24">
-                                                <g fill="none" fill-rule="evenodd">
-                                                    <path d="M0 0h24v24H0z"></path>
-                                                    <path class="fill" fill="currentColor"
-                                                          d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
-                                                </g>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                            </a>
-                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{{ attachment.url }}" class="chatlog__content error">{{ attachment.url }}</a>
+                        {% endif %}
                     {% endfor %}
                 {% endfor %}
             </div>
@@ -349,7 +353,7 @@
     }
 
     function copyAllMenu(element) {
-        let tooltip = element.children[0];
+        let tooltip = element.parentElement.children[1];
         copyAll(tooltip);
     }
 

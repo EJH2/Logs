@@ -103,12 +103,14 @@ class Attachment:
             self.url = data
             self.is_image = True
             self.size = 0
+            self.error = False
         else:
             self.id = int(data['id'])
             self.filename = data['filename']
             self.url = data['url']
             self.is_image = data['is_image']
             self.size = filesize(data['size'])
+            self.error = data['error']
 
 
 class Embed:
