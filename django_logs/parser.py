@@ -24,28 +24,21 @@ giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname
                  r'(?P<content>[\S\s]*?) \| Attach: (?P<attach>(?:http(?:|s):.*))? \| RichEmbed: ' \
                  r'(?P<embeds>null|.*)'
 
-giraffeduck_header_re = r' \((\d{16,18})\)(?:; |)'
-
 auttaja_re = r'\[(?P<time>[\w :]{24})\] \((?P<uname>.*)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18})' \
              r'\]: (?P<content>[\S\s]*)'
-
-auttaja_detect_re = r'\[(?P<time>[\w :]{24})\] \((?P<uname>.*)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d' \
-                    r'{16,18})\]: (?P<content>[\S\s]*?)(?:\n\n|\r\n\r\n)'
-
-logger_detect_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<time>[\w :-]{33}) \(\w{3,4}\): ' \
-                    r'(?P<content>[\S\s]*?)(?: ======> Contains Embed)?(?: =====> Attachment: (?P<filename>[\w.]+):' \
-                    r'(?P<attach>(?:http(?:|s):.*)))?\n'
 
 logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<time>[\w :-]{33}) \(\w{3,4}\): ' \
             r'(?P<content>[\S\s]*?)(?: ======> Contains Embed)?(?: =====> Attachment: (?P<filename>[\w.]+):' \
             r'(?P<attach>(?:http(?:|s):.*)))?$'
 
-sajuukbot_detect_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ ' \
-                      r'(?P<uid>[\d]{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)' \
-                      r'(?: \((?P<attach>(?:http(?:|s):.*))\))?\n'
-
 sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
-               r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?$'
+               r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
+
+spectra_re = r'\[(?P<time>[\w, :]{29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s]*?)' \
+             r'(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
+
+# attachment_re = '(?: ?(?P<attach>(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attach' \
+#                 'ments|external)\/.*))?$'
 
 
 class LogParser:
@@ -140,7 +133,6 @@ class LogParser:
             data['messages'].append(message_dict)
 
         data['users'] = users
-        data['generated_at'] = str(datetime.now(tz=pytz.UTC))
 
         return data
 
@@ -184,7 +176,7 @@ class LogParser:
         headers = content.split('\n')[:5]
         header_info = list()
         for header in headers:  # Splits headers into [('name', 'id'),...]
-            _headers = list(zip(*[iter(re.split(giraffeduck_header_re, header[1:-1])[:-1])] * 2))
+            _headers = list(zip(*[iter(re.split(r' \((\d{16,18})\)(?:; |)', header[1:-1])[:-1])] * 2))
             header_info.append(_headers)
         users = dict()
         user_mentions = dict()
@@ -285,5 +277,27 @@ class LogParser:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
         data = self._parse(data, match_data)
         data['type'] = 'SajuukBot'
+
+        return data
+
+    def _parse_spectra(self, content):
+        data = dict()
+        data['raw_content'] = content
+        data['messages'] = list()
+        content = re.sub('\r\n', '\n', content)
+        lines = re.split('\n\n', content)[1:]
+        _matches = list()
+        for text in lines:
+            if re.match(spectra_re, text):
+                _matches.append(text)
+            else:
+                _matches[len(_matches) - 1] = _matches[len(_matches) - 1] + f'\n\n{text}'
+
+        matches = list(re.match(spectra_re, m) for m in _matches)
+        match_data = list(m.groupdict() for m in matches)
+        for match in match_data:
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
+        data = self._parse(data, match_data)
+        data['type'] = 'Spectra'
 
         return data

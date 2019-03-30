@@ -15,6 +15,7 @@ class LogRoute(models.Model):
     url = models.TextField(editable=False)
     short_code = models.CharField(max_length=5, editable=False, unique=True)
     log_type = models.CharField(max_length=20, editable=False)
+    generated_at = models.DateTimeField(auto_now_add=True)
     data = fields.JSONField(editable=False)
 
     @classmethod
@@ -32,7 +33,7 @@ class LogRoute(models.Model):
 
 class LogEntry:
     def __init__(self, data):
-        self.generated_at = dateutil.parser.parse(data['generated_at']) if data.get('generated_at', None) else None
+        self.generated_at = data['generated_at'] if data.get('generated_at', None) else None
         tz = self.generated_at.tzinfo if self.generated_at else pytz.UTC
         self.human_generated_at = duration(self.generated_at, now=datetime.now(tz=tz)) if self.generated_at else None
         self.messages = [Message(m) for m in data['messages']]
