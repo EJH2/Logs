@@ -17,10 +17,17 @@ class LogRoute(models.Model):
     log_type = models.CharField(max_length=20, editable=False)
     data = fields.JSONField(editable=False)
 
+    @classmethod
+    def generate_short_code(cls, data):
+        return shortuuid.uuid(str(data))[:5]
+
     def save(self, *args, **kwargs):
         if not self.id:
-            self.short_code = shortuuid.uuid(str(self.data))[:5]
+            self.short_code = self.generate_short_code(self.data)
         super(LogRoute, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return 'Log %s' % self.short_code
 
 
 class LogEntry:

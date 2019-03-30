@@ -72,7 +72,7 @@ Format virtually any log file into an aesthetically pleasing and readable format
 + Multi-line code
 ``` | Attach: https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png, https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore | RichEmbed: {embed}"""
 
-    data = LogParser('giraffeduck').parse(content)
+    data, _ = LogParser('giraffeduck').parse(content)
     data['type'] = None
     for msg in data['messages']:
         msg['timestamp'] = None
@@ -86,10 +86,30 @@ def logs(request, short_code, raw=False):
         if raw:
             content = f"<pre>{log.data['raw_content']}</pre>"
             return HttpResponse(content)
-        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(log.data), 'original_url': log.url,
-                                                          'log_type': log.log_type})
+        if request.session.get('cached', None):
+            del request.session['cached']
+            messages.warning(request, 'A log containing the same data was found, so we used that instead.')
+        log.data['generated_at'] = log.generated_at
+        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(log.data),
+                                                                 'original_url': log.url,
+                                                                 'log_type': log.log_type})
     except ObjectDoesNotExist:
-        return HttpResponse('Log not found.')
+        return HttpResponse('Log not found.', status=404)
+
+
+def temp(request, short_code=None):
+    if not short_code:
+        return redirect('index')
+    try:
+        data = request.session['data'].pop(short_code)
+        if request.session['data'] == {}:
+            del request.session['data']
+        messages.warning(request, 'This log will expire as soon as the page is refreshed, and cannot be shared.')
+        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data),
+                                                                 'original_url': data['url'],
+                                                                 'log_type': data['log_type']})
+    except KeyError:
+        return HttpResponse('Log not found.', status=404)
 
 
 def view(request):
@@ -98,7 +118,10 @@ def view(request):
         messages.error(request, 'You have to provide a url to parse!')
         return redirect('index')
 
-    resp = requests.get(url)
+    try:
+        resp = requests.get(url)
+    except requests.exceptions.MissingSchema:
+        resp = requests.get('https://' + url)
     assert isinstance(resp, requests.Response)
     content = resp.content.decode()
     if content == '':
@@ -107,24 +130,24 @@ def view(request):
 
     # Cached?
     cached = LogRoute.objects.filter(url=url).exists()
-    if cached:  # Cached
+    if cached and not request.GET.get('new', None):  # Cached, and user wants from cache
+        request.session['cached'] = True
         return redirect('logs', short_code=LogRoute.objects.get(url=url).short_code)
 
     types = {'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re, 'giraffeduck': giraffeduck_re,
-             'auttaja': auttaja_detect_re, 'logger': logger_detect_re, 'sajuukbot': sajuukbot_detect_re}
+             'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re, 'spectra': spectra_re}
 
     for log_type in types.keys():  # Try all log types
-        if len(re.findall(types[log_type], content)) > 0:
-            short = LogParser(log_type=log_type).create(content, url)
+        if len(re.findall(types[log_type], content, re.MULTILINE)) > 0:
+            if request.GET.get('temp', None):
+                data, short = LogParser(log_type=log_type).parse(content)
+                data['log_type'] = log_type
+                data['url'] = url
+                request.session['data'] = {short: data}
+                return redirect('temp', short_code=short)
+            short, created = LogParser(log_type=log_type).create(content, url)
+            request.session['cached'] = not created
             return redirect('logs', short_code=short)
 
     # Mission failed, we'll get em next time
-    return HttpResponse('We can\'t seem to parse that file. Are you sure it\'s a valid log type?', 404)
-
-
-def handler404(request):
-    return render(request, '404.html', status=404)
-
-
-def handler500(request):
-    return render(request, '500.html', status=500)
+    return HttpResponse('We can\'t seem to parse that file. Are you sure it\'s a valid log type?', status=404)

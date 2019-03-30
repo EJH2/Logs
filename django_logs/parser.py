@@ -55,15 +55,20 @@ class LogParser:
 
     def create(self, content, url):
         log_type = self.log_type
-        data = self.parse(content)
-        log, _ = LogRoute.objects.get_or_create(url=url, log_type=log_type, data=data)
-        return log.short_code
+        data, short_code = self.parse(content)
+        if LogRoute.objects.filter(url=url).exists():
+            LogRoute.objects.filter(url=url).update(log_type=log_type, data=data)
+        if LogRoute.objects.filter(short_code=short_code).exists():
+            return short_code, False
+        log, created = LogRoute.objects.get_or_create(url=url, log_type=log_type, data=data)
+        return log.short_code, created
 
     def parse(self, content):
         log_type = self.log_type
         parser = getattr(self, f'_parse_{log_type}')
         data = parser(content)
-        return data
+        short_code = LogRoute.generate_short_code(data)
+        return data, short_code
 
     @staticmethod
     def _get_attach_info(attachments: list):

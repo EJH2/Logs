@@ -20,6 +20,14 @@
 </head>
 <body class="no-js">
 <br>
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-warning" role="alert">
+    {{ message }}
+    </div>
+    <br>
+    {% endfor %}
+{% endif %}
 <div class="info">
     <div class="info__guild-icon-container">
         <img class="info__guild-icon"
