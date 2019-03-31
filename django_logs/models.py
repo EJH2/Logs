@@ -101,7 +101,7 @@ class MessageGroup:
 
     @property
     def created_at(self):
-        return self.messages[0].created_at.isoformat()
+        return self.messages[0].created_iso
 
     @property
     def human_created_at(self):
@@ -162,6 +162,7 @@ class Message:
         self.id = int(data['message_id']) if data.get('message_id') else None
         ts = data.get('timestamp', None)
         self.created_at = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else None
+        self.created_iso = self.created_at.isoformat() if ts else None
         tz = self.created_at.tzinfo if self.created_at else pytz.UTC
         self.human_created_at = duration(self.created_at.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.created_at else None

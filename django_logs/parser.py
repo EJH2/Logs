@@ -70,7 +70,7 @@ class LogParser:
         if len(attachments) > 0 and attachments[0] != '':
             for url in attachments:
                 attach_info = {'id': url.rsplit('/', 2)[1], 'filename': url.rsplit('/', 2)[2], 'url': url, 'size': 0,
-                               'is_image': False}
+                               'is_image': False, 'error': False}
                 try:
                     req = requests.head(url)
                 except requests.exceptions.MissingSchema:
