@@ -138,7 +138,7 @@ def view(request):
              'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re, 'spectra': spectra_re}
 
     for log_type in types.keys():  # Try all log types
-        if len(re.findall(types[log_type], content, re.MULTILINE)) > 0:
+        if len(re.findall(types[log_type], content)) > 0:
             if request.GET.get('temp', None):
                 data, short = LogParser(log_type=log_type).parse(content)
                 data['log_type'] = log_type

@@ -223,12 +223,8 @@ class LogParser:
             else:
                 _matches[len(_matches) - 1] = _matches[len(_matches) - 1] + f'\n\n{text}'
 
-        def sort_mid(v):
-            return int(v['mid'])
-
         matches = list(re.match(auttaja_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
-        match_data.sort(key=sort_mid)
         for match in match_data:
             match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
         data = self._parse(data, match_data)

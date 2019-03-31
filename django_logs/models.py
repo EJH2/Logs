@@ -36,10 +36,19 @@ class LogEntry:
         self.generated_at = data['generated_at'] if data.get('generated_at', None) else None
         tz = self.generated_at.tzinfo if self.generated_at else pytz.UTC
         self.human_generated_at = duration(self.generated_at, now=datetime.now(tz=tz)) if self.generated_at else None
-        self.messages = [Message(m) for m in data['messages']]
+        self.messages = [Message(m) for m in self.sorted(data['messages'])]
         self.users = data['users']
         self.raw_content = data['raw_content']
         self.type = data['type']
+
+    @classmethod
+    def sorted(cls, messages: list):
+
+        def sort_chronologcal(value):
+            return int(value.get('message_id', 0)) or dateutil.parser.parse(value.get('timestamp'))
+
+        messages.sort(key=sort_chronologcal)
+        return messages
 
     @property
     def message_groups(self):
@@ -92,7 +101,7 @@ class MessageGroup:
 
     @property
     def created_at(self):
-        return self.messages[0].ts
+        return self.messages[0].created_at.isoformat()
 
     @property
     def human_created_at(self):
@@ -132,8 +141,8 @@ class Embed:
         self.url = data.get('url', None)
         self.type = data.get('type', 'rich')
         self.author = data.get('author', None)
-        self.ts = data.get('timestamp', None)
-        self.timestamp = self.ts if self.ts is None else dateutil.parser.parse(self.ts)
+        ts = data.get('timestamp', None)
+        self.timestamp = ts if ts is None else dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC))
         tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
         self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.timestamp else None
@@ -151,9 +160,9 @@ class Embed:
 class Message:
     def __init__(self, data):
         self.id = int(data['message_id']) if data.get('message_id') else None
-        self.ts = data.get('timestamp', None)
-        self.created_at = dateutil.parser.parse(self.ts) if self.ts else None
-        tz = self.created_at.tzinfo if self.created_at else None
+        ts = data.get('timestamp', None)
+        self.created_at = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else None
+        tz = self.created_at.tzinfo if self.created_at else pytz.UTC
         self.human_created_at = duration(self.created_at.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.created_at else None
         self.raw_content = data['content']

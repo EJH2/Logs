@@ -284,7 +284,7 @@
 
     for (let t of document.getElementsByTagName('time')) {
         let date = t.getAttribute('datetime');
-        t.textContent = moment(date).utc().calendar();
+        t.textContent = moment(date).calendar();
     }
 
     for (let s of document.getElementsByClassName('chatlog__spoiler-box')) {
