@@ -37,8 +37,9 @@ sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<
 spectra_re = r'\[(?P<time>[\w, :]{29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s]*?)' \
              r'(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
 
-# attachment_re = '(?: ?(?P<attach>(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attach' \
-#                 'ments|external)\/.*))?$'
+gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*)' \
+              r'#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?) \| (?:(?P<attach>(?:http(?:|s):.*)) ' \
+              r'?)?'
 
 
 class LogParser:
@@ -295,5 +296,23 @@ class LogParser:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
         data = self._parse(data, match_data)
         data['type'] = 'Spectra'
+
+        return data
+
+    def _parse_gearboat(self, content):
+        data = dict()
+        data['raw_content'] = content
+        data['messages'] = list()
+        matches = list(re.finditer(gearboat_re, content))
+        match_data = list()
+
+        for match in matches:
+            match_info = match.groupdict()
+            match_info['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
+                else []
+            match_data.append(match_info)
+
+        data = self._parse(data, match_data)
+        data['type'] = 'GearBoat'
 
         return data

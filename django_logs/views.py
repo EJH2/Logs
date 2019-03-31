@@ -135,7 +135,8 @@ def view(request):
         return redirect('logs', short_code=LogRoute.objects.get(url=url).short_code)
 
     types = {'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re, 'giraffeduck': giraffeduck_re,
-             'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re, 'spectra': spectra_re}
+             'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re, 'spectra': spectra_re,
+             'gearboat': gearboat_re}
 
     for log_type in types.keys():  # Try all log types
         if len(re.findall(types[log_type], content)) > 0:
