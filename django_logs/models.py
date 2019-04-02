@@ -45,7 +45,7 @@ class LogEntry:
     def sorted(cls, messages: list):
 
         def sort_chronologcal(value):
-            return int(value.get('message_id', 0)) or dateutil.parser.parse(value.get('timestamp'))
+            return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
 
         messages.sort(key=sort_chronologcal)
         return messages

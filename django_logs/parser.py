@@ -216,7 +216,7 @@ class LogParser:
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        lines = re.split('\n\n', content)
+        lines = content.split('\n\n')
         _matches = list()
         for text in lines:
             if re.match(auttaja_re, text):
@@ -238,7 +238,7 @@ class LogParser:
         data['raw_content'] = content
         data['messages'] = list()
         content = re.sub('\r\n', '\n', content)
-        lines = re.split('\n', content)
+        lines = content.split('\n')
         _matches = list()
         for text in lines:
             if re.match(logger_re, text):
@@ -260,7 +260,7 @@ class LogParser:
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        lines = re.split('\n', content)
+        lines = content.split('\n')
         _matches = list()
         for text in lines:
             if re.match(sajuukbot_re, text):
@@ -282,7 +282,7 @@ class LogParser:
         data['raw_content'] = content
         data['messages'] = list()
         content = re.sub('\r\n', '\n', content)
-        lines = re.split('\n\n', content)[1:]
+        lines = content.split('\n\n')[1:]
         _matches = list()
         for text in lines:
             if re.match(spectra_re, text):
