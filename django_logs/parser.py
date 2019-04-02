@@ -74,10 +74,11 @@ class LogParser:
                 try:
                     req = requests.head(url)
                 except requests.exceptions.MissingSchema:
-                    req = requests.head('https://' + url)
+                    req = requests.get('https://' + url, stream=True)
                 if req.status_code == 200:
                     if req.headers['Content-Type'].split('/')[0] == 'image':
                         attach_info['is_image'] = True
+                    attach_info['size'] = req.headers['Content-Length']
                 else:
                     attach_info['error'] = True
                 attach.append(attach_info)
