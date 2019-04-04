@@ -34,8 +34,8 @@ logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<time>[
 sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
                r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
 
-spectra_re = r'\[(?P<time>[\w, :]{29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s]*?)' \
-             r'(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
+spectra_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s]' \
+             r'*?)(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
 
 gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*)' \
               r'#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?) \| (?:(?P<attach>(?:http(?:|s):.*)) ' \
@@ -72,7 +72,7 @@ class LogParser:
                 attach_info = {'id': url.rsplit('/', 2)[1], 'filename': url.rsplit('/', 2)[2], 'url': url, 'size': 0,
                                'is_image': False, 'error': False}
                 try:
-                    req = requests.head(url)
+                    req = requests.get(url, stream=True)
                 except requests.exceptions.MissingSchema:
                     req = requests.get('https://' + url, stream=True)
                 if req.status_code == 200:
@@ -250,6 +250,7 @@ class LogParser:
         matches = list(re.match(logger_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
+            match['content'] = match['content'] if not match['content'] == 'No Message Content' else ''
             match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
         data = self._parse(data, match_data)
