@@ -94,12 +94,15 @@ def logs(request, short_code, raw=False):
                                                                  'original_url': log.url,
                                                                  'log_type': log.log_type})
     except ObjectDoesNotExist:
-        return HttpResponse('Log not found.', status=404)
+        messages.error(request, 'Log not found.')
+        return redirect('index')
 
 
 def temp(request, short_code=None):
-    if not short_code:
+    if not short_code and not request.GET.get('url', None):
         return redirect('index')
+    if request.GET.get('url', None):
+        return view(request, temp_url=True)
     try:
         data = request.session['data'].pop(short_code)
         if request.session['data'] == {}:
@@ -109,19 +112,24 @@ def temp(request, short_code=None):
                                                                  'original_url': data['url'],
                                                                  'log_type': data['log_type']})
     except KeyError:
-        return HttpResponse('Log not found.', status=404)
+        messages.error(request, 'Log not found.')
+        return redirect('index')
 
 
-def view(request):
+def view(request, temp_url=None):
     url = request.GET.get('url', None)
     if url is None or url is '':
         messages.error(request, 'You have to provide a url to parse!')
         return redirect('index')
 
     try:
-        resp = requests.get(url)
-    except requests.exceptions.MissingSchema:
-        resp = requests.get('https://' + url)
+        try:
+            resp = requests.get(url)
+        except requests.exceptions.MissingSchema:
+            resp = requests.get('https://' + url)
+    except requests.exceptions.ConnectionError:
+        messages.error(request, f'Connection to url "{url}" failed. Is it a valid url?')
+        return redirect('index')
     assert isinstance(resp, requests.Response)
     content = resp.content.decode()
     if content == '':
@@ -140,7 +148,7 @@ def view(request):
 
     for log_type in types.keys():  # Try all log types
         if len(re.findall(types[log_type], content)) > 0:
-            if request.GET.get('temp', None):
+            if temp_url:
                 data, short = LogParser(log_type=log_type).parse(content)
                 data['log_type'] = log_type
                 data['url'] = url
@@ -151,4 +159,5 @@ def view(request):
             return redirect('logs', short_code=short)
 
     # Mission failed, we'll get em next time
-    return HttpResponse('We can\'t seem to parse that file. Are you sure it\'s a valid log type?', status=404)
+    messages.error(request, 'We can\'t seem to parse that file. Are you sure it\'s a valid log type?')
+    return redirect('index')
