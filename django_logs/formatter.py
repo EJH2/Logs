@@ -78,16 +78,17 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
     content = re.sub(r'((\:)([\w-]+?)\2)', lambda m: process_emojis(m, content), content)
 
     # Process bold (**text**)
-    content = re.sub(r'(\*\*)(?=\S)(.+?[*_]*)(?<=\S)\1', r'<b>\2</b>', content)
+    content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
 
     # Process underline (__text__)
-    content = re.sub(r'(__)(?=\S)(.+?)(?<=\S)\1', r'<u>\2</u>', content)
+    content = re.sub(r'__((?:\\[\s\S]|[^\\])+?)__(?!_)', r'<u>\1</u>', content)
 
     # Process italic (*text* or _text_)
-    content = re.sub(r'(\*|_)(?=\S)(.+?)(?<=\S)\1', r'<i>\2</i>', content)
+    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s\*\\]|\*\*)|'
+                     r'[^\s\*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
 
     # Process strike through (~~text~~)
-    content = re.sub(r'(~~)(?=\S)(.+?)(?<=\S)\1', r'<s>\2</s>', content)
+    content = re.sub(r'~~(?=\S)((?:\\[\s\S]|~(?!~)|[^\s\\~]|\s+(?!~~))+?)~~', r'<s>\1</s>', content)
 
     def decode_inline_codeblock(m):
         decoded = base64.b64decode(m.group(1).encode()).decode()
@@ -246,16 +247,17 @@ def format_micro_content_html(content: str) -> str:
     content = re.sub(r'(\:)([\w-]+?)\1', process_emojis, content)
 
     # Process bold (**text**)
-    content = re.sub(r'(\*\*)(?=\S)(.+?[*_]*)(?<=\S)\1', r'<b>\2</b>', content)
+    content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
 
     # Process underline (__text__)
-    content = re.sub(r'(__)(?=\S)(.+?)(?<=\S)\1', r'<u>\2</u>', content)
+    content = re.sub(r'__((?:\\[\s\S]|[^\\])+?)__(?!_)', r'<u>\1</u>', content)
 
     # Process italic (*text* or _text_)
-    content = re.sub(r'(\*|_)(?=\S)(.+?)(?<=\S)\1', r'<i>\2</i>', content)
+    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s\*\\]|\*\*)|'
+                     r'[^\s\*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
 
     # Process strike through (~~text~~)
-    content = re.sub(r'(~~)(?=\S)(.+?)(?<=\S)\1', r'<s>\2</s>', content)
+    content = re.sub(r'~~(?=\S)((?:\\[\s\S]|~(?!~)|[^\s\\~]|\s+(?!~~))+?)~~', r'<s>\1</s>', content)
 
     def decode_inline_codeblock(m):
         decoded = base64.b64decode(m.group(1).encode()).decode()
