@@ -235,11 +235,13 @@
                     {% for attachment in message.attachments %}
                         {% if not attachment.error %}
                             <div class="chatlog__attachment">
-                                <a href="{{ attachment.url }}">
-                                    {% if attachment.is_image %}
+                                {% if attachment.is_image %}
+                                    <a href="#{{ attachment.filename }}">
                                         <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}"
-                                             alt="attachment"/>
-                                    {% else %}
+                                             alt="attachment" data-id="{{ attachment.filename }}"/>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ attachment.url }}">
                                         <div class="horizontal">
                                             <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}"
                                                  alt="Attachment file type: unknown" title="unknown">
@@ -261,8 +263,8 @@
                                                 </svg>
                                             </a>
                                         </div>
-                                    {% endif %}
-                                </a>
+                                    </a>
+                                {% endif %}
                             </div>
                         {% else %}
                             <a href="{{ attachment.url }}" class="chatlog__content error">{{ attachment.url }}</a>
@@ -273,6 +275,7 @@
         </div>
     {% endfor %}
 </div>
+<div id="lightbox_div"></div>
 <script>
     document.body.classList.remove('no-js');
 
@@ -281,6 +284,26 @@
             hljs.highlightBlock(block);
         });
     });
+
+    for (let attach of document.getElementsByClassName('chatlog__attachment-thumbnail')) {
+        const lightDiv = document.getElementById('lightbox_div');
+        let a = attach.parentElement;
+        a.onclick = function () {
+            let id = a.getAttribute('href').substring(1);
+            console.log(id);
+            let lightA = document.createElement('a');
+            lightA.setAttribute('id', id);
+            lightA.classList.add('lightbox');
+            let lightImg = document.createElement('img');
+            lightImg.setAttribute('src', attach.getAttribute('src'));
+            lightA.onclick = function () {
+                window.history.back();
+                lightDiv.innerHTML = '';
+            };
+            lightA.appendChild(lightImg);
+            lightDiv.appendChild(lightA);
+        };
+    }
 
     for (let t of document.getElementsByTagName('time')) {
         let date = t.getAttribute('datetime');
