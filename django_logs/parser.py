@@ -27,9 +27,9 @@ giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname
 auttaja_re = r'\[(?P<time>[\w :]{24})\] \((?P<uname>.*)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18})' \
              r'\]: (?P<content>[\S\s]*)'
 
-logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<time>[\w :-]{33}) \(\w{3,4}\): ' \
-            r'(?P<content>[\S\s]*?)(?: ======> Contains Embed)?(?: =====> Attachment: (?P<filename>[\w.]+):' \
-            r'(?P<attach>(?:http(?:|s):.*)))?$'
+logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \((?:(?:https://cdn\.discordapp\.com/avatars/\d' \
+            r'{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \([\w ]+\): (?P<content>' \
+            r'[\S\s]*?) \| (?P<embeds>.*?)? \| (?P<attach>(?:http(?:|s):.*))?$'
 
 sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
                r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
@@ -40,6 +40,10 @@ spectra_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<
 gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*)' \
               r'#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?) \| (?:(?P<attach>(?:http(?:|s):.*)) ' \
               r'?)?'
+
+capnbot_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) \((' \
+             r'?:(?:https://cdn\.discordapp\.com/avatars/\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) (?P<' \
+             r'uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?:|s):.*))? \| (?P<embeds>.*?)?$'
 
 
 class LogParser:
@@ -72,9 +76,9 @@ class LogParser:
                 attach_info = {'id': url.rsplit('/', 2)[1], 'filename': url.rsplit('/', 2)[2], 'url': url, 'size': 0,
                                'is_image': False, 'error': False}
                 try:
-                    req = requests.get(url, stream=True)
+                    req = requests.head(url)
                 except requests.exceptions.MissingSchema:
-                    req = requests.get('https://' + url, stream=True)
+                    req = requests.head('https://' + url)
                 if req.status_code == 200:
                     if req.headers['Content-Type'].split('/')[0] == 'image':
                         attach_info['is_image'] = True
@@ -95,26 +99,31 @@ class LogParser:
             message_dict = {'message_id': match.get('mid', None), 'timestamp': match['time'],
                             'content': match['content']}
 
-            user = {'id': uid, 'username': match.get('uname', 'Unknown User'), 'discriminator': match.get('disc', '0000'
-                                                                                                          )}
+            user = {'id': uid, 'username': match.get('uname', 'Unknown User'),
+                    'discriminator': match.get('disc', '0000'), 'avatar': match.get('avatar', None)}
+
+            def get_avatar(user_dict: dict, default_avatar: bool = False):
+                if not user_dict.get('avatar', None) or default_avatar:
+                    default = int(user_dict['discriminator']) % 5
+                    return f'https://cdn.discordapp.com/embed/avatars/{default}.png'
+                ending = 'gif' if user_dict['avatar'].startswith('a_') else 'png'
+                return f'https://cdn.discordapp.com/avatars/{uid}/{user["avatar"]}.{ending}'
+
             if uid not in _users:
-                if DISCORD_TOKEN is None:
-                    default = int(user['discriminator']) % 5
-                    user['avatar'] = f'https://cdn.discordapp.com/embed/avatars/{default}.png'
+                if user.get('avatar', None):  # User supplied avatar, don't bombard the API
+                    user['avatar'] = get_avatar(user)
+                    pass
+                elif not DISCORD_TOKEN:  # We can't request the API, so use the default avatar
+                    pass
                 else:
                     with requests.get(f'{DISCORD_API_URL}/{uid}', headers=DISCORD_HEADERS) as r:
                         _user = r.json()
-                        if _user.get('message', None):  # Discord can't find the user, so default avatar
-                            default = int(user['discriminator']) % 5
-                            user['avatar'] = f'https://cdn.discordapp.com/embed/avatars/{default}.png'
-                        else:
+                        if not _user.get('message', None):  # No error code, so Discord found the user
                             user = _user
                             if user.get('avatar', None) is not None:
-                                ending = 'gif' if user['avatar'].startswith('a_') else 'png'
-                                user['avatar'] = f'https://cdn.discordapp.com/avatars/{uid}/{user["avatar"]}.{ending}'
-                            else:
-                                default = int(user['discriminator']) % 5
-                                user['avatar'] = f'https://cdn.discordapp.com/embed/avatars/{default}.png'
+                                user['avatar'] = get_avatar(user)
+
+                user['avatar'] = user['avatar'] or get_avatar(user, default_avatar=True)
                 _users[uid] = user
                 users.append(User(user).__dict__)
             else:
@@ -250,9 +259,9 @@ class LogParser:
         matches = list(re.match(logger_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
-            match['content'] = match['content'] if not match['content'] == 'No Message Content' else ''
+            match['embeds'] = json.loads(match['embeds'])['embeds'] if match.get('embeds', None) else []
             match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match.get('attach', None) else []
         data = self._parse(data, match_data)
         data['type'] = 'Logger'
 
@@ -316,5 +325,24 @@ class LogParser:
 
         data = self._parse(data, match_data)
         data['type'] = 'GearBoat'
+
+        return data
+
+    def _parse_capnbot(self, content):
+        data = dict()
+        data['raw_content'] = content
+        data['messages'] = list()
+        matches = list(re.finditer(capnbot_re, content, re.MULTILINE))
+        match_data = list()
+
+        for match in matches:
+            match_info = match.groupdict()
+            match_info['embeds'] = json.loads(match['embeds'])['embeds'] if match['embeds'] else []
+            match_info['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
+                else []
+            match_data.append(match_info)
+
+        data = self._parse(data, match_data)
+        data['type'] = 'CapnBot'
 
         return data
