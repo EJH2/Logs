@@ -59,7 +59,7 @@ a, a.chatlog__embed-title {
     color: #2F3136;
 }
 
-.info__user-list span {
+.info__user-list span:not(.bot-tag) {
     color: #000;
 }
 
