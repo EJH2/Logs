@@ -139,7 +139,7 @@
                 </div>
                 {% for message in group.messages %}
                     {% if message.content %}
-                        <div class="chatlog__content">
+                        <div class="chatlog__content {{ message.error }}">
                             {{ message.content | safe }}
                             {% if message.edited %}
                                 <span class="chatlog__edited-timestamp">(edited)</span>
@@ -194,13 +194,13 @@
                                     </div>
                                     {% if embed.thumbnail %}
                                         <img src="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail"
-                                             style="width: {{ embed.thumbnail.width | default:'80px' }}; height: {{ embed.thumbnail.height | default:'80px' }}">
+                                             style="width: 80px; height: 80px">
                                     {% endif %}
                                 </div>
                                 {% if embed.image %}
                                     <img src="{{ embed.image.url }}"
                                          class="chatlog__embed-image chatlog__embed-margin-large"
-                                         style="width: {{ embed.image.width | default:'128px' }}; height: {{ embed.image.height | default:'128px' }}">
+                                         style="width: 128px; height: 128px">
                                 {% endif %}
                                 {% if embed.footer or embed.timestamp %}
                                     {% if embed.footer and not embed.timestamp %}

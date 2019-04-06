@@ -173,6 +173,12 @@ class Message:
         self.author = User(data['author'])
         self.edited = data.get('edited', False)
 
+        # Check to see if the message has any content, and if not, make the message an error
+        self.error = ''
+        if not any([self.raw_content, self.attachments, self.embeds]):  # No content, attachments or embeds
+            self.error = 'error'
+            self.content = '[No Message Content]'
+
     def is_different_from(self, other):
         if self.created_at is not None:
             return (
