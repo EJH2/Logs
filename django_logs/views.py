@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
 from django_logs.parser import *
@@ -103,17 +103,17 @@ def temp(request, short_code=None):
         return redirect('index')
     if request.GET.get('url', None):
         return view(request, temp_url=True)
-    try:
-        data = request.session['data'].pop(short_code)
-        if request.session['data'] == {}:
-            del request.session['data']
-        messages.warning(request, 'This log will expire as soon as the page is refreshed, and cannot be shared.')
-        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data),
-                                                                 'original_url': data['url'],
-                                                                 'log_type': data['log_type']})
-    except KeyError:
-        messages.error(request, 'Log not found.')
-        return redirect('index')
+    # try:
+    data = request.session['data'].pop(short_code)
+    if request.session['data'] == {}:
+        del request.session['data']
+    messages.warning(request, 'This log will expire as soon as the page is refreshed, and cannot be shared.')
+    return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data),
+                                                             'original_url': data['url'],
+                                                             'log_type': data['log_type']})
+    # except KeyError:
+    #     messages.error(request, 'Log not found.')
+    #     return redirect('index')
 
 
 def view(request, temp_url=None):
@@ -136,24 +136,38 @@ def view(request, temp_url=None):
         messages.error(request, 'You have to provide a url with text in it to parse!')
         return redirect('index')
 
+    # API call?
+    fast = False
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'application/json':
+        fast = True
+
     # Cached?
     cached = LogRoute.objects.filter(url=url).exists()
     if cached and not request.GET.get('new', None):  # Cached, and user wants from cache
         request.session['cached'] = True
         return redirect('logs', short_code=LogRoute.objects.get(url=url).short_code)
 
-    types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re, 'giraffeduck': giraffeduck_re,
-             'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re, 'spectra': spectra_re,
-             'gearboat': gearboat_re}
+    types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
+             'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
+             'spectra': spectra_re, 'gearboat': gearboat_re}
 
     for log_type in types.keys():  # Try all log types
-        if len(re.findall(types[log_type], content)) > 0:
+        if len(re.findall(types[log_type], content, re.MULTILINE)) > 0:
+            content = re.sub('\r\n', '\n', content)
             if temp_url:
-                data, short = LogParser(log_type=log_type).parse(content)
+                data, short = LogParser(log_type=log_type).parse(content, True)
                 data['log_type'] = log_type
                 data['url'] = url
                 request.session['data'] = {short: data}
                 return redirect('temp', short_code=short)
+            if fast:
+                short, _ = LogParser(log_type=log_type).create(content, url, fast)
+                data = {
+                    'status': 200,
+                    'short': short,
+                    'url': f'{request.META["HTTP_HOST"]}/{short}'
+                }
+                return JsonResponse(data)
             short, created = LogParser(log_type=log_type).create(content, url)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)

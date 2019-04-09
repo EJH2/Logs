@@ -62,6 +62,9 @@ img {
     padding: 8px;
     border: 2px solid;
     border-radius: 5px;
+    font-size: 0.875rem;
+    line-height: 1rem;
+    text-indent: 0;
 }
 
 .pre--inline {

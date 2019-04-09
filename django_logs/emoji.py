@@ -1565,6 +1565,8 @@ _EMOJI_LIST = {
 EMOJI_LIST = json.loads(json.dumps(_EMOJI_LIST))
 # Reverse-lookup for Emoji List
 UNICODE_LIST = {v: k for k, v in EMOJI_LIST.items()}
+UNICODE_LIST['🕹️'] = 'joystick'
+UNICODE_LIST['🛡️'] = 'shield'
 
 EMOJI_REGEX = r'(?P<emoji>' \
               r'(?:\U0001f1e6[\U0001f1e8-\U0001f1ec\U0001f1ee\U0001f1f1\U0001f1f2\U0001f1f4\U0001f1f6-\U0001f1fa' \

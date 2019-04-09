@@ -1,3 +1,4 @@
+import ast
 import json
 import re
 
@@ -12,20 +13,18 @@ DISCORD_API_URL = 'https://discordapp.com/api/v7/users'
 
 DISCORD_HEADERS = {'Authorization': DISCORD_TOKEN}
 
-rowboat_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ ' \
-             r'(?P<uid>[\d]{16,18})\) (?P<uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?) ' \
-             r'\((?P<attach>(?:http(?:|s):.*))?\)'
+rowboat_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
+             r'(?P<uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \((?P<attach>(?:http(?:|s):.*))?\)$'
 
-rosalina_bottings_re = r'(?P<time>(?:[\d-]{10})T(?:[\d:.]{15}))\+[\d:]{5} \| (?P<gname>.*?)\[(?P<gid>\d{16,18})\]' \
-             r' \|  (?P<cname>[\w-]{1,100})\[(?P<cid>\d{16,18})\] \| (?P<uname>.*?)\[(?P<uid>\d{16,18})' \
-             r'\] \| said: (?P<content>[\S\s]*?)\nMessage ID: (?P<mid>\d{16,18})'
+rosalina_bottings_re = r'(?P<time>(?:[\d-]{10})T(?:[\d:.]{15}))\+[\d:]{5} \| (?P<gname>.*?)\[(?P<gid>\d{16,18})\] \|' \
+                       r'  (?P<cname>[\w-]{1,100})\[(?P<cid>\d{16,18})\] \| (?P<uname>.*?)\[(?P<uid>\d{16,18})\] \|' \
+                       r' said: (?P<content>[\S\s]*?)\nMessage ID: (?P<mid>\d{16,18})$'
 
-giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname>.*)#(?P<disc>\d{4}) : ' \
-                 r'(?P<content>[\S\s]*?) \| Attach: (?P<attach>(?:http(?:|s):.*))? \| RichEmbed: ' \
-                 r'(?P<embeds>null|.*)'
+giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname>.*)#(?P<disc>\d{4}) : (?P<content>' \
+                 r'[\S\s]*?)? \| Attach: (?P<attach>(?:http(?:|s):.*))? \| RichEmbed: (?:null|(?P<embeds>.*))$'
 
-auttaja_re = r'\[(?P<time>[\w :]{24})\] \((?P<uname>.*)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18})' \
-             r'\]: (?P<content>[\S\s]*)'
+auttaja_re = r'\[(?P<time>[\w :]{24,25})\] \((?P<uname>.*)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18}' \
+             r')\]: (?P<content>[\S\s]*?)(?: (?P<attach>(?:http(?:|s):.*))?)?$'
 
 logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \((?:(?:https://cdn\.discordapp\.com/avatars/\d' \
             r'{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \([\w ]+\): (?P<content>' \
@@ -35,15 +34,16 @@ sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<
                r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
 
 spectra_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s]' \
-             r'*?)(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
+             r'*?)?(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
 
 gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*)' \
-              r'#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?) \| (?:(?P<attach>(?:http(?:|s):.*)) ' \
-              r'?)?'
+              r'#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?)? \|(?: ?(?P<attach>(?:http(?:|s):.*)' \
+              r')?)?$'
 
 capnbot_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) \((' \
              r'?:(?:https://cdn\.discordapp\.com/avatars/\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) (?P<' \
-             r'uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?:|s):.*))? \| (?P<embeds>.*?)?$'
+             r'uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?:|s):.*))? \| (?P<embeds>(?:{' \
+             r'\"embeds\": \[).*?)?$'
 
 
 class LogParser:
@@ -51,9 +51,9 @@ class LogParser:
     def __init__(self, log_type):
         self.log_type = log_type
 
-    def create(self, content, url):
+    def create(self, content, url, fast=False):
         log_type = self.log_type
-        data, short_code = self.parse(content)
+        data, short_code = self.parse(content, fast)
         if LogRoute.objects.filter(url=url).exists():
             LogRoute.objects.filter(url=url).update(log_type=log_type, data=data)
         if LogRoute.objects.filter(short_code=short_code).exists():
@@ -61,35 +61,46 @@ class LogParser:
         log, created = LogRoute.objects.get_or_create(url=url, log_type=log_type, data=data)
         return log.short_code, created
 
-    def parse(self, content):
+    def parse(self, content, fast=False):
         log_type = self.log_type
         parser = getattr(self, f'_parse_{log_type}')
-        data = parser(content)
+        data = parser(content, fast)
         short_code = LogRoute.generate_short_code(data)
         return data, short_code
 
     @staticmethod
-    def _get_attach_info(attachments: list):
+    def _get_attach_info(attachments: list, fast: bool = False):
         attach = []
         if len(attachments) > 0 and attachments[0] != '':
             for url in attachments:
                 attach_info = {'id': url.rsplit('/', 2)[1], 'filename': url.rsplit('/', 2)[2], 'url': url, 'size': 0,
                                'is_image': False, 'error': False}
-                try:
-                    req = requests.head(url)
-                except requests.exceptions.MissingSchema:
-                    req = requests.head('https://' + url)
-                if req.status_code == 200:
-                    if req.headers['Content-Type'].split('/')[0] == 'image':
+                if fast:
+                    if url.rsplit('.', 2)[1] in ['png', 'jpg', 'jpeg', 'gif', 'webm', 'webp', 'mp4']:
                         attach_info['is_image'] = True
-                    attach_info['size'] = req.headers['Content-Length']
                 else:
-                    attach_info['error'] = True
+                    try:
+                        req = requests.head(url)
+                    except requests.exceptions.MissingSchema:
+                        req = requests.head('https://' + url)
+                    if req.status_code == 200:
+                        if req.headers['Content-Type'].split('/')[0] == 'image':
+                            attach_info['is_image'] = True
+                        attach_info['size'] = req.headers['Content-Length']
+                    else:
+                        attach_info['error'] = True
                 attach.append(attach_info)
         return attach
 
     @staticmethod
-    def _parse(data: dict, match_data: list):
+    def _get_embed_info(embeds: str):
+        try:
+            return json.loads(embeds)
+        except json.decoder.JSONDecodeError:
+            return ast.literal_eval(embeds)  # I'M SORRY
+
+    @staticmethod
+    def _parse(data: dict, match_data: list, fast: bool = True):
         users = list()
         _users = dict()
         data['messages'] = list()
@@ -110,7 +121,7 @@ class LogParser:
                 return f'https://cdn.discordapp.com/avatars/{uid}/{user["avatar"]}.{ending}'
 
             if uid not in _users:
-                if user.get('avatar', None):  # User supplied avatar, don't bombard the API
+                if user.get('avatar', None) or fast:  # User supplied avatar (or API call), don't bombard Discord's API
                     user['avatar'] = get_avatar(user)
                     pass
                 elif not DISCORD_TOKEN:  # We can't request the API, so use the default avatar
@@ -147,42 +158,42 @@ class LogParser:
 
         return data
 
-    def _parse_rowboat(self, content):
+    def _parse_rowboat(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        matches = list(re.finditer(rowboat_re, content))
+        matches = list(re.finditer(rowboat_re, content, re.MULTILINE))
         match_data = list()
 
         for match in matches:
             match_info = match.groupdict()
-            match_info['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
-                else []
+            match_info['attach'] = self._get_attach_info(match['attach'].split(', '), fast) if match['attach'] \
+                                                                                               is not None else []
             match_data.append(match_info)
 
-        data = self._parse(data, match_data)
+        data = self._parse(data, match_data, fast)
         data['type'] = 'Rowboat'
 
         return data
 
-    def _parse_rosalina_bottings(self, content):
+    def _parse_rosalina_bottings(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        matches = list(re.finditer(rosalina_bottings_re, content))
+        matches = list(re.finditer(rosalina_bottings_re, content, re.MULTILINE))
 
         match_data = list(m.groupdict() for m in matches)
-        data = self._parse(data, match_data)
+        data = self._parse(data, match_data, fast)
         data['type'] = 'Rosalina Bottings'
 
         return data
 
-    def _parse_giraffeduck(self, content):
+    def _parse_giraffeduck(self, content, fast):
         data = dict()
         match_data = list()
         data['raw_content'] = content
         data['messages'] = list()
-        matches = list(re.finditer(giraffeduck_re, content))
+        matches = list(re.finditer(giraffeduck_re, content, re.MULTILINE))
 
         headers = content.split('\n')[:5]
         header_info = list()
@@ -205,9 +216,9 @@ class LogParser:
         for match in matches:
             match = match.groupdict()
             match['uid'] = users[f'{match["uname"]}#{match["disc"]}']
-            _attach = match['attach'].split(', ')
-            match['attach'] = self._get_attach_info(_attach)
-            match['embeds'] = [json.loads(match['embeds'])] if match['embeds'] != 'null' else []
+            _attach = match['attach'].split(', ') if match['attach'] else []
+            match['attach'] = self._get_attach_info(_attach, fast)
+            match['embeds'] = [self._get_embed_info(match['embeds'])] if match['embeds'] else []
             match['content'] = re.sub(r'(<@!?(\d+)>)', lambda m: f'<@{user_mentions[m.group(2)]} ({m.group(2)})>',
                                       match['content'])
             match['content'] = re.sub(r'(<#(\d+)>)', lambda m: f'<#{channel_mentions[m.group(2)]}>', match['content'])
@@ -215,13 +226,12 @@ class LogParser:
 
             match_data.append(match)
 
-        data = self._parse(data, match_data)
+        data = self._parse(data, match_data, fast)
         data['type'] = 'GiraffeDuck'
 
         return data
 
-    def _parse_auttaja(self, content):
-        content = re.sub('\r\n', '\n', content)
+    def _parse_auttaja(self, content, fast):
         content = content[:-1] if content.endswith('\n') else content
         data = dict()
         data['raw_content'] = content
@@ -238,16 +248,17 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
             match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
-        data = self._parse(data, match_data)
+            match['attach'] = self._get_attach_info(match['attach'].split(' '), fast) if match.get('attach', None) \
+                else []
+        data = self._parse(data, match_data, fast)
         data['type'] = 'Auttaja'
 
         return data
 
-    def _parse_logger(self, content):
+    def _parse_logger(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        content = re.sub('\r\n', '\n', content)
         lines = content.split('\n')
         _matches = list()
         for text in lines:
@@ -259,15 +270,16 @@ class LogParser:
         matches = list(re.match(logger_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
-            match['embeds'] = json.loads(match['embeds'])['embeds'] if match.get('embeds', None) else []
+            match['embeds'] = self._get_embed_info(match['embeds'])['embeds'] if match.get('embeds', None) else []
             match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match.get('attach', None) else []
-        data = self._parse(data, match_data)
+            match['attach'] = self._get_attach_info(match['attach'].split(', '), fast) if match.get('attach', None) \
+                else []
+        data = self._parse(data, match_data, fast)
         data['type'] = 'Logger'
 
         return data
 
-    def _parse_sajuukbot(self, content):
+    def _parse_sajuukbot(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
@@ -282,17 +294,17 @@ class LogParser:
         matches = list(re.match(sajuukbot_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
-        data = self._parse(data, match_data)
+            match['attach'] = self._get_attach_info(match['attach'].split(', '), fast) if match['attach'] is not None \
+                else []
+        data = self._parse(data, match_data, fast)
         data['type'] = 'SajuukBot'
 
         return data
 
-    def _parse_spectra(self, content):
+    def _parse_spectra(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
-        content = re.sub('\r\n', '\n', content)
         lines = content.split('\n\n')[1:]
         _matches = list()
         for text in lines:
@@ -304,13 +316,14 @@ class LogParser:
         matches = list(re.match(spectra_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
         for match in match_data:
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
-        data = self._parse(data, match_data)
+            match['attach'] = self._get_attach_info(match['attach'].split(', '), fast) if match['attach'] is not None \
+                else []
+        data = self._parse(data, match_data, fast)
         data['type'] = 'Spectra'
 
         return data
 
-    def _parse_gearboat(self, content):
+    def _parse_gearboat(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
@@ -319,16 +332,16 @@ class LogParser:
 
         for match in matches:
             match_info = match.groupdict()
-            match_info['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
-                else []
+            match_info['attach'] = self._get_attach_info(match['attach'].split(', '), fast) if match['attach'] is not \
+                                                                                               None else []
             match_data.append(match_info)
 
-        data = self._parse(data, match_data)
+        data = self._parse(data, match_data, fast)
         data['type'] = 'GearBoat'
 
         return data
 
-    def _parse_capnbot(self, content):
+    def _parse_capnbot(self, content, fast):
         data = dict()
         data['raw_content'] = content
         data['messages'] = list()
@@ -337,12 +350,12 @@ class LogParser:
 
         for match in matches:
             match_info = match.groupdict()
-            match_info['embeds'] = json.loads(match['embeds'])['embeds'] if match['embeds'] else []
-            match_info['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
-                else []
+            match_info['embeds'] = self._get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
+            match_info['attach'] = self._get_attach_info(match['attach'].split(', '), fast) if match['attach'] is not \
+                                                                                               None else []
             match_data.append(match_info)
 
-        data = self._parse(data, match_data)
+        data = self._parse(data, match_data, fast)
         data['type'] = 'CapnBot'
 
         return data
