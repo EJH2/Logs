@@ -103,17 +103,17 @@ def temp(request, short_code=None):
         return redirect('index')
     if request.GET.get('url', None):
         return view(request, temp_url=True)
-    # try:
-    data = request.session['data'].pop(short_code)
-    if request.session['data'] == {}:
-        del request.session['data']
-    messages.warning(request, 'This log will expire as soon as the page is refreshed, and cannot be shared.')
-    return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data),
-                                                             'original_url': data['url'],
-                                                             'log_type': data['log_type']})
-    # except KeyError:
-    #     messages.error(request, 'Log not found.')
-    #     return redirect('index')
+    try:
+        data = request.session['data'].pop(short_code)
+        if request.session['data'] == {}:
+            del request.session['data']
+        messages.warning(request, 'This log will expire as soon as the page is refreshed, and cannot be shared.')
+        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data),
+                                                                 'original_url': data['url'],
+                                                                 'log_type': data['log_type']})
+    except KeyError:
+        messages.error(request, 'Log not found.')
+        return redirect('index')
 
 
 def view(request, temp_url=None):
@@ -155,7 +155,7 @@ def view(request, temp_url=None):
         if len(re.findall(types[log_type], content, re.MULTILINE)) > 0:
             content = re.sub('\r\n', '\n', content)
             if temp_url:
-                data, short = LogParser(log_type=log_type).parse(content, True)
+                data, short = LogParser(log_type=log_type).parse(content)
                 data['log_type'] = log_type
                 data['url'] = url
                 request.session['data'] = {short: data}
