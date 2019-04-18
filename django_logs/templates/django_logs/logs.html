@@ -194,13 +194,12 @@
                                     </div>
                                     {% if embed.thumbnail %}
                                         <img src="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail"
-                                             style="width: 80px; height: 80px">
+                                             style="max-width: 80px; max-height: 80px">
                                     {% endif %}
                                 </div>
                                 {% if embed.image %}
                                     <img src="{{ embed.image.url }}"
-                                         class="chatlog__embed-image chatlog__embed-margin-large"
-                                         style="width: 128px; height: 128px">
+                                         class="chatlog__embed-image chatlog__embed-margin-large">
                                 {% endif %}
                                 {% if embed.footer or embed.timestamp %}
                                     {% if embed.footer and not embed.timestamp %}

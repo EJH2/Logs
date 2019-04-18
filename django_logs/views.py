@@ -1,82 +1,35 @@
+import pytz
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
+from django_logs import home
+from django_logs.models import LogEntry
 from django_logs.parser import *
+
+types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
+             'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
+             'spectra': spectra_re, 'gearboat': gearboat_re}
+
+
+def _request_url(url: str):
+    try:
+        try:
+            resp = requests.get(url)
+        except requests.exceptions.MissingSchema:
+            resp = requests.get('https://' + url)
+    except requests.exceptions.ConnectionError:
+        resp = None
+    return resp
 
 
 # Create your views here.
 def index(request):
-    embed = json.dumps({
-        "description": "Heck, even attachments are included...",
-        "color": 1362241,
-        "footer": {
-            "icon_url": "https://cdn.discordapp.com/embed/avatars/1.png",
-            "text": ":^)"
-        },
-        "thumbnail": {
-            "url": "https://cdn.discordapp.com/embed/avatars/2.png"
-        },
-        "image": {
-            "url": "https://cdn.discordapp.com/embed/avatars/3.png"
-        },
-        "author": {
-            "name": "Embeds too!",
-            "url": "https://discordapp.com",
-            "icon_url": "https://cdn.discordapp.com/embed/avatars/4.png"},
-        "fields": [
-            {
-                "name": "🤔",
-                "value": "is there anything this can't do?"
-            },
-            {
-                "name": "😱",
-                "value": "not really..."
-            },
-            {
-                "name": "🙄",
-                "value": "if you find something we don't support, feel free to message <@EJH2#0330 (125370065624236033)"
-                         "> on [Discord](https://discordapp.com)!"
-            },
-            {
-                "name": "How do I use this?",
-                "value": "Simply go to https://v.ej.gl/view?url=yoururlhere",
-                "inline": True
-            },
-            {
-                "name": "What happens then?",
-                "value": "You get your own unique log, looking just as cool as this!",
-                "inline": True
-            }
-        ]
-    })
-    content = f"""[]
-[EJH2#0330 (125370065624236033)]
-[EJH2#0330 (125370065624236033)]
-[]
-[]
-
-[0000-00-00 00:00:00] (125370065624236033) EJH2#0330 : Welcome to **Discord Log Viewer!**
-
-Format virtually any log file into an aesthetically pleasing and readable format. Currently, we support:
-<:yes:487035217752752129> Emojis :sunglasses:
-<:yes:487035217752752129> *Italics* 
-<:yes:487035217752752129> **Bold**
-<:yes:487035217752752129> __Underline__
-<:yes:487035217752752129> ~~Strikethrough~~
-<:yes:487035217752752129> `Inline code`
-<:yes:487035217752752129> ||spoilers||
-<:yes:487035217752752129> ||***__~~`A combination of all of them`~~__***||
-<:yes:487035217752752129> ```diff
-+ Multi-line code
-``` | Attach: https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png, https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore | RichEmbed: {embed}"""
-
-    data, _ = LogParser('giraffeduck').parse(content)
+    home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))
+    data, _ = LogParser('giraffeduck').parse(home.content)
     data['type'] = None
-    for msg in data['messages']:
-        msg['timestamp'] = None
-    data['generated_at'] = None
+    data['generated_at'] = datetime.now()
     return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data), 'log_type': None})
 
 
@@ -98,36 +51,76 @@ def logs(request, short_code, raw=False):
         return redirect('index')
 
 
-def temp(request, short_code=None):
-    if not short_code and not request.GET.get('url', None):
-        return redirect('index')
-    if request.GET.get('url', None):
-        return view(request, temp_url=True)
-    try:
-        data = request.session['data'].pop(short_code)
-        if request.session['data'] == {}:
-            del request.session['data']
-        messages.warning(request, 'This log will expire as soon as the page is refreshed, and cannot be shared.')
-        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data),
-                                                                 'original_url': data['url'],
-                                                                 'log_type': data['log_type']})
-    except KeyError:
-        messages.error(request, 'Log not found.')
-        return redirect('index')
+def api(request):
+    if not request.method == 'POST':
+        resp = {'status': 405, 'message': 'This endpoint only accepts POST requests!'}
+        return JsonResponse(resp, status=405)
+
+    data = request.POST
+    if not all([any([any(['url', 'content']) in data, request.FILES is not None]), 'type' in data]):
+        resp = {'status': 400, 'message': 'Request body must contain one of [files, url, content] and [type] '
+                                          'to parse!'}
+        return JsonResponse(resp, status=400)
+
+    if data.get('type') not in types:
+        resp = {'status': 400, 'message': f'Log type must be one of [{", ".join(types.keys())}]!'}
+        return JsonResponse(resp, status=400)
+
+    url = None
+
+    if data.get('url'):
+        url = data.get('url')
+        resp = _request_url(url)
+        if not resp:
+            resp = {'status': 400, 'message': f'Connection to url "{url}" failed.'}
+            return JsonResponse(resp, status=400)
+        else:
+            content = resp.content.decode()
+    elif data.get('content'):
+        content = data.get('content')
+    elif request.FILES:
+        with request.FILES[next(iter(request.FILES))].open() as f:
+            content = f.read()
+    else:  # Nothing to parse, we've given up
+        resp = {'status': 400, 'message': 'Request body must contain one of [files, url, content] and [type] '
+                                          'to parse!'}
+        return JsonResponse(resp, status=400)
+
+    if not content:
+        resp = {'status': 400, 'message': 'Log content must not be empty!'}
+        return JsonResponse(resp, status=400)
+
+    log_type = data.get('type')
+    match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+    if match_len > 0:
+        content = re.sub('\r\n', '\n', content)
+        short, created = LogParser(log_type=log_type).create(content, url)
+        data = {
+            'status': 200,
+            'short': short,
+            'url': f'{request.META["HTTP_HOST"]}/{short}',
+            'created': created
+        }
+        return JsonResponse(data)
+
+    resp = {'status': 400, 'message': 'Could not parse log content using specified type!'}
+    return JsonResponse(resp, status=400)
 
 
-def view(request, temp_url=None):
+def view(request):
     url = request.GET.get('url', None)
-    if url is None or url is '':
+    if not url:
         messages.error(request, 'You have to provide a url to parse!')
         return redirect('index')
 
-    try:
-        try:
-            resp = requests.get(url)
-        except requests.exceptions.MissingSchema:
-            resp = requests.get('https://' + url)
-    except requests.exceptions.ConnectionError:
+    # Cached?
+    cached = LogRoute.objects.filter(url=url).exists()
+    if cached and not request.GET.get('new', None):  # Cached, and user wants from cache
+        request.session['cached'] = True
+        return redirect('logs', short_code=LogRoute.objects.get(url=url).short_code)
+
+    resp = _request_url(url)
+    if not resp:
         messages.error(request, f'Connection to url "{url}" failed. Is it a valid url?')
         return redirect('index')
     assert isinstance(resp, requests.Response)
@@ -136,38 +129,14 @@ def view(request, temp_url=None):
         messages.error(request, 'You have to provide a url with text in it to parse!')
         return redirect('index')
 
-    # API call?
-    fast = False
-    if request.META.get('HTTP_X_REQUESTED_WITH') == 'application/json':
-        fast = True
-
-    # Cached?
-    cached = LogRoute.objects.filter(url=url).exists()
-    if cached and not request.GET.get('new', None):  # Cached, and user wants from cache
-        request.session['cached'] = True
-        return redirect('logs', short_code=LogRoute.objects.get(url=url).short_code)
-
-    types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
-             'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
-             'spectra': spectra_re, 'gearboat': gearboat_re}
-
     for log_type in types.keys():  # Try all log types
-        if len(re.findall(types[log_type], content, re.MULTILINE)) > 0:
+        match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+        if match_len > 500:
+            messages.error(request, f'Logs with over 500 messages must be processed through the api, found at'
+                                    f'{request.META["HTTP_HOST"]}/api!')
+            return redirect('index')
+        if match_len > 0:
             content = re.sub('\r\n', '\n', content)
-            if temp_url:
-                data, short = LogParser(log_type=log_type).parse(content)
-                data['log_type'] = log_type
-                data['url'] = url
-                request.session['data'] = {short: data}
-                return redirect('temp', short_code=short)
-            if fast:
-                short, _ = LogParser(log_type=log_type).create(content, url, fast)
-                data = {
-                    'status': 200,
-                    'short': short,
-                    'url': f'{request.META["HTTP_HOST"]}/{short}'
-                }
-                return JsonResponse(data)
             short, created = LogParser(log_type=log_type).create(content, url)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)

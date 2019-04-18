@@ -12,7 +12,7 @@ from django_logs.formatter import format_content_html, format_micro_content_html
 
 
 class LogRoute(models.Model):
-    url = models.TextField(editable=False)
+    url = models.TextField(editable=False, null=True)
     short_code = models.CharField(max_length=5, editable=False, unique=True)
     log_type = models.CharField(max_length=20, editable=False)
     generated_at = models.DateTimeField(auto_now_add=True)
@@ -87,6 +87,15 @@ class User:
             int(self.discriminator) % 5
         )
 
+    @classmethod
+    def from_dict(cls, data: dict):
+        self = cls.__new__(cls)
+
+        for k in data:
+            setattr(self, k, data[k])
+
+        return self
+
     def __str__(self):
         return f'{self.name}#{self.discriminator}'
 
@@ -129,8 +138,17 @@ class Attachment:
             self.size = filesize(data['size'])
             self.error = data['error']
 
+    @classmethod
+    def from_dict(cls, data: dict):
+        self = cls.__new__(cls)
 
-class Embed:
+        for k in data:
+            setattr(self, k, data[k])
+
+        return self
+
+
+class SerializedEmbed:
     def __init__(self, data):
         self.title = data.get('title', None)
         if self.title:
@@ -141,11 +159,7 @@ class Embed:
         self.url = data.get('url', None)
         self.type = data.get('type', 'rich')
         self.author = data.get('author', None)
-        ts = data.get('timestamp', None)
-        self.timestamp = ts if ts is None else dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC))
-        tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
-        self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
-            self.timestamp else None
+        self.timestamp = data.get('timestamp', None)
         self.color = f'#{data.get("color", 5198940):06X}'  # default discord embed color
         self.image = data.get('image', None)
         self.thumbnail = data.get('thumbnail', None)
@@ -157,20 +171,60 @@ class Embed:
         self.footer = data.get('footer', [])
 
 
-class Message:
+class Embed:
+    def __init__(self, data):
+        self.title = data.get('title', None)
+        self.description = data.get('description', None)
+        self.url = data.get('url', None)
+        self.type = data.get('type', 'rich')
+        self.author = data.get('author', None)
+        ts = data.get('timestamp', None)
+        self.timestamp = ts if ts is None else dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC))
+        tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
+        self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
+            self.timestamp else None
+        self.color = data.get("color", '#4F545C')
+        self.image = data.get('image', None)
+        self.thumbnail = data.get('thumbnail', None)
+        self.fields = data.get('fields', [])
+        self.footer = data.get('footer', [])
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        self = cls.__new__(cls)
+
+        for k in data:
+            setattr(self, k, data[k])
+
+        return self
+
+
+class SerializedMessage:
     def __init__(self, data):
         self.id = int(data['message_id']) if data.get('message_id') else None
+        self.timestamp = data.get('timestamp', None)
+        self.raw_content = data['content']
+        self.content = format_content_html(self.raw_content, masked_links=True)
+        self.attachments = [Attachment(a).__dict__ for a in data['attachments']]
+        self.embeds = [SerializedEmbed(e).__dict__ for e in data['embeds']]
+        self.author = User(data['author']).__dict__
+        self.edited = data.get('edited', False)
+
+
+class Message:
+    def __init__(self, data):
+        self.id = int(data['id']) if data.get('id') else None
         ts = data.get('timestamp', None)
         self.created_at = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else None
         self.created_iso = self.created_at.isoformat() if ts else None
         tz = self.created_at.tzinfo if self.created_at else pytz.UTC
         self.human_created_at = duration(self.created_at.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.created_at else None
-        self.raw_content = data['content']
-        self.content = self.format_html_content(self.raw_content)
-        self.attachments = [Attachment(a) for a in data['attachments']]
-        self.embeds = [Embed(e) for e in data['embeds']]
-        self.author = User(data['author'])
+        self.raw_content = data['raw_content']
+        self.content = data['content']
+        self.attachments = [Attachment.from_dict(a) for a in data['attachments']]
+        self.embeds = [Embed.from_dict(e) for e in data['embeds']]
+        self.author = User.from_dict(data['author'])
         self.edited = data.get('edited', False)
 
         # Check to see if the message has any content, and if not, make the message an error
@@ -186,7 +240,3 @@ class Message:
                     or other.author != self.author
             )
         return other.author != self.author
-
-    @staticmethod
-    def format_html_content(content):
-        return format_content_html(content, masked_links=True)
