@@ -105,10 +105,11 @@ def api(request):
     if match_len > 0:
         content = re.sub('\r\n', '\n', content)
         short, created = LogParser(log_type=log_type).create(content, origin)
+        sec = 's' if request.is_secure() else ''
         data = {
             'status': 200,
             'short': short,
-            'url': f'{request.META["HTTP_HOST"]}/{short}',
+            'url': f'http{sec}://{request.META["HTTP_HOST"]}/{short}',
             'created': created
         }
         return JsonResponse(data)
@@ -124,10 +125,10 @@ def view(request):
         return redirect('index')
 
     # Cached?
-    cached = LogRoute.objects.filter(url=url).exists()
-    if cached and not request.GET.get('new', None):  # Cached, and user wants from cache
+    cached = LogRoute.objects.filter(url=url)
+    if cached.exists() and not request.GET.get('new', None):  # Cached, and user wants from cache
         request.session['cached'] = True
-        return redirect('logs', short_code=LogRoute.objects.get(url=url).short_code)
+        return redirect('logs', short_code=cached[0].short_code.split('-')[0])
 
     resp = _request_url(url)
     if not resp:
@@ -142,8 +143,9 @@ def view(request):
     for log_type in types.keys():  # Try all log types
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 500:
-            messages.error(request, f'Logs with over 500 messages must be processed through the api, found at'
-                                    f'{request.META["HTTP_HOST"]}/api!')
+            sec = 's' if request.is_secure() else ''
+            messages.error(request, f'Logs with over 500 messages must be processed through the api, found at '
+                                    f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
             content = re.sub('\r\n', '\n', content)
