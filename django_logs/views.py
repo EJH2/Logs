@@ -30,19 +30,28 @@ def index(request):
     data, _ = LogParser('giraffeduck').parse(home.content)
     data['type'] = None
     data['generated_at'] = datetime.now()
+    data['raw_content'] = home.content
     return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data), 'log_type': None})
 
 
-def logs(request, short_code, raw=False):
+def logs(request, short_code: str, raw=False):
     try:
-        log = LogRoute.objects.get(short_code=short_code)
+        short_code = short_code.split('-')[0]
+        _log = LogRoute.objects.filter(short_code__startswith=short_code)
+        if not _log.exists():
+            raise ObjectDoesNotExist
+        log = _log[0]
+        if _log.count() > 1:
+            log.messages = log.messages = [msg for msgs in [_l.messages for _l in _log.order_by('id')] for msg in msgs]
         if raw:
-            content = f"<pre>{log.data['raw_content']}</pre>"
+            content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
         if request.session.get('cached', None):
             del request.session['cached']
             messages.warning(request, 'A log containing the same data was found, so we used that instead.')
         log.data['generated_at'] = log.generated_at
+        log.data['messages'] = log.messages
+        log.data['raw_content'] = log.content
         return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(log.data),
                                                                  'original_url': log.url,
                                                                  'log_type': log.log_type})
@@ -66,19 +75,20 @@ def api(request):
         resp = {'status': 400, 'message': f'Log type must be one of [{", ".join(types.keys())}]!'}
         return JsonResponse(resp, status=400)
 
-    url = None
-
     if data.get('url'):
         url = data.get('url')
         resp = _request_url(url)
+        origin = ('url', url)
         if not resp:
             resp = {'status': 400, 'message': f'Connection to url "{url}" failed.'}
             return JsonResponse(resp, status=400)
         else:
             content = resp.content.decode()
     elif data.get('content'):
+        origin = 'raw'
         content = data.get('content')
     elif request.FILES:
+        origin = 'file'
         with request.FILES[next(iter(request.FILES))].open() as f:
             content = f.read()
     else:  # Nothing to parse, we've given up
@@ -94,7 +104,7 @@ def api(request):
     match_len = len(re.findall(types[log_type], content, re.MULTILINE))
     if match_len > 0:
         content = re.sub('\r\n', '\n', content)
-        short, created = LogParser(log_type=log_type).create(content, url)
+        short, created = LogParser(log_type=log_type).create(content, origin)
         data = {
             'status': 200,
             'short': short,

@@ -1,12 +1,12 @@
 import json
+import pytz
+
+from datetime import datetime
 
 embed = json.dumps({
     "description": "Heck, even attachments are included...",
     "color": 1362241,
-    "footer": {
-        "icon_url": "https://cdn.discordapp.com/embed/avatars/1.png",
-        "text": ":^)"
-    },
+    "timestamp": datetime.now(tz=pytz.UTC).isoformat(),
     "thumbnail": {
         "url": "https://cdn.discordapp.com/embed/avatars/2.png"
     },
@@ -38,7 +38,7 @@ embed = json.dumps({
         },
         {
             "name": "What happens then?",
-            "value": "You get your own unique log, looking just as cool as this!",
+            "value": "You get your own `unique` log, looking just as cool as this!",
             "inline": True
         }
     ]

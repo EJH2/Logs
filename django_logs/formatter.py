@@ -7,7 +7,7 @@ import emoji_unicode
 from django_logs.emoji import EMOJI_LIST, UNICODE_LIST, EMOJI_REGEX
 
 
-def format_content_html(content: str, masked_links: bool = False) -> str:
+def format_content_html(content: str, masked_links: bool = False, newlines: bool = True) -> str:
     # HTML-encode content
 
     def encode_codeblock(m):
@@ -15,7 +15,7 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
         return '\x1AM' + encoded + '\x1AM'
 
     # Encode multiline codeblocks (```text```)
-    content = re.sub(r'```+((?:[^`]*?\n)?(?:[^`]+))\n?```+',
+    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+',
                      encode_codeblock,
                      content)
 
@@ -117,30 +117,15 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
     # Decode and process URLs
     content = re.sub('\x1AU(.*?)\x1AU', decode_url, content)
 
-    # Process new lines
-    content = content.replace('\n', '<br>')
+    if newlines:
+        # Process new lines
+        content = content.replace('\n', '<br>')
 
     # Nobody said this was gonna be pretty
     spoiler_html = r'<span class="chatlog__spoiler-box"><span class="chatlog__spoiler-text">\2</span></span>'
 
     # Process spoiler (||text||)
     content = re.sub(r'(\|\|)(?=\S)([\S\s]+?)(?<=\S)\1', spoiler_html, content)
-
-    def decode_codeblock(m):
-        decoded = base64.b64decode(m.group(1).encode()).decode()
-        match = re.match('^([^`]*?\n)?([^`]+)$', decoded)
-        lang = match.group(1) or ''
-        if not lang.strip(' \n\r'):
-            lang = 'plaintext'
-        else:
-            lang = lang.strip(' \n\r')
-
-        result = html.escape(match.group(2))
-        return (f'<div class="pre pre--multiline {lang}">{result}'
-                '</div>')
-
-    # Decode and process multiline codeblocks
-    content = re.sub('\x1AM(.*?)\x1AM', decode_codeblock, content)
 
     # Meta mentions (@everyone)
     content = content.replace('@everyone',
@@ -187,6 +172,22 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
     content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{emoji_class_animated}" title="\1" src="'
                                                fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
 
+    def decode_codeblock(m):
+        decoded = base64.b64decode(m.group(1).encode()).decode()
+        match = re.match('([^`]*?\n)?([\s\S]+)', decoded)
+        lang = match.group(1) or ''
+        if not lang.strip(' \n\r'):
+            lang = 'plaintext'
+        else:
+            lang = lang.strip(' \n\r')
+
+        result = html.escape(match.group(2))
+        return (f'<div class="pre pre--multiline {lang}">{result}'
+                '</div>'.replace('\x00', ''))
+
+    # Decode and process multiline codeblocks
+    content = re.sub('\x1AM(.*?)\x1AM', decode_codeblock, content)
+
     return content
 
 
@@ -194,13 +195,13 @@ def format_content_html(content: str, masked_links: bool = False) -> str:
 #    Stripped Down Version for Embeds
 # ======================================
 
-def format_micro_content_html(content: str) -> str:
+def format_micro_content_html(content: str, newlines: bool = True) -> str:
     def encode_codeblock(m):
         encoded = base64.b64encode(m.group(1).encode()).decode()
         return '\x1AM' + encoded + '\x1AM'
 
     # Encode multiline codeblocks (```text```)
-    content = re.sub(r'```+((?:[^`]*?\n)?(?:[^`]+))\n?```+',
+    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+',
                      encode_codeblock,
                      content)
 
@@ -227,7 +228,7 @@ def format_micro_content_html(content: str) -> str:
 
     def process_unicode_emojis(m):
         e = emoji_unicode.Emoji(unicode=m.group('emoji'))
-        return fr'<img class="emoji" title="{UNICODE_LIST[m.group(1)].replace("_", " ")}" ' \
+        return fr'<img class="emoji" title="{UNICODE_LIST.get(m.group(1), "").replace("_", " ")}" ' \
                fr'src="https://twemoji.maxcdn.com/2/svg/{e.code_points}.svg" alt="{e.unicode}">'
 
     # Process unicode emojis
@@ -274,30 +275,15 @@ def format_micro_content_html(content: str) -> str:
     # Decode and process URLs
     content = re.sub('\x1AU(.*?)\x1AU', decode_url, content)
 
-    # Process new lines
-    content = content.replace('\n', '<br>')
+    if newlines:
+        # Process new lines
+        content = content.replace('\n', '<br>')
 
     # Nobody said this was gonna be pretty
     spoiler_html = r'<span class="chatlog__spoiler-box"><span class="chatlog__spoiler-text">\2</span></span>'
 
     # Process spoiler (||text||)
     content = re.sub(r'(\|\|)(?=\S)([\S\s]+?)(?<=\S)\1', spoiler_html, content)
-
-    def decode_codeblock(m):
-        decoded = base64.b64decode(m.group(1).encode()).decode()
-        match = re.match('^([^`]*?\n)?([^`]+)$', decoded)
-        lang = match.group(1) or ''
-        if not lang.strip(' \n\r'):
-            lang = 'plaintext'
-        else:
-            lang = lang.strip(' \n\r')
-
-        result = html.escape(match.group(2))
-        return (f'<div class="pre pre--multiline {lang}">{result}'
-                '</div>')
-
-    # Decode and process multiline codeblocks
-    content = re.sub('\x1AM(.*?)\x1AM', decode_codeblock, content)
 
     # Meta mentions (@everyone)
     content = content.replace('@everyone',
@@ -329,5 +315,21 @@ def format_micro_content_html(content: str) -> str:
     # Role mentions (<@&name>)
     content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)',
                      r'<span class="mention" title="Role: \2">@\2</span>', content)
+
+    def decode_codeblock(m):
+        decoded = base64.b64decode(m.group(1).encode()).decode()
+        match = re.match('([^`]*?\n)?([\s\S]+)', decoded)
+        lang = match.group(1) or ''
+        if not lang.strip(' \n\r'):
+            lang = 'plaintext'
+        else:
+            lang = lang.strip(' \n\r')
+
+        result = html.escape(match.group(2))
+        return (f'<div class="pre pre--multiline {lang}">{result}'
+                '</div>'.replace('\x00', ''))
+
+    # Decode and process multiline codeblocks
+    content = re.sub('\x1AM(.*?)\x1AM', decode_codeblock, content)
 
     return content

@@ -12,20 +12,19 @@ from django_logs.formatter import format_content_html, format_micro_content_html
 
 
 class LogRoute(models.Model):
+    origin = models.CharField(max_length=10, editable=False)
     url = models.TextField(editable=False, null=True)
-    short_code = models.CharField(max_length=5, editable=False, unique=True)
-    log_type = models.CharField(max_length=20, editable=False)
+    short_code = models.CharField(max_length=15, editable=False, unique=True)
+    log_type = models.CharField(max_length=30, editable=False)
     generated_at = models.DateTimeField(auto_now_add=True)
-    data = fields.JSONField(editable=False)
+    data = fields.JSONField(editable=False, null=True)
+    content = models.TextField(editable=False, null=True)
+    messages = fields.JSONField(editable=False)
+    chunked = models.BooleanField(editable=False, default=False)
 
     @classmethod
     def generate_short_code(cls, data):
         return shortuuid.uuid(str(data))[:5]
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.short_code = self.generate_short_code(self.data)
-        super(LogRoute, self).save(*args, **kwargs)
 
     def __str__(self):
         return 'Log %s' % self.short_code
@@ -155,7 +154,7 @@ class SerializedEmbed:
             self.title = format_micro_content_html(self.title)
         self.description = data.get('description', None)
         if self.description:
-            self.description = format_content_html(self.description, masked_links=True)
+            self.description = format_content_html(self.description, masked_links=True, newlines=False)
         self.url = data.get('url', None)
         self.type = data.get('type', 'rich')
         self.author = data.get('author', None)
@@ -179,7 +178,8 @@ class Embed:
         self.type = data.get('type', 'rich')
         self.author = data.get('author', None)
         ts = data.get('timestamp', None)
-        self.timestamp = ts if ts is None else dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC))
+        self.timestamp = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else ts
+        self.t = type(self.timestamp)
         tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
         self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.timestamp else None

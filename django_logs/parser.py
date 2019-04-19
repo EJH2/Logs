@@ -15,37 +15,37 @@ DISCORD_API_URL = 'https://discordapp.com/api/v7/users'
 DISCORD_HEADERS = {'Authorization': DISCORD_TOKEN}
 
 rowboat_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
-             r'(?P<uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \((?P<attach>(?:http(?:|s):.*))?\)$'
+             r'(?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \((?P<attach>(?:http(?:|s):.*))?\)$'
 
 rosalina_bottings_re = r'(?P<time>(?:[\d-]{10})T(?:[\d:.]{15}))\+[\d:]{5} \| (?P<gname>.*?)\[(?P<gid>\d{16,18})\] \|' \
                        r'  (?P<cname>[\w-]{1,100})\[(?P<cid>\d{16,18})\] \| (?P<uname>.*?)\[(?P<uid>\d{16,18})\] \|' \
                        r' said: (?P<content>[\S\s]*?)\nMessage ID: (?P<mid>\d{16,18})$'
 
-giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname>.*)#(?P<disc>\d{4}) : (?P<content>' \
+giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname>.*?)#(?P<disc>\d{4}) : (?P<content>' \
                  r'[\S\s]*?)? \| Attach: (?P<attach>(?:http(?:|s):.*))? \| RichEmbed: (?:null|(?P<embeds>.*))$'
 
-auttaja_re = r'\[(?P<time>[\w :]{24,25})\] \((?P<uname>.*)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18}' \
-             r')\]: (?P<content>[\S\s]*?)(?: (?P<attach>(?:http(?:|s):.*))?)?$'
+auttaja_re = r'\[(?P<time>[\w :]{24,25})\] \((?P<uname>.*?)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18' \
+             r'})\]: (?P<content>[\S\s]*?)(?: (?P<attach>(?:http(?:|s):.*))?)?$'
 
-logger_re = r'(?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?:(?:https://cdn\.discordapp\.com/avatars/\d' \
-            r'{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \([\w ]+\): (?P<content>' \
+logger_re = r'(?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?:(?:https://cdn\.discordapp\.com/avatars/' \
+            r'\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \([\w ]+\): (?P<content>' \
             r'[\S\s]*?) \| (?P<embeds>(?:{\"embeds\": \[.*?))? \| (?: =====> Attachment:.*?:(?P<attach>(?:http(?:|s)' \
             r':.*)))?$'
 
-sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
+sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
                r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
 
-spectra_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s]' \
-             r'+?)?(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
+spectra_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s' \
+             r']+?)?(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
 
-gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*)' \
-              r'#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?)? \|(?: ?(?P<attach>(?:http(?:|s):.*)' \
-              r')?)?$'
+gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*?' \
+              r')#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?)? \|(?: ?(?P<attach>(?:http(?:|s):.*' \
+              r'))?)?$'
 
-capnbot_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) \((' \
-             r'?:(?:https://cdn\.discordapp\.com/avatars/\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) (?P<' \
-             r'uname>.*)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?:|s):.*))? \| (?P<embeds>(?:{' \
-             r'\"embeds\": \[).*?)?$'
+capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
+             r'\((?:(?:https://cdn\.discordapp\.com/avatars/\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) (?P<' \
+             r'uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?:|s):.*))? \| (?P<embeds>' \
+             r'(?:{\"embeds\": \[).*?)?$'
 
 
 class LogParser:
@@ -53,21 +53,67 @@ class LogParser:
     def __init__(self, log_type):
         self.log_type = log_type
 
-    def create(self, content, url):
-        log_type = self.log_type
+    def _update_db(self, objects, create_data):
+        messages = create_data['data'].pop('messages')
+        short_code = create_data.pop('short_code')
+        first = objects[0]
+        assert isinstance(first, LogRoute)
+
+        # These messages don't need chunking
+        if len(messages) <= 500 and first.chunked is False:
+            return objects.update(**create_data, messages=messages, short_code=f'{short_code}')
+        if len(messages) <= 500 and first.chunked is True:
+            objects.delete()
+            return LogRoute.objects.create(**create_data, messages=messages, short_code=f'{short_code}')
+
+        # These messages do
+        objects.delete()  # Wipe the row(s) so no old info is left over
+        self._create_chunked(messages, create_data, short_code)
+
+    def _create_chunked(self, messages, create_data, short_code):
+        batch_list = list()
+        for batch in range(0, len(messages), 500):
+            batch_list.append(messages[batch:batch + 500])  # Split messages by the 500
+        create_data['chunked'] = True
+        new_first = LogRoute(**create_data, short_code=f'{short_code}-0', messages=batch_list[0])
+        create_data['data'] = None
+        create_data['content'] = None
+        new_rest = (LogRoute(**create_data, short_code=f'{short_code}-{i}', messages=batch_list[i]) for i in range(
+            1, len(batch_list)))
+        new_objects = [new_first, *new_rest]
+        logs = LogRoute.objects.bulk_create(new_objects)
+        return logs[0], True
+
+    def create(self, content, origin):
         data, short_code = self.parse(content)
-        if LogRoute.objects.filter(url=url).exists() and url is not None:
-            LogRoute.objects.filter(url=url).update(log_type=log_type, data=data)
-        if LogRoute.objects.filter(short_code=short_code).exists():
+        url = None
+        if isinstance(origin, tuple):
+            url = origin[1]
+            origin = 'url'
+        create_data = {'origin': origin, 'url': url, 'short_code': short_code, 'log_type': self.log_type, 'data': data,
+                       'content': content}
+        if url:
+            filter_url = LogRoute.objects.filter(url=url).order_by('generated_at')
+            if filter_url.exists():
+                self._update_db(filter_url, create_data)
+        if LogRoute.objects.filter(short_code__startswith=short_code).exists():
+            print('cached')
             return short_code, False
-        log, created = LogRoute.objects.get_or_create(url=url, log_type=log_type, data=data)
-        return log.short_code, created
+        messages = data.pop('messages')
+        chunked = len(messages) > 500
+        short_code = create_data.pop('short_code')
+        with open('data.json', 'w') as w:
+            w.write(json.dumps(messages))
+        if chunked:
+            _, created = self._create_chunked(messages, create_data, short_code)
+        else:
+            _, created = LogRoute.objects.get_or_create(**create_data, messages=messages, short_code=short_code)
+        return short_code, created
 
     def parse(self, content):
-        log_type = self.log_type
-        parser = getattr(self, f'_parse_{log_type}')
+        parser = getattr(self, f'_parse_{self.log_type}')
         data = parser(content)
-        short_code = LogRoute.generate_short_code(data)
+        short_code = LogRoute.generate_short_code(data['messages'])
         return data, short_code
 
     @staticmethod
@@ -105,6 +151,9 @@ class LogParser:
         users = list()
         _users = dict()
         data['messages'] = list()
+
+        # Force uniqueness of messages, because you can't have more than one message with the same ID/timestamp
+        match_data = list({match['id'] if match.get('id') else match['time']: match for match in match_data}.values())
 
         for match in match_data:
             uid = match['uid']
@@ -161,7 +210,6 @@ class LogParser:
 
     def _parse_rowboat(self, content):
         data = dict()
-        data['raw_content'] = content
         matches = list(re.finditer(rowboat_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
@@ -175,7 +223,6 @@ class LogParser:
 
     def _parse_rosalina_bottings(self, content):
         data = dict()
-        data['raw_content'] = content
         matches = list(re.finditer(rosalina_bottings_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
@@ -186,7 +233,6 @@ class LogParser:
 
     def _parse_giraffeduck(self, content):
         data = dict()
-        data['raw_content'] = content
         matches = list(re.finditer(giraffeduck_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
@@ -226,7 +272,6 @@ class LogParser:
     def _parse_auttaja(self, content):
         content = content[:-1] if content.endswith('\n') else content
         data = dict()
-        data['raw_content'] = content
         lines = content.split('\n\n')
         _matches = list()
         for text in lines:
@@ -248,7 +293,6 @@ class LogParser:
 
     def _parse_logger(self, content):
         data = dict()
-        data['raw_content'] = content
         matches = list(re.finditer(logger_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
@@ -265,7 +309,6 @@ class LogParser:
 
     def _parse_sajuukbot(self, content):
         data = dict()
-        data['raw_content'] = content
         lines = content.split('\n')
         _matches = list()
         for text in lines:
@@ -286,7 +329,6 @@ class LogParser:
 
     def _parse_spectra(self, content):
         data = dict()
-        data['raw_content'] = content
         lines = content.split('\n\n')[1:]
         _matches = list()
         for text in lines:
@@ -307,7 +349,6 @@ class LogParser:
 
     def _parse_gearboat(self, content):
         data = dict()
-        data['raw_content'] = content
         matches = list(re.finditer(gearboat_re, content))
         match_data = list(m.groupdict() for m in matches)
 
@@ -321,7 +362,6 @@ class LogParser:
 
     def _parse_capnbot(self, content):
         data = dict()
-        data['raw_content'] = content
         matches = list(re.finditer(capnbot_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
