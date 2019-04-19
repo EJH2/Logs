@@ -101,8 +101,6 @@ class LogParser:
         messages = data.pop('messages')
         chunked = len(messages) > 500
         short_code = create_data.pop('short_code')
-        with open('data.json', 'w') as w:
-            w.write(json.dumps(messages))
         if chunked:
             _, created = self._create_chunked(messages, create_data, short_code)
         else:
