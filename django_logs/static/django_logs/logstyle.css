@@ -69,7 +69,7 @@ img {
 
 .pre--inline {
     font-family: Menlo, Consolas, Monaco, monospace;
-    font-size: 14px;
+    font-size: 85%;
     line-height: 16px;
     padding: 2px;
     border-radius: 3px;
@@ -391,10 +391,6 @@ body {
         opacity: 1;
     }
 
-    .pre--inline {
-        font-size: 85%
-    }
-
     input:checked ~ .info__toolbox-tools li:nth-child(1) {
         top: 30px;
     }
@@ -595,6 +591,7 @@ body {
     display: flex;
     max-width: 520px;
     margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 .chatlog__embed .emoji {
@@ -732,7 +729,7 @@ body {
 }
 
 .chatlog__embed-footer {
-    margin-top: 10px;
+    display: flex;
 }
 
 .chatlog__embed-footer-icon {

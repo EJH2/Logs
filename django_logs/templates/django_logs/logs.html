@@ -212,7 +212,9 @@
                                         </div>
                                     {% endif %}
                                     {% if embed.timestamp and not embed.footer %}
-                                        <time class="chatlog__embed-footer chatlog__embed-footer-text" datetime="{{ embed.timestamp.isoformat }}">{{ embed.human_timestamp }}</time>
+                                        <div class="chatlog__embed-footer">
+                                            <time class="chatlog__embed-footer-text" datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
+                                        </div>
                                     {% endif %}
                                     {% if embed.footer and embed.timestamp %}
                                         <div class="chatlog__embed-footer">
@@ -223,7 +225,7 @@
                                             <span class="chatlog__embed-footer-text">
                                                 {{ embed.footer.text }}
                                                 <span class="chatlog__embed-footer-separator">•</span>
-                                                <time datetime="{{ embed.timestamp.isoformat }}">{{ embed.human_timestamp }}</time>
+                                                <time datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
                                             </span>
                                         </div>
                                     {% endif %}
