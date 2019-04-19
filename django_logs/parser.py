@@ -97,7 +97,6 @@ class LogParser:
             if filter_url.exists():
                 self._update_db(filter_url, create_data)
         if LogRoute.objects.filter(short_code__startswith=short_code).exists():
-            print('cached')
             return short_code, False
         messages = data.pop('messages')
         chunked = len(messages) > 500
