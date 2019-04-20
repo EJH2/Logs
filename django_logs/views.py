@@ -160,6 +160,7 @@ def view(request):
         messages.error(request, 'You have to provide a url with text in it to parse!')
         return redirect('index')
 
+    content = re.sub('\r\n', '\n', content)
     for log_type in types.keys():  # Try all log types
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 500:
@@ -168,11 +169,21 @@ def view(request):
                                     f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
-            content = re.sub('\r\n', '\n', content)
-            short, created = LogParser(log_type=log_type).create(content, url)
+            print(match_len)
+            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
 
     # Mission failed, we'll get em next time
     messages.error(request, 'We can\'t seem to parse that file. Are you sure it\'s a valid log type?')
+    return redirect('index')
+
+
+def handle404(request):
+    messages.error(request, 'Log not found.')
+    return redirect('index')
+
+
+def handle500(request):
+    messages.error(request, 'Something broke, please contact EJH2#0330 on Discord about this issue!')
     return redirect('index')

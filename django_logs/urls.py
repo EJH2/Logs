@@ -13,3 +13,6 @@ urlpatterns = [
     re_path(r'(?P<short_code>[\w]{5})/raw', views.logs, kwargs={'raw': True}, name='raw'),
     re_path(r'(?P<short_code>[\w]{5})', views.logs, name='logs'),
 ]
+
+handler404 = views.handle404
+handler500 = views.handle500

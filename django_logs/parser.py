@@ -28,10 +28,10 @@ giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname
 auttaja_re = r'\[(?P<time>[\w :]{24,25})\] \((?P<uname>.*?)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18' \
              r'})\]: (?P<content>[\S\s]*?)(?: (?P<attach>(?:http(?:|s):.*))?)?$'
 
-logger_re = r'(?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?:(?:https://cdn\.discordapp\.com/avatars/' \
-            r'\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \([\w ]+\): (?P<content>' \
-            r'[\S\s]*?) \| (?P<embeds>(?:{\"embeds\": \[.*?))? \| (?: =====> Attachment:.*?:(?P<attach>(?:http(?:|s)' \
-            r':.*)))?$'
+logger_re = r'(?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?:(?:https://(?:cdn\.)?discordapp\.com/(?:' \
+            r'avatars/\d{16,18}|assets)/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \(' \
+            r'[\w ]+\): (?P<content>[\S\s]*?) \| (?P<embeds>(?:{\"embeds\": \[.*?))? \| (?: =====> Attachment:.*?:' \
+            r'(?P<attach>(?:http(?:|s):.*)))?$'
 
 sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
                r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
@@ -44,9 +44,9 @@ gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) 
               r'))?)?$'
 
 capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
-             r'\((?:(?:https://cdn\.discordapp\.com/avatars/\d{16,18}/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) (?P<' \
-             r'uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?:|s):.*))? \| (?P<embeds>' \
-             r'(?:{\"embeds\": \[).*?)?$'
+             r'\((?:(?:https://(?:cdn\.)?discordapp\.com/(?:avatars/\d{16,18}|(?P<asset>assets))/(?P<avatar>\w+)\.\w' \
+             r'{3,4}(?:\?[\w=]+)?))\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?' \
+             r':|s):.*))? \| (?P<embeds>(?:{\"embeds\": \[).*?)?$'
 
 
 class LogParser:
@@ -95,7 +95,7 @@ class LogParser:
         logs = LogRoute.objects.bulk_create(new_objects)
         return logs[0], True
 
-    def create(self, content, origin):
+    def create(self, content, origin, *, new=False):
         data, short_code = self.parse(content)
         url = None
         if isinstance(origin, tuple):
@@ -107,8 +107,11 @@ class LogParser:
             filter_url = LogRoute.objects.filter(url=url).order_by('id')
             if filter_url.exists():
                 self._update_db(filter_url, create_data)
-        if LogRoute.objects.filter(short_code__startswith=short_code).exists():
-            return short_code, False
+        filter_short = LogRoute.objects.filter(short_code__startswith=short_code)
+        if filter_short.exists():
+            if not new:
+                return short_code, False
+            filter_short.delete()
         messages = self._get_messages(data)
         chunked = len(messages) > 1000
         short_code = create_data.pop('short_code')
@@ -158,10 +161,10 @@ class LogParser:
     def _parse(data: dict, match_data: list):
         users = list()
         _users = dict()
-        data['messages'] = list()
+        messages = list()
 
-        # Force uniqueness of messages, because you can't have more than one message with the same ID/timestamp
-        match_data = list({match['id'] if match.get('id') else match['time']: match for match in match_data}.values())
+        # Force uniqueness of messages, because you can't have more than one message that is the exact same
+        match_data = list(i for n, i in enumerate(match_data) if i not in match_data[n + 1:])
 
         for match in match_data:
             uid = match['uid']
@@ -171,16 +174,18 @@ class LogParser:
             user = {'id': uid, 'username': match.get('uname', 'Unknown User'),
                     'discriminator': match.get('disc', '0000'), 'avatar': match.get('avatar', None)}
 
-            def get_avatar(user_dict: dict, default_avatar: bool = False):
-                if not user_dict.get('avatar', None) or default_avatar:
-                    default = int(user_dict['discriminator']) % 5
+            def get_avatar(default_avatar: bool = False):
+                if not user.get('avatar', None) or default_avatar:
+                    default = int(user['discriminator']) % 5
                     return f'https://cdn.discordapp.com/embed/avatars/{default}.png'
-                ending = 'gif' if user_dict['avatar'].startswith('a_') else 'png'
+                if match.get('asset'):
+                    return f'https://discordapp.com/assets/{user["avatar"]}.png'
+                ending = 'gif' if user['avatar'].startswith('a_') else 'png'
                 return f'https://cdn.discordapp.com/avatars/{uid}/{user["avatar"]}.{ending}'
 
             if uid not in _users:
                 if user.get('avatar', None):  # User supplied avatar, don't bombard Discord's API
-                    user['avatar'] = get_avatar(user)
+                    user['avatar'] = get_avatar()
                     pass
                 elif not DISCORD_TOKEN:  # We can't request the API, so use the default avatar
                     pass
@@ -192,7 +197,7 @@ class LogParser:
                             if user.get('avatar', None) is not None:
                                 user['avatar'] = get_avatar(user)
 
-                user['avatar'] = user['avatar'] or get_avatar(user, default_avatar=True)
+                user['avatar'] = user['avatar'] or get_avatar(default_avatar=True)
                 _users[uid] = user
                 users.append(User(user).__dict__)
             else:
@@ -210,7 +215,9 @@ class LogParser:
                 if len(match['embeds']) > 0 and match['embeds'][0] != '':
                     message_dict['embeds'] = match['embeds']
 
-            data['messages'].append(SerializedMessage(message_dict).__dict__)
+            messages.append(SerializedMessage(message_dict).__dict__)
+
+        data['messages'] = messages
 
         def sort_alphabetical(value):
             return value['name']
@@ -298,6 +305,7 @@ class LogParser:
             match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
             match['attach'] = self._get_attach_info(match['attach'].split(' ')) if match.get('attach', None) \
                 else []
+
         data = self._parse(data, match_data)
         data['type'] = 'Auttaja'
 
@@ -334,6 +342,7 @@ class LogParser:
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
                 else []
+
         data = self._parse(data, match_data)
         data['type'] = 'SajuukBot'
 
@@ -354,6 +363,7 @@ class LogParser:
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
                 else []
+
         data = self._parse(data, match_data)
         data['type'] = 'Spectra'
 
