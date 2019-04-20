@@ -5,6 +5,10 @@ body {
     color: #747F8D;
 }
 
+.info__metadata b {
+    color: #000000;
+}
+
 a, a.chatlog__embed-title {
     color: #00B0F4;
 }
@@ -76,11 +80,11 @@ a, a.chatlog__embed-title {
 }
 
 .copied {
-    animation: copied 1s ease-in-out;
+    animation: copied .5s ease-out;
 }
 
 .copied.mention {
-    animation: copiedMention 1s ease-in-out;
+    animation: copiedMention .5s ease-out;
 }
 
 @keyframes copied {

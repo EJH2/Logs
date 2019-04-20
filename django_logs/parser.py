@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import re
 
+import dateutil
 import requests
 
 from django_logs.models import LogRoute, User, SerializedMessage
@@ -53,16 +54,26 @@ class LogParser:
     def __init__(self, log_type):
         self.log_type = log_type
 
+    @staticmethod
+    def _get_messages(data):
+        _msgs = data.pop('messages')
+
+        def sort_chronological(value):
+            return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
+
+        _msgs.sort(key=sort_chronological)
+        return _msgs
+
     def _update_db(self, objects, create_data):
-        messages = create_data['data'].pop('messages')
+        messages = self._get_messages(create_data['data'])
         short_code = create_data.pop('short_code')
         first = objects[0]
         assert isinstance(first, LogRoute)
 
         # These messages don't need chunking
-        if len(messages) <= 500 and first.chunked is False:
+        if len(messages) <= 1000 and first.chunked is False:
             return objects.update(**create_data, messages=messages, short_code=f'{short_code}')
-        if len(messages) <= 500 and first.chunked is True:
+        if len(messages) <= 1000 and first.chunked is True:
             objects.delete()
             return LogRoute.objects.create(**create_data, messages=messages, short_code=f'{short_code}')
 
@@ -72,8 +83,8 @@ class LogParser:
 
     def _create_chunked(self, messages, create_data, short_code):
         batch_list = list()
-        for batch in range(0, len(messages), 500):
-            batch_list.append(messages[batch:batch + 500])  # Split messages by the 500
+        for batch in range(0, len(messages), 1000):
+            batch_list.append(messages[batch:batch + 1000])  # Split messages by the 1000
         create_data['chunked'] = True
         new_first = LogRoute(**create_data, short_code=f'{short_code}-0', messages=batch_list[0])
         create_data['data'] = None
@@ -93,13 +104,13 @@ class LogParser:
         create_data = {'origin': origin, 'url': url, 'short_code': short_code, 'log_type': self.log_type, 'data': data,
                        'content': content}
         if url:
-            filter_url = LogRoute.objects.filter(url=url).order_by('generated_at')
+            filter_url = LogRoute.objects.filter(url=url).order_by('id')
             if filter_url.exists():
                 self._update_db(filter_url, create_data)
         if LogRoute.objects.filter(short_code__startswith=short_code).exists():
             return short_code, False
-        messages = data.pop('messages')
-        chunked = len(messages) > 500
+        messages = self._get_messages(data)
+        chunked = len(messages) > 1000
         short_code = create_data.pop('short_code')
         if chunked:
             _, created = self._create_chunked(messages, create_data, short_code)
@@ -201,6 +212,10 @@ class LogParser:
 
             data['messages'].append(SerializedMessage(message_dict).__dict__)
 
+        def sort_alphabetical(value):
+            return value['name']
+
+        users.sort(key=sort_alphabetical)
         data['users'] = users
 
         return data

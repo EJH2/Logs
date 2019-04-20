@@ -1,6 +1,7 @@
 import pytz
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
@@ -31,7 +32,8 @@ def index(request):
     data['type'] = None
     data['generated_at'] = datetime.now()
     data['raw_content'] = home.content
-    return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data), 'log_type': None})
+    return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data), 'log_type': None,
+                                                             'msg_len': 1})
 
 
 def logs(request, short_code: str, raw=False):
@@ -41,8 +43,25 @@ def logs(request, short_code: str, raw=False):
         if not _log.exists():
             raise ObjectDoesNotExist
         log = _log[0]
+        chunked = False
+        msg_page = None
+        msg_len = len(log.messages)
         if _log.count() > 1:
-            log.messages = log.messages = [msg for msgs in [_l.messages for _l in _log.order_by('id')] for msg in msgs]
+            chunked = True
+            page = request.GET.get('page', None)
+            if not request.is_ajax() and page:
+                return redirect('logs', short_code=short_code)
+
+            msgs = [msg for msgs in [_l.messages for _l in _log.order_by('id')] for msg in msgs]
+            msg_len = len(msgs)
+            paginator = Paginator(msgs, 100)
+            try:
+                msg_page = paginator.page(page)
+            except PageNotAnInteger:
+                msg_page = paginator.page(1)
+            except EmptyPage:
+                msg_page = paginator.page(paginator.num_pages)
+            log.messages = msg_page.object_list
         if raw:
             content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
@@ -53,8 +72,9 @@ def logs(request, short_code: str, raw=False):
         log.data['messages'] = log.messages
         log.data['raw_content'] = log.content
         return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(log.data),
-                                                                 'original_url': log.url,
-                                                                 'log_type': log.log_type})
+                                                                 'original_url': log.url, 'log_type': log.log_type,
+                                                                 'chunked': chunked, 'msg_page': msg_page,
+                                                                 'msg_len': msg_len, 'short': short_code})
     except ObjectDoesNotExist:
         messages.error(request, 'Log not found.')
         return redirect('index')

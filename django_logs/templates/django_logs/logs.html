@@ -6,7 +6,7 @@
     {% load static %}
     <meta name="viewport" content="width=device-width"/>
     <meta name="og:title" content="Discord Log Viewer">
-    <meta name="og:description" content="Message Count: {{ log_entry.messages | length }}">
+    <meta name="og:description" content="Message Count: {{ msg_len }}">
     <meta name="og:image" content="https://{{ request.META.HTTP_HOST }}{% static 'django_logs/black_file.png' %}">
     <link href="{% static "django_logs/logstyle.css" %}" rel="stylesheet">
     <link id="theme" href="{% static "django_logs/logstyle_dark.css" %}" rel="stylesheet">
@@ -17,6 +17,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
 </head>
 <body class="no-js">
 <br>
@@ -51,7 +52,7 @@
             <div class="info__generated-at"><span>Generated:</span>
                 <b>{{ log_entry.human_generated_at }}</b></div>{% endif %}
         <div class="info__channel-message-count"><span>Message Count:</span>
-            <b>{{ log_entry.messages | length }}</b></div>
+            <b>{{ msg_len }}</b></div>
         <div class="info__user-list">
             <span>User{% if log_entry.users|length > 1 %}s: {% else %}: {% endif %}</span>
             <label class="material-icons info__user-toggle">
@@ -116,9 +117,9 @@
         </ul>
     </div>
 </div>
-<div class="chatlog">
+<div class="chatlog{% if chunked %} infinite-container{% endif %}">
     {% for group in log_entry.message_groups %}
-        <div class="chatlog__message-group">
+        <div class="chatlog__message-group{% if chunked %} infinite-item{% endif %}">
             <div class="chatlog__author-avatar-container">
                 <img class="chatlog__author-avatar"
                      src="{{ group.author.avatar_url }}"
@@ -276,53 +277,64 @@
         </div>
     {% endfor %}
 </div>
+{% if chunked and msg_page.has_next %}
+    <div class="infinite-next">
+        <a class="infinite-more-link" href="{{ short }}?page={{ msg_page.next_page_number }}"></a>
+    </div>
+    <div class="infinite-scroll-status" style="text-align: center">
+        <img class="infinite-scroll-request" src="{% static 'django_logs/loading.gif' %}">
+    </div>
+{% endif %}
 <div id="lightbox_div"></div>
 <script>
     document.body.classList.remove('no-js');
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function loadJS() {
+
         document.querySelectorAll('.pre--multiline').forEach((block) => {
             hljs.highlightBlock(block);
         });
-    });
 
-    for (let attach of document.getElementsByClassName('chatlog__attachment-thumbnail')) {
         const lightDiv = document.getElementById('lightbox_div');
-        let a = attach.parentElement;
-        a.onclick = function () {
-            let id = a.getAttribute('href').substring(1);
-            console.log(id);
-            let lightA = document.createElement('a');
-            lightA.setAttribute('id', id);
-            lightA.classList.add('lightbox');
-            let lightImg = document.createElement('img');
-            lightImg.setAttribute('src', attach.getAttribute('src'));
-            lightA.onclick = function () {
-                window.history.back();
-                lightDiv.innerHTML = '';
+
+        for (let attach of document.getElementsByClassName('chatlog__attachment-thumbnail')) {
+            let a = attach.parentElement;
+            a.onclick = function () {
+                let id = a.getAttribute('href').substring(1);
+                let lightA = document.createElement('a');
+                lightA.setAttribute('id', id);
+                lightA.classList.add('lightbox');
+                let lightImg = document.createElement('img');
+                lightImg.setAttribute('src', attach.getAttribute('src'));
+                lightA.onclick = function () {
+                    window.history.back();
+                    lightDiv.innerHTML = '';
+                };
+                lightA.appendChild(lightImg);
+                lightDiv.appendChild(lightA);
             };
-            lightA.appendChild(lightImg);
-            lightDiv.appendChild(lightA);
-        };
-    }
+        }
 
-    for (let t of document.getElementsByTagName('time')) {
-        let date = t.getAttribute('datetime');
-        t.textContent = moment(date).calendar();
-    }
+        for (let t of document.getElementsByTagName('time')) {
+            let date = t.getAttribute('datetime');
+            t.textContent = moment(date).calendar();
+        }
 
-    for (let s of document.getElementsByClassName('chatlog__spoiler-box')) {
-        s.onclick = function () {
-            s.classList.toggle('chatlog__spoiler-hidden');
-        };
-        s.classList.add('chatlog__spoiler-hidden');
-    }
+        for (let s of document.getElementsByClassName('chatlog__spoiler-box')) {
+            s.onclick = function () {
+                s.classList.toggle('chatlog__spoiler-hidden');
+            };
+            s.classList.add('chatlog__spoiler-hidden');
+        }
 
-    for (let s of document.getElementsByClassName('mention user')) {
-        s.onclick = function () {
-            return copyIDMention(s);
+        for (let s of document.getElementsByClassName('mention user')) {
+            s.onclick = function () {
+                return copyIDMention(s);
+            }
         }
     }
+
+    loadJS();
 
     function toggleDrawer(element) {
         element.classList.toggle('rotated');
@@ -404,6 +416,17 @@
         textArea.remove();
         element.classList.toggle('copied');
     }
+
+    {% if chunked %}
+        let infScroll = new InfiniteScroll('.infinite-container', {
+            path: '.infinite-more-link',
+            append: '.infinite-item',
+            status: '.infinite-scroll-status',
+            hideNav: '.infinite-next',
+            history: 'replace',
+        });
+        infScroll.on('append', function( response, path, items ) { loadJS() });
+    {% endif %}
 </script>
 </body>
 </html>

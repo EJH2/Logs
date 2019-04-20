@@ -35,19 +35,10 @@ class LogEntry:
         self.generated_at = data['generated_at'] if data.get('generated_at', None) else None
         tz = self.generated_at.tzinfo if self.generated_at else pytz.UTC
         self.human_generated_at = duration(self.generated_at, now=datetime.now(tz=tz)) if self.generated_at else None
-        self.messages = [Message(m) for m in self.sorted(data['messages'])]
+        self.messages = [Message(m) for m in data['messages']]
         self.users = data['users']
         self.raw_content = data['raw_content']
         self.type = data['type']
-
-    @classmethod
-    def sorted(cls, messages: list):
-
-        def sort_chronologcal(value):
-            return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
-
-        messages.sort(key=sort_chronologcal)
-        return messages
 
     @property
     def message_groups(self):

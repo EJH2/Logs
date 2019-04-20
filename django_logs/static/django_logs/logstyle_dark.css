@@ -5,6 +5,10 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
+.info__metadata b {
+    color: #FFFFFF;
+}
+
 a, a.chatlog__embed-title {
     color: #0096CF;
 }
@@ -77,11 +81,11 @@ a, a.chatlog__embed-title {
 }
 
 .copied {
-    animation: copied 1s ease-in-out;
+    animation: copied .5s ease-out;
 }
 
 .copied.mention {
-    animation: copiedMention 1s ease-in-out;
+    animation: copiedMention .5s ease-out;
 }
 
 @keyframes copied {
@@ -188,13 +192,13 @@ a, a.chatlog__embed-title {
 }
 
 .chatlog__spoiler-box {
-    background-color: #FFFFFF03;
+    background-color: rgba(255, 255, 255, 0.01);
 }
 
 .chatlog__reaction {
-    background-color: #FFFFFF03;
+    background-color: rgba(255, 255, 255, 0.01);
 }
 
 .chatlog__reaction-count {
-    color: #FFFFFF4D;
+    color: rgba(255, 255, 255, 0.3);
 }
