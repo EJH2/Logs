@@ -17,9 +17,9 @@ types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosa
 def _request_url(url: str):
     try:
         try:
-            resp = requests.get(url)
+            resp = requests.get(url, stream=True)
         except requests.exceptions.MissingSchema:
-            resp = requests.get('https://' + url)
+            resp = requests.get('https://' + url, stream=True)
     except requests.exceptions.ConnectionError:
         resp = None
     return resp
@@ -98,12 +98,14 @@ def api(request):
     if data.get('url'):
         url = data.get('url')
         resp = _request_url(url)
-        origin = ('url', url)
         if not resp:
             resp = {'status': 400, 'message': f'Connection to url "{url}" failed.'}
             return JsonResponse(resp, status=400)
-        else:
-            content = resp.content.decode()
+        if 'text/plain' not in resp.headers['Content-Type']:
+            resp = {'status': 400, 'message': f'Content-Type of "{url}" must be of type "text/plain"!'}
+            return JsonResponse(resp, status=400)
+        origin = ('url', url)
+        content = resp.content.decode()
     elif data.get('content'):
         origin = 'raw'
         content = data.get('content')
@@ -155,6 +157,9 @@ def view(request):
         messages.error(request, f'Connection to url "{url}" failed. Is it a valid url?')
         return redirect('index')
     assert isinstance(resp, requests.Response)
+    if 'text/plain' not in resp.headers['Content-Type']:
+        messages.error(request, f'Content-Type of "{url}" must be of type "text/plain"!')
+        return redirect('index')
     content = resp.content.decode()
     if content == '':
         messages.error(request, 'You have to provide a url with text in it to parse!')
