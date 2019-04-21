@@ -39,7 +39,7 @@ def index(request):
 def logs(request, short_code: str, raw=False):
     try:
         short_code = short_code.split('-')[0]
-        _log = LogRoute.objects.filter(short_code__startswith=short_code)
+        _log = LogRoute.objects.filter(short_code__startswith=short_code).order_by('id')
         if not _log.exists():
             raise ObjectDoesNotExist
         log = _log[0]
@@ -52,7 +52,7 @@ def logs(request, short_code: str, raw=False):
             if not request.is_ajax() and page:
                 return redirect('logs', short_code=short_code)
 
-            msgs = [msg for msgs in [_l.messages for _l in _log.order_by('id')] for msg in msgs]
+            msgs = [msg for msgs in [_l.messages for _l in _log] for msg in msgs]
             msg_len = len(msgs)
             paginator = Paginator(msgs, 100)
             try:

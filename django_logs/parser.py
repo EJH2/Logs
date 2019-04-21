@@ -48,6 +48,9 @@ capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\
              r'{3,4}(?:\?[\w=]+)?))\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?' \
              r':|s):.*))? \| (?P<embeds>(?:{\"embeds\": \[).*?)?$'
 
+attachment_re = r'(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attachments(?:\/\d{16,18' \
+                r'}){2}|external\/[^\/]+)\/(?P<filename>.*)'
+
 
 class LogParser:
 
@@ -132,18 +135,10 @@ class LogParser:
         attach = []
         if len(attachments) > 0 and attachments[0] != '':
             for url in attachments:
-                attach_info = {'id': url.rsplit('/', 2)[1], 'filename': url.rsplit('/', 2)[2], 'url': url, 'size': 0,
-                               'is_image': False, 'error': False}
-                try:
-                    req = requests.head(url)
-                except requests.exceptions.MissingSchema:
-                    req = requests.head('https://' + url)
-                if req.status_code == 200:
-                    if req.headers['Content-Type'].split('/')[0] == 'image':
-                        attach_info['is_image'] = True
-                    attach_info['size'] = req.headers['Content-Length']
-                else:
-                    attach_info['error'] = True
+                file = re.match(attachment_re, url).group('filename')
+                attach_info = {'filename': file, 'url': url, 'size': 0, 'is_image': False}
+                if file.rsplit('.', 1)[-1] in ['png', 'jpg', 'jpeg', 'gif', 'webm', 'webp', 'mp4']:
+                    attach_info['is_image'] = True
                 attach.append(attach_info)
         return attach
 
@@ -162,9 +157,6 @@ class LogParser:
         users = list()
         _users = dict()
         messages = list()
-
-        # Force uniqueness of messages, because you can't have more than one message that is the exact same
-        match_data = list(i for n, i in enumerate(match_data) if i not in match_data[n + 1:])
 
         for match in match_data:
             uid = match['uid']
@@ -301,6 +293,7 @@ class LogParser:
 
         matches = list(re.match(auttaja_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
+
         for match in match_data:
             match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
             match['attach'] = self._get_attach_info(match['attach'].split(' ')) if match.get('attach', None) \
@@ -339,6 +332,7 @@ class LogParser:
 
         matches = list(re.match(sajuukbot_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
+
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
                 else []
@@ -360,6 +354,7 @@ class LogParser:
 
         matches = list(re.match(spectra_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
+
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
                 else []

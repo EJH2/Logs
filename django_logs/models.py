@@ -114,19 +114,15 @@ class MessageGroup:
 class Attachment:
     def __init__(self, data):
         if isinstance(data, str):  # Backwards compatibility
-            self.id = data.rsplit('/', 2)[1]
-            self.filename = data.rsplit('/', 2)[2]
+            self.filename = data.rsplit('/', 1)[1]
             self.url = data
             self.is_image = True
             self.size = 0
-            self.error = False
         else:
-            self.id = int(data['id'])
             self.filename = data['filename']
             self.url = data['url']
             self.is_image = data['is_image']
             self.size = filesize(data['size'])
-            self.error = data['error']
 
     @classmethod
     def from_dict(cls, data: dict):

@@ -23,9 +23,7 @@
 <br>
 {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-warning" role="alert">
-    {{ message }}
-    </div>
+    <div class="alert alert-warning" role="alert">{{ message }}</div>
     <br>
     {% endfor %}
 {% endif %}
@@ -33,20 +31,15 @@
     <div class="info__guild-icon-container">
         <img class="info__guild-icon"
             {% if log_type %}
-                {% with 'django_logs/'|add:log_type|lower|add:'.png' as image_static %}
-                    src="{% static image_static %}"
-                {% endwith %}
+                {% with 'django_logs/'|add:log_type|lower|add:'.png' as image_static %} src="{% static image_static %}" {% endwith %}
             {% else %}
                 src="{% static 'django_logs/white_file.png' %}"
             {% endif %}
-             onerror="this.src='{% static 'django_logs/white_file.png' %}'"
-             alt="avatar">
+             onerror="this.src='{% static 'django_logs/white_file.png' %}'" alt="avatar">
     </div>
     <div class="info__metadata">
         <div class="info__guild-name">
-            <span>Logs From {% if log_entry.type %}
-                {{ log_entry.type }}{% else %}
-                File{% endif %}</span>
+            <span>Logs From {% if log_entry.type %}{{ log_entry.type }}{% else %}File{% endif %}</span>
         </div>
         {% if log_entry.generated_at %}
             <div class="info__generated-at"><span>Generated:</span>
@@ -73,8 +66,7 @@
                 {% endfor %}
                 <li class="copyall" style="list-style: none">
                     <span class="tooltip">
-                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)"
-                              style="opacity: 1;">Copy All IDs</span>
+                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)" style="opacity: 1;">Copy All IDs</span>
                     </span>
                 </li>
             </ul>
@@ -121,10 +113,7 @@
     {% for group in log_entry.message_groups %}
         <div class="chatlog__message-group{% if chunked %} infinite-item{% endif %}">
             <div class="chatlog__author-avatar-container">
-                <img class="chatlog__author-avatar"
-                     src="{{ group.author.avatar_url }}"
-                     onerror="this.src='{{ group.author.default_avatar_url }}'"
-                     alt="avatar"/>
+                <img class="chatlog__author-avatar" src="{{ group.author.avatar_url }}" onerror="this.src='{{ group.author.default_avatar_url }}'" alt="avatar"/>
             </div>
             <div class="chatlog__messages">
                 <div class="chatlog__header">
@@ -156,13 +145,11 @@
                                         {% if embed.author %}
                                             <div class="chatlog__embed-author">
                                                 {% if embed.author.icon_url %}
-                                                    <img alt class="chatlog__embed-author-icon"
-                                                         src="{{ embed.author.icon_url }}">
+                                                    <img alt class="chatlog__embed-author-icon" src="{{ embed.author.icon_url }}">
                                                 {% endif %}
                                                 {% if embed.author.name %}
                                                     {% if embed.author.url %}
-                                                        <a class="chatlog__embed-author chatlog__embed-author-name-link chatlog__embed-link"
-                                                           href="{{ embed.author.url }}">{{ embed.author.name }}</a>
+                                                        <a class="chatlog__embed-author chatlog__embed-author-name-link chatlog__embed-link" href="{{ embed.author.url }}">{{ embed.author.name }}</a>
                                                     {% else %}
                                                         <span class="chatlog__embed-author-name">{{ embed.author.name }}</span>
                                                     {% endif %}
@@ -172,8 +159,7 @@
                                         {% if embed.title %}
                                             <div class="chatlog__embed-margin">
                                                 {% if embed.url %}
-                                                    <a class="chatlog__embed-title chatlog__embed-link"
-                                                       href="{{ embed.url }}">{{ embed.title | safe }}</a>
+                                                    <a class="chatlog__embed-title chatlog__embed-link" href="{{ embed.url }}">{{ embed.title | safe }}</a>
                                                 {% else %}
                                                     <span class="chatlog__embed-title">{{ embed.title | safe }}</span>
                                                 {% endif %}
@@ -194,20 +180,17 @@
                                         {% endif %}
                                     </div>
                                     {% if embed.thumbnail %}
-                                        <img src="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail"
-                                             style="max-width: 80px; max-height: 80px">
+                                        <img src="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail" style="max-width: 80px; max-height: 80px">
                                     {% endif %}
                                 </div>
                                 {% if embed.image %}
-                                    <img src="{{ embed.image.url }}"
-                                         class="chatlog__embed-image chatlog__embed-margin-large">
+                                    <img src="{{ embed.image.url }}" class="chatlog__embed-image chatlog__embed-margin-large">
                                 {% endif %}
                                 {% if embed.footer or embed.timestamp %}
                                     {% if embed.footer and not embed.timestamp %}
                                         <div class="chatlog__embed-footer">
                                             {% if embed.footer.icon_url %}
-                                                <img class="chatlog__embed-footer-icon"
-                                                     src="{{ embed.footer.icon_url }}">
+                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}">
                                             {% endif %}
                                             <span class="chatlog__embed-footer-text">{{ embed.footer.text }}</span>
                                         </div>
@@ -220,8 +203,7 @@
                                     {% if embed.footer and embed.timestamp %}
                                         <div class="chatlog__embed-footer">
                                             {% if embed.footer.icon_url %}
-                                                <img class="chatlog__embed-footer-icon"
-                                                     src="{{ embed.footer.icon_url }}">
+                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}">
                                             {% endif %}
                                             <span class="chatlog__embed-footer-text">
                                                 {{ embed.footer.text }}
@@ -235,42 +217,33 @@
                         </div>
                     {% endfor %}
                     {% for attachment in message.attachments %}
-                        {% if not attachment.error %}
-                            <div class="chatlog__attachment">
-                                {% if attachment.is_image %}
-                                    <a href="#{{ attachment.filename }}">
-                                        <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}"
-                                             alt="attachment" data-id="{{ attachment.filename }}"/>
-                                    </a>
-                                {% else %}
-                                    <a href="{{ attachment.url }}">
-                                        <div class="horizontal">
-                                            <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}"
-                                                 alt="Attachment file type: unknown" title="unknown">
-                                            <div class="chatlog__attachment-inner">
-                                                <div class="filename-link">
-                                                    <a class="filename-link-inner"
-                                                       href="{{ attachment.url }}">{{ attachment.filename }}</a>
-                                                </div>
-                                                <div class="chatlog__attachment-size">{{ attachment.size }}</div>
+                        <div class="chatlog__attachment">
+                            {% if attachment.is_image %}
+                                <a href="#{{ attachment.filename }}">
+                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'django_logs/dead_attachment.svg' %}'; this.title='attachment unavailable'"/>
+                                </a>
+                            {% else %}
+                                <a href="{{ attachment.url }}">
+                                    <div class="horizontal">
+                                        <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
+                                        <div class="chatlog__attachment-inner">
+                                            <div class="filename-link">
+                                                <a class="filename-link-inner" href="{{ attachment.url }}">{{ attachment.filename }}</a>
                                             </div>
-                                            <a class="filename-link-inner" href="{{ attachment.url }}">
-                                                <svg name="Download" class="chatlog__attachment-download" width="24"
-                                                     height="24" viewBox="0 0 24 24">
-                                                    <g fill="none" fill-rule="evenodd">
-                                                        <path d="M0 0h24v24H0z"></path>
-                                                        <path class="fill" fill="currentColor"
-                                                              d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
-                                                    </g>
-                                                </svg>
-                                            </a>
+                                            <div class="chatlog__attachment-size">{{ attachment.size }}</div>
                                         </div>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <a href="{{ attachment.url }}" class="chatlog__content error">{{ attachment.url }}</a>
-                        {% endif %}
+                                        <a class="filename-link-inner" href="{{ attachment.url }}">
+                                            <svg name="Download" class="chatlog__attachment-download" width="24" height="24" viewBox="0 0 24 24">
+                                                <g fill="none" fill-rule="evenodd">
+                                                    <path d="M0 0h24v24H0z"></path>
+                                                    <path class="fill" fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                                                </g>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                 {% endfor %}
             </div>
