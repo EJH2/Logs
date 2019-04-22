@@ -5,7 +5,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-logs',
-    version='0.3.6',
+    version='0.5.6',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -25,5 +25,6 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-    ], install_requires=['django', 'requests', 'python-dateutil', 'pytz', 'shortuuid', 'natural', 'emoji-unicode']
+    ],
+    install_requires=['django', 'requests', 'python-dateutil', 'pytz', 'shortuuid', 'natural', 'emoji-unicode']
 )

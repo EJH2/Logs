@@ -99,36 +99,38 @@ class LogParser:
         return logs[0], True
 
     def create(self, content, origin, *, new=False):
-        data, short_code = self.parse(content)
         url = None
         if isinstance(origin, tuple):
             url = origin[1]
             origin = 'url'
-        create_data = {'origin': origin, 'url': url, 'short_code': short_code, 'log_type': self.log_type, 'data': data,
-                       'content': content}
-        if url:
-            filter_url = LogRoute.objects.filter(url=url).order_by('id')
-            if filter_url.exists():
-                self._update_db(filter_url, create_data)
+        short_code = LogRoute.generate_short_code(content)
+        filter_url = LogRoute.objects.filter(url=url).filter(url__isnull=False).order_by('id')
+        if filter_url.exists():
+            if not new:
+                return short_code, False
         filter_short = LogRoute.objects.filter(short_code__startswith=short_code)
         if filter_short.exists():
             if not new:
                 return short_code, False
             filter_short.delete()
+        data = self.parse(content)
+        create_data = {'origin': origin, 'url': url, 'short_code': short_code, 'log_type': self.log_type, 'data': data,
+                       'content': content}
+        if url and filter_url.exists():
+            self._update_db(filter_url, create_data)
         messages = self._get_messages(data)
         chunked = len(messages) > 1000
-        short_code = create_data.pop('short_code')
         if chunked:
+            short_code = create_data.pop('short_code')
             _, created = self._create_chunked(messages, create_data, short_code)
         else:
-            _, created = LogRoute.objects.get_or_create(**create_data, messages=messages, short_code=short_code)
+            _, created = LogRoute.objects.get_or_create(**create_data, messages=messages)
         return short_code, created
 
     def parse(self, content):
         parser = getattr(self, f'_parse_{self.log_type}')
         data = parser(content)
-        short_code = LogRoute.generate_short_code(data['messages'])
-        return data, short_code
+        return data
 
     @staticmethod
     def _get_attach_info(attachments: list):
@@ -187,7 +189,7 @@ class LogParser:
                         if not _user.get('message', None):  # No error code, so Discord found the user
                             user = _user
                             if user.get('avatar', None) is not None:
-                                user['avatar'] = get_avatar(user)
+                                user['avatar'] = get_avatar()
 
                 user['avatar'] = user['avatar'] or get_avatar(default_avatar=True)
                 _users[uid] = user

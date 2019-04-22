@@ -1,3 +1,5 @@
+import time
+
 import pytz
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -46,7 +48,7 @@ def logs(request, short_code: str, raw=False):
         chunked = False
         msg_page = None
         msg_len = len(log.messages)
-        if _log.count() > 1:
+        if _log.count() > 1 or msg_len > 100:
             chunked = True
             page = request.GET.get('page', None)
             if not request.is_ajax() and page:
@@ -81,6 +83,7 @@ def logs(request, short_code: str, raw=False):
 
 
 def api(request):
+    t = time.time()
     if not request.method == 'POST':
         resp = {'status': 405, 'message': 'This endpoint only accepts POST requests!'}
         return JsonResponse(resp, status=405)
@@ -132,7 +135,8 @@ def api(request):
             'status': 200,
             'short': short,
             'url': f'http{sec}://{request.META["HTTP_HOST"]}/{short}',
-            'created': created
+            'created': created,
+            'time': time.time() - t
         }
         return JsonResponse(data)
 
@@ -166,6 +170,14 @@ def view(request):
         return redirect('index')
 
     content = re.sub('\r\n', '\n', content)
+    log_type = request.GET.get('type')
+    if log_type and log_type in types:
+        match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+        if match_len > 0:
+            print(match_len)
+            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True)
+            request.session['cached'] = not created
+            return redirect('logs', short_code=short)
     for log_type in types.keys():  # Try all log types
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 500:
