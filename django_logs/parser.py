@@ -37,8 +37,8 @@ logger_re = r'(?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?:(?:h
 sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
                r'{16,18}) \/ (?P<cid>[\d]{16,18})\): (?P<content>[\S\s]*?)(?: \((?P<attach>(?:http(?:|s):.*))\))?'
 
-spectra_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s' \
-             r']+?)?(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
+vortex_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s' \
+            r']+?)?(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
 
 gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*?' \
               r')#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?)? \|(?: ?(?P<attach>(?:http(?:|s):.*' \
@@ -351,24 +351,24 @@ class LogParser:
 
         return data
 
-    def _parse_spectra(self, content):
+    def _parse_vortex(self, content):
         data = dict()
         lines = content.split('\n\n')[1:]
         _matches = list()
         for text in lines:
-            if re.match(spectra_re, text):
+            if re.match(vortex_re, text):
                 _matches.append(text)
             else:
                 _matches[-1] += f'\n\n{text}'
 
-        matches = (re.match(spectra_re, m) for m in _matches)
+        matches = (re.match(vortex_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
-        data['type'] = 'Spectra'
+        data['type'] = 'Vortex'
 
         return data
 

@@ -13,7 +13,7 @@ from django_logs.parser import *
 
 types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
              'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
-             'spectra': spectra_re, 'gearboat': gearboat_re, 'modmailbot': modmailbot_re}
+             'vortex': vortex_re, 'gearboat': gearboat_re, 'modmailbot': modmailbot_re}
 
 
 def _request_url(url: str):

@@ -71,7 +71,7 @@ Format virtually any log file into an aesthetically pleasing and readable format
 + SajuukBot
 + GearBot
 + Rosalina Bottings
-+ Spectra
++ Vortex
 + GiraffeDuck
 + CapnBot
 ``` | Attach: https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png, https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore | RichEmbed: {embed}"""
