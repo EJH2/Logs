@@ -13,7 +13,7 @@ from django_logs.parser import *
 
 types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
              'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
-             'spectra': spectra_re, 'gearboat': gearboat_re}
+             'spectra': spectra_re, 'gearboat': gearboat_re, 'modmailbot': modmailbot_re}
 
 
 def _request_url(url: str):
@@ -50,7 +50,7 @@ def logs(request, short_code: str, raw=False):
         msg_len = len(log.messages)
         if _log.count() > 1 or msg_len > 100:
             chunked = True
-            page = request.GET.get('page', None)
+            page = request.GET.get('page')
             if not request.is_ajax() and page:
                 return redirect('logs', short_code=short_code)
 
@@ -67,7 +67,7 @@ def logs(request, short_code: str, raw=False):
         if raw:
             content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
-        if request.session.get('cached', None):
+        if request.session.get('cached'):
             del request.session['cached']
             messages.warning(request, 'A log containing the same data was found, so we used that instead.')
         log.data['generated_at'] = log.generated_at
@@ -145,14 +145,14 @@ def api(request):
 
 
 def view(request):
-    url = request.GET.get('url', None)
+    url = request.GET.get('url')
     if not url:
         messages.error(request, 'You have to provide a url to parse!')
         return redirect('index')
 
     # Cached?
     cached = LogRoute.objects.filter(url=url)
-    if cached.exists() and not request.GET.get('new', None):  # Cached, and user wants from cache
+    if cached.exists() and not request.GET.get('new'):  # Cached, and user wants from cache
         request.session['cached'] = True
         return redirect('logs', short_code=cached[0].short_code.split('-')[0])
 
@@ -190,7 +190,6 @@ def view(request):
                                     f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
-            print(match_len)
             short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)

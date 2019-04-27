@@ -32,7 +32,7 @@ class LogRoute(models.Model):
 
 class LogEntry:
     def __init__(self, data):
-        self.generated_at = data['generated_at'] if data.get('generated_at', None) else None
+        self.generated_at = data['generated_at'] if data.get('generated_at') else None
         tz = self.generated_at.tzinfo if self.generated_at else pytz.UTC
         self.human_generated_at = duration(self.generated_at, now=datetime.now(tz=tz)) if self.generated_at else None
         self.messages = [Message(m) for m in data['messages']]
@@ -66,7 +66,7 @@ class LogEntry:
 
 class User:
     def __init__(self, data):
-        self.id = int(data.get('id'))
+        self.id = int(data['id']) if data.get('id') else None
         self.name = data['username']
         self.discriminator = data['discriminator']
         self.avatar_url = data['avatar']
@@ -91,7 +91,7 @@ class User:
         return f'{self.name}#{self.discriminator}'
 
     def __eq__(self, other):
-        return other.id == self.id
+        return other.__dict__ == self.__dict__
 
 
 class MessageGroup:
@@ -137,19 +137,19 @@ class Attachment:
 
 class SerializedEmbed:
     def __init__(self, data):
-        self.title = data.get('title', None)
+        self.title = data.get('title')
         if self.title:
             self.title = format_micro_content_html(self.title)
-        self.description = data.get('description', None)
+        self.description = data.get('description')
         if self.description:
             self.description = format_content_html(self.description, masked_links=True, newlines=False)
-        self.url = data.get('url', None)
+        self.url = data.get('url')
         self.type = data.get('type', 'rich')
-        self.author = data.get('author', None)
-        self.timestamp = data.get('timestamp', None)
+        self.author = data.get('author')
+        self.timestamp = data.get('timestamp')
         self.color = f'#{data.get("color", 5198940):06X}'  # default discord embed color
-        self.image = data.get('image', None)
-        self.thumbnail = data.get('thumbnail', None)
+        self.image = data.get('image')
+        self.thumbnail = data.get('thumbnail')
         self.fields = data.get('fields', [])
         if len(self.fields) > 0:
             for field in self.fields:
@@ -160,20 +160,20 @@ class SerializedEmbed:
 
 class Embed:
     def __init__(self, data):
-        self.title = data.get('title', None)
-        self.description = data.get('description', None)
-        self.url = data.get('url', None)
+        self.title = data.get('title')
+        self.description = data.get('description')
+        self.url = data.get('url')
         self.type = data.get('type', 'rich')
-        self.author = data.get('author', None)
-        ts = data.get('timestamp', None)
+        self.author = data.get('author')
+        ts = data.get('timestamp')
         self.timestamp = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else ts
         self.t = type(self.timestamp)
         tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
         self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.timestamp else None
         self.color = data.get("color", '#4F545C')
-        self.image = data.get('image', None)
-        self.thumbnail = data.get('thumbnail', None)
+        self.image = data.get('image')
+        self.thumbnail = data.get('thumbnail')
         self.fields = data.get('fields', [])
         self.footer = data.get('footer', [])
 
@@ -190,7 +190,7 @@ class Embed:
 class SerializedMessage:
     def __init__(self, data):
         self.id = int(data['message_id']) if data.get('message_id') else None
-        self.timestamp = data.get('timestamp', None)
+        self.timestamp = data.get('timestamp')
         self.raw_content = data['content']
         self.content = format_content_html(self.raw_content, masked_links=True)
         self.attachments = [Attachment(a).__dict__ for a in data['attachments']]
@@ -202,7 +202,7 @@ class SerializedMessage:
 class Message:
     def __init__(self, data):
         self.id = int(data['id']) if data.get('id') else None
-        ts = data.get('timestamp', None)
+        ts = data.get('timestamp')
         self.created_at = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else None
         self.created_iso = self.created_at.isoformat() if ts else None
         tz = self.created_at.tzinfo if self.created_at else pytz.UTC

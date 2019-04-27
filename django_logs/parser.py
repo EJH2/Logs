@@ -49,6 +49,10 @@ capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\
              r'{3,4}(?:\?[\w=]+)?))\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?' \
              r':|s):.*))? \| (?P<embeds>(?:{\"embeds\": \[).*?)?$'
 
+modmailbot_re = r'\[(?P<time>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\] (?:\(Anonymous\) )?\(.*?\))? (?P<uname>' \
+                r'.*?)(?:#(?P<disc>\d{4}))?: (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* .*? \(.*\)\n(?P<attach' \
+                r'>(?:http(?:|s):.*)))?$| (?P<botcontent>[^\n]+))'
+
 attachment_re = r'(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attachments(?:\/\d{16,18' \
                 r'}){2}|external\/[^\/]+)\/(?P<filename>.*)'
 
@@ -138,7 +142,8 @@ class LogParser:
         attach = []
         if len(attachments) > 0 and attachments[0] != '':
             for url in attachments:
-                file = re.match(attachment_re, url).group('filename')
+                match = re.match(attachment_re, url)
+                file = match.group('filename') if match else url.rsplit('/', 1)[-1]
                 attach_info = {'filename': file, 'url': url, 'size': 0, 'is_image': False}
                 if file.rsplit('.', 1)[-1] in ['png', 'jpg', 'jpeg', 'gif', 'webm', 'webp', 'mp4']:
                     attach_info['is_image'] = True
@@ -162,15 +167,18 @@ class LogParser:
         messages = list()
 
         for match in match_data:
-            uid = match['uid']
-            message_dict = {'message_id': match.get('mid', None), 'timestamp': match['time'],
+            uid = match.get('uid')
+            message_dict = {'message_id': match.get('mid'), 'timestamp': match['time'],
                             'content': match['content']}
 
-            user = {'id': uid, 'username': match.get('uname', 'Unknown User'),
-                    'discriminator': match.get('disc', '0000'), 'avatar': match.get('avatar', None)}
+            user = {'id': uid, 'username': match.get('uname') or 'Unknown User',
+                    'discriminator': match.get('disc') or '0000', 'avatar': match.get('avatar')}
+
+            if not uid:
+                uid = f'{user["username"]}#{user["discriminator"]}'
 
             def get_avatar(default_avatar: bool = False):
-                if not user.get('avatar', None) or default_avatar:
+                if not user.get('avatar') or default_avatar:
                     default = int(user['discriminator']) % 5
                     return f'https://cdn.discordapp.com/embed/avatars/{default}.png'
                 if match.get('asset'):
@@ -179,18 +187,19 @@ class LogParser:
                 return f'https://cdn.discordapp.com/avatars/{uid}/{user["avatar"]}.{ending}'
 
             if uid not in _users:
-                if user.get('avatar', None):  # User supplied avatar, don't bombard Discord's API
+                if user.get('avatar'):  # User supplied avatar, don't bombard Discord's API
                     user['avatar'] = get_avatar()
                     pass
                 elif not DISCORD_TOKEN:  # We can't request the API, so use the default avatar
                     pass
                 else:
-                    with requests.get(f'{DISCORD_API_URL}/{uid}', headers=DISCORD_HEADERS) as r:
-                        _user = r.json()
-                        if not _user.get('message', None):  # No error code, so Discord found the user
-                            user = _user
-                            if user.get('avatar', None) is not None:
-                                user['avatar'] = get_avatar()
+                    if uid.isdigit():
+                        with requests.get(f'{DISCORD_API_URL}/{uid}', headers=DISCORD_HEADERS) as r:
+                            _user = r.json()
+                            if not _user.get('message'):  # No error code, so Discord found the user
+                                user = _user
+                                if user.get('avatar') is not None:
+                                    user['avatar'] = get_avatar()
 
                 user['avatar'] = user['avatar'] or get_avatar(default_avatar=True)
                 _users[uid] = user
@@ -228,7 +237,7 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'Rowboat'
@@ -299,8 +308,7 @@ class LogParser:
 
         for match in match_data:
             match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
-            match['attach'] = self._get_attach_info(match['attach'].split(' ')) if match.get('attach', None) \
-                else []
+            match['attach'] = self._get_attach_info(match['attach'].split(' ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'Auttaja'
@@ -313,10 +321,9 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
-            match['embeds'] = self._get_embed_info(match['embeds'])['embeds'] if match.get('embeds', None) else []
+            match['embeds'] = self._get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
             match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match.get('attach', None) \
-                else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'Logger'
@@ -337,8 +344,7 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
-                else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'SajuukBot'
@@ -359,8 +365,7 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None \
-                else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'Spectra'
@@ -373,7 +378,7 @@ class LogParser:
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'GearBoat'
@@ -387,9 +392,31 @@ class LogParser:
 
         for match in match_data:
             match['embeds'] = self._get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
-            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] is not None else []
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
         data['type'] = 'CapnBot'
+
+        return data
+
+    def _parse_modmailbot(self, content):
+        data = dict()
+        content = '────────────────\n'.join(content.split('────────────────\n')[1:])  # Gets rid of useless header
+        lines = content.split('\n')
+        _matches = list()
+        for text in lines:
+            if re.match(modmailbot_re, text):
+                _matches.append(text)
+            else:
+                _matches[-1] += f'\n{text}'
+
+        matches = (re.match(modmailbot_re, m) for m in _matches)
+        match_data = list(d.groupdict() for d in matches if not d.group('botcontent'))
+
+        for match in match_data:
+            match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        data = self._parse(data, match_data)
+        data['type'] = 'ModMailBot'
 
         return data
