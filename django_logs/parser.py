@@ -18,9 +18,10 @@ DISCORD_HEADERS = {'Authorization': DISCORD_TOKEN}
 rowboat_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
              r'(?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \((?P<attach>(?:http(?:|s):.*))?\)$'
 
-rosalina_bottings_re = r'(?P<time>(?:[\d-]{10})T(?:[\d:.]{15}))\+[\d:]{5} \| (?P<gname>.*?)\[(?P<gid>\d{16,18})\] \|' \
-                       r'  (?P<cname>[\w-]{1,100})\[(?P<cid>\d{16,18})\] \| (?P<uname>.*?)\[(?P<uid>\d{16,18})\] \|' \
-                       r' said: (?P<content>[\S\s]*?)\nMessage ID: (?P<mid>\d{16,18})$'
+rosalina_bottings_re = r'(?P<time>(?:[\d-]{10})T(?:[\d:.]{8,15}))\+[\d:]{5} \| (?P<gname>.*?)\[(?P<gid>\d{16,18})\]' \
+                       r' \|  (?P<cname>[\w-]{1,100})\[(?P<cid>\d{16,18})\] \| (?P<uname>.*?)\[(?P<uid>\d{16,18})\]' \
+                       r' \| said: (?P<content>[\S\s]*?)(?:\nAttachment: (?P<attach>(?:http(?:|s):.*)))?\nMessage ' \
+                       r'ID: (?P<mid>\d{16,18})$'
 
 giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname>.*?)#(?P<disc>\d{4}) : (?P<content>' \
                  r'[\S\s]*?)? \| Attach: (?P<attach>(?:http(?:|s):.*))? \| RichEmbed: (?:null|(?P<embeds>.*))$'
