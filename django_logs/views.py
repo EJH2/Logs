@@ -201,6 +201,6 @@ def handle404(request, exception):
     return redirect('index')
 
 
-def handle500(request, exception):
-    messages.error(request, f'Something broke, please contact EJH2#0330 on Discord about this issue! {exception}')
+def handle500(request):
+    messages.error(request, 'Something broke, please contact EJH2#0330 on Discord about this issue!')
     return redirect('index')
