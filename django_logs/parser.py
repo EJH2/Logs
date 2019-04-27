@@ -51,7 +51,7 @@ capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\
 
 modmailbot_re = r'\[(?P<time>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\] (?:\(Anonymous\) )?\(.*?\))? (?P<uname>' \
                 r'.*?)(?:#(?P<disc>\d{4}))?: (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* .*? \(.*\)\n(?P<attach' \
-                r'>(?:http(?:|s):.*)))?$| (?P<botcontent>[^\n]+))'
+                r'>(?:http(?:|s):.*)))?$| (?P<bcontent>[^\n]+))'
 
 attachment_re = r'(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attachments(?:\/\d{16,18' \
                 r'}){2}|external\/[^\/]+)\/(?P<filename>.*)'
@@ -233,7 +233,7 @@ class LogParser:
 
     def _parse_rowboat(self, content):
         data = dict()
-        matches = list(re.finditer(rowboat_re, content, re.MULTILINE))
+        matches = (re.finditer(rowboat_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -246,7 +246,7 @@ class LogParser:
 
     def _parse_rosalina_bottings(self, content):
         data = dict()
-        matches = list(re.finditer(rosalina_bottings_re, content, re.MULTILINE))
+        matches = (re.finditer(rosalina_bottings_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         data = self._parse(data, match_data)
@@ -256,7 +256,7 @@ class LogParser:
 
     def _parse_giraffeduck(self, content):
         data = dict()
-        matches = list(re.finditer(giraffeduck_re, content, re.MULTILINE))
+        matches = (re.finditer(giraffeduck_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         headers = content.split('\n')[:5]
@@ -303,7 +303,7 @@ class LogParser:
             else:
                 _matches[-1] += f'\n\n{text}'
 
-        matches = list(re.match(auttaja_re, m) for m in _matches)
+        matches = (re.match(auttaja_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -317,7 +317,7 @@ class LogParser:
 
     def _parse_logger(self, content):
         data = dict()
-        matches = list(re.finditer(logger_re, content, re.MULTILINE))
+        matches = (re.finditer(logger_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -340,7 +340,7 @@ class LogParser:
             else:
                 _matches[-1] += f'\n{text}'
 
-        matches = list(re.match(sajuukbot_re, m) for m in _matches)
+        matches = (re.match(sajuukbot_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -361,7 +361,7 @@ class LogParser:
             else:
                 _matches[-1] += f'\n\n{text}'
 
-        matches = list(re.match(spectra_re, m) for m in _matches)
+        matches = (re.match(spectra_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -374,7 +374,7 @@ class LogParser:
 
     def _parse_gearboat(self, content):
         data = dict()
-        matches = list(re.finditer(gearboat_re, content, re.MULTILINE))
+        matches = (re.finditer(gearboat_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -387,7 +387,7 @@ class LogParser:
 
     def _parse_capnbot(self, content):
         data = dict()
-        matches = list(re.finditer(capnbot_re, content, re.MULTILINE))
+        matches = (re.finditer(capnbot_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -411,7 +411,7 @@ class LogParser:
                 _matches[-1] += f'\n{text}'
 
         matches = (re.match(modmailbot_re, m) for m in _matches)
-        match_data = list(d.groupdict() for d in matches if not d.group('botcontent'))
+        match_data = list(m.groupdict() for m in matches if not m.group('bcontent'))
 
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
