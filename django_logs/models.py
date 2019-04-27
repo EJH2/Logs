@@ -37,6 +37,7 @@ class LogEntry:
         self.human_generated_at = duration(self.generated_at, now=datetime.now(tz=tz)) if self.generated_at else None
         self.messages = [Message(m) for m in data['messages']]
         self.users = data['users']
+        self.ids = list(u['id'] for u in self.users if u['id'])
         self.raw_content = data['raw_content']
         self.type = data['type']
 

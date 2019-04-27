@@ -55,7 +55,7 @@
             <ul class="info__users">
                 {% for user in log_entry.users %}
                     <li class="info__user tooltip">
-                        <span class="info__user-name" onclick="return copyID(this.parentElement)">
+                        <span class="info__user-name"{% if user.id %} onclick="return copyID(this.parentElement)"{% endif %}>
                             <b>{{ user.name | escape }}</b>#{{ user.discriminator }}
                             {% if user.bot %}
                                 <span class="bot-tag">BOT</span>
@@ -64,11 +64,13 @@
                         <span class='tooltiptext pre pre--inline id'>{{ user.id }}</span>
                     </li>
                 {% endfor %}
-                <li class="copyall" style="list-style: none">
-                    <span class="tooltip">
-                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)" style="opacity: 1;">Copy All IDs</span>
-                    </span>
-                </li>
+                {% if log_entry.ids %}
+                    <li class="copyall" style="list-style: none">
+                        <span class="tooltip">
+                            <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)" style="opacity: 1;">Copy All IDs</span>
+                        </span>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -94,12 +96,21 @@
                     </div>
                 </li>
             {% endif %}
-            <li>
-                <div class="tooltip">
-                    <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
-                    <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
-                </div>
-            </li>
+            {% if log_entry.ids %}
+                <li>
+                    <div class="tooltip">
+                        <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
+                        <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
+                    </div>
+                </li>
+            {% else %}
+                <li>
+                    <div class="tooltip">
+                        <span class="material-icons md-inactive tool">assignment</span>
+                        <span class="tooltiptext pre pre--inline tool-text copy">No IDs To Copy</span>
+                    </div>
+                </li>
+            {% endif %}
             <li>
                 <div class="tooltip">
                     <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
@@ -376,10 +387,7 @@
 
     function copyAll(element) {
         let textArea = document.createElement("textarea");
-        let ids = document.getElementsByClassName('tooltiptext pre pre--inline id');
-        for (let id of ids) {
-            textArea.value = textArea.value + id.textContent + " ";
-        }
+        textArea.value = ({{ log_entry.ids }}).join(" ");
         document.body.appendChild(textArea);
         setTimeout(function () {
             element.classList.toggle('copied');
