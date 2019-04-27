@@ -331,7 +331,7 @@ class LogParser:
             if re.match(sajuukbot_re, text):
                 _matches.append(text)
             else:
-                _matches[-1] += f'\n\n{text}'
+                _matches[-1] += f'\n{text}'
 
         matches = list(re.match(sajuukbot_re, m) for m in _matches)
         match_data = list(m.groupdict() for m in matches)
@@ -369,7 +369,7 @@ class LogParser:
 
     def _parse_gearboat(self, content):
         data = dict()
-        matches = list(re.finditer(gearboat_re, content))
+        matches = list(re.finditer(gearboat_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
