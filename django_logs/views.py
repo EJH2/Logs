@@ -30,7 +30,7 @@ def _request_url(url: str):
 # Create your views here.
 def index(request):
     home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))
-    data, _ = LogParser('giraffeduck').parse(home.content)
+    data = LogParser('giraffeduck').parse(home.content)
     data['type'] = None
     data['generated_at'] = datetime.now()
     data['raw_content'] = home.content
@@ -196,11 +196,11 @@ def view(request):
     return redirect('index')
 
 
-def handle404(request):
+def handle404(request, exception):
     messages.error(request, 'Log not found.')
     return redirect('index')
 
 
-def handle500(request):
-    messages.error(request, 'Something broke, please contact EJH2#0330 on Discord about this issue!')
+def handle500(request, exception):
+    messages.error(request, f'Something broke, please contact EJH2#0330 on Discord about this issue! {exception}')
     return redirect('index')
