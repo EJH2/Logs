@@ -174,10 +174,11 @@ def view(request):
     if log_type and log_type in types:
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 0:
-            print(match_len)
             short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
+        messages.error(request, f'We can\'t seem to parse that file using log type {log_type}. Maybe try another one?')
+        return redirect('index')
     for log_type in types.keys():  # Try all log types
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 500:
