@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width"/>
     <meta name="og:title" content="Discord Log Viewer">
     <meta name="og:description" content="Message Count: {{ msg_len }}">
-    <meta name="og:image" content="https://{{ request.META.HTTP_HOST }}{% static 'django_logs/black_file.png' %}">
-    <link href="{% static "django_logs/logstyle.css" %}" rel="stylesheet">
-    <link id="theme" href="{% static "django_logs/logstyle_dark.css" %}" rel="stylesheet">
+    <meta name="og:image" content="https://{{ request.META.HTTP_HOST }}{% static 'django_logs/icons/black_file.png' %}">
+    <link href="{% static "django_logs/css/logstyle.css" %}" rel="stylesheet">
+    <link id="theme" href="{% static "django_logs/css/logstyle_dark.css" %}" rel="stylesheet">
     <link id="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css"
           rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="shortcut icon" href="{% static 'django_logs/favicon.png' %}">
+    <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
@@ -31,11 +31,11 @@
     <div class="info__guild-icon-container">
         <img class="info__guild-icon"
             {% if log_type %}
-                {% with 'django_logs/'|add:log_type|lower|add:'.png' as image_static %} src="{% static image_static %}" {% endwith %}
+                {% with 'django_logs/images/'|add:log_type|lower|add:'.png' as image_static %} src="{% static image_static %}" {% endwith %}
             {% else %}
-                src="{% static 'django_logs/white_file.png' %}"
+                src="{% static 'django_logs/icons/white_file.png' %}"
             {% endif %}
-             onerror="this.src='{% static 'django_logs/white_file.png' %}'" alt="avatar">
+             onerror="this.src='{% static 'django_logs/icons/white_file.png' %}'" alt="avatar">
     </div>
     <div class="info__metadata">
         <div class="info__guild-name">
@@ -236,7 +236,7 @@
                             {% else %}
                                 <a href="{{ attachment.url }}">
                                     <div class="horizontal">
-                                        <img class="icon" src="{% static 'django_logs/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
+                                        <img class="icon" src="{% static 'django_logs/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
                                         <div class="chatlog__attachment-inner">
                                             <div class="filename-link">
                                                 <a class="filename-link-inner" href="{{ attachment.url }}">{{ attachment.filename }}</a>
@@ -266,7 +266,7 @@
         <a class="infinite-more-link" href="{{ short }}?page={{ msg_page.next_page_number }}"></a>
     </div>
     <div class="infinite-scroll-status" style="text-align: center">
-        <img class="infinite-scroll-request" src="{% static 'django_logs/loading.gif' %}">
+        <img class="infinite-scroll-request" src="{% static 'django_logs/icons/loading.gif' %}">
     </div>
 {% endif %}
 <div id="lightbox_div"></div>
@@ -329,16 +329,16 @@
         let hlTheme = document.getElementById('hl_theme');
         let guildIcon = document.getElementsByClassName('info__guild-icon')[0];
         if (theme.getAttribute('href').indexOf('dark') > -1) {
-            theme.setAttribute('href', '{% static 'django_logs/logstyle_light.css' %}');
+            theme.setAttribute('href', '{% static 'django_logs/css/logstyle_light.css' %}');
             hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-light.min.css');
         } else {
-            theme.setAttribute('href', '{% static 'django_logs/logstyle_dark.css' %}');
+            theme.setAttribute('href', '{% static 'django_logs/css/logstyle_dark.css' %}');
             hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css');
         }
         if (guildIcon.src.indexOf('white_file') > -1) {
-            guildIcon.src = "{% static 'django_logs/black_file.png' %}"
+            guildIcon.src = "{% static 'django_logs/icons/black_file.png' %}"
         } else if (guildIcon.src.indexOf('black_file') > -1) {
-            guildIcon.src = "{% static 'django_logs/white_file.png' %}"
+            guildIcon.src = "{% static 'django_logs/icons/white_file.png' %}"
         }
     }
 

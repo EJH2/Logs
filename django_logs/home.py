@@ -33,7 +33,7 @@ embed = json.dumps({
         },
         {
             "name": "How do I use this?",
-            "value": "Simply go to https://lol-sa.me/view?url=yoururlhere",
+            "value": "Simply go to [homepage]/view?url=yoururlhere",
             "inline": True
         },
         {

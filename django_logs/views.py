@@ -42,6 +42,8 @@ def _request_url(url: str):
 # Create your views here.
 def index(request):
     home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))
+    home.content = home.content.replace('[homepage]', f'http{"s" if request.is_secure() else ""}://'
+                                                      f'{request.META["HTTP_HOST"]}')
     data = LogParser('giraffeduck').parse(home.content)
     data['type'] = None
     data['generated_at'] = datetime.now()
