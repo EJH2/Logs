@@ -1,4 +1,5 @@
 import time
+from urllib.parse import urlparse
 
 import pytz
 from django.contrib import messages
@@ -13,7 +14,18 @@ from django_logs.parser import *
 
 types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
              'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
-             'vortex': vortex_re, 'gearboat': gearboat_re, 'modmailbot': modmailbot_re}
+             'vortex': vortex_re, 'gearbot': gearbot_re, 'modmailbot': modmailbot_re}
+
+rowboat_types = {
+    'air.aetherya.stream': ('airplane', 'A1RPL4NE'),
+    'dashboard.aperturebot.science': ('aperture', 'Aperture'),
+    'flyg.farkasdev.com': ('flygbåt', 'Flygbåt'),
+    'mod.warframe.gg': ('heimdallr', 'Heimdallr'),
+    'jetski.ga': ('jetski', 'Jetski'),
+    'jake.dooleylabs.com': ('lmg_showboat', 'LMG Showboat'),
+    'rawgo.at': ('rawgoat', 'Rawgoat'),
+    'row.swvn.io': ('speedboat', 'Speedboat')
+}
 
 
 def _request_url(url: str):
@@ -98,6 +110,7 @@ def api(request):
         resp = {'status': 400, 'message': f'Log type must be one of [{", ".join(types.keys())}]!'}
         return JsonResponse(resp, status=400)
 
+    variant = None
     if data.get('url'):
         url = data.get('url')
         resp = _request_url(url)
@@ -108,6 +121,7 @@ def api(request):
             resp = {'status': 400, 'message': f'Content-Type of "{url}" must be of type "text/plain"!'}
             return JsonResponse(resp, status=400)
         origin = ('url', url)
+        variant = rowboat_types.get(urlparse(url).netloc)
         content = resp.content.decode()
     elif data.get('content'):
         origin = 'raw'
@@ -129,7 +143,7 @@ def api(request):
     match_len = len(re.findall(types[log_type], content, re.MULTILINE))
     if match_len > 0:
         content = re.sub('\r\n', '\n', content)
-        short, created = LogParser(log_type=log_type).create(content, origin)
+        short, created = LogParser(log_type=log_type).create(content, origin, variant=variant)
         sec = 's' if request.is_secure() else ''
         data = {
             'status': 200,
@@ -171,10 +185,11 @@ def view(request):
 
     content = re.sub('\r\n', '\n', content)
     log_type = request.GET.get('type')
+    variant = rowboat_types.get(urlparse(url).netloc)
     if log_type and log_type in types:
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 0:
-            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True)
+            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True, variant=variant)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
         messages.error(request, f'We can\'t seem to parse that file using log type {log_type}. Maybe try another one?')
@@ -190,7 +205,7 @@ def view(request):
                                     f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
-            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True)
+            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True, variant=variant)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
 

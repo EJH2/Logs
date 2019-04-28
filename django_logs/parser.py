@@ -40,7 +40,7 @@ sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P
 vortex_re = r'\[(?P<time>[\w, :]{28,29})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) : (?P<content>[\S\s' \
             r']+?)?(?: ?(?P<attach>(?:http(?:|s):.*)))?$'
 
-gearboat_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*?' \
+gearbot_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) - (?P<mid>\d{16,18}) \| (?P<uname>.*?' \
               r')#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| (?P<content>[\S\s]*?)? \|(?: ?(?P<attach>(?:http(?:|s):.*' \
               r'))?)?$'
 
@@ -103,7 +103,7 @@ class LogParser:
         logs = LogRoute.objects.bulk_create(new_objects)
         return logs[0], True
 
-    def create(self, content, origin, *, new=False):
+    def create(self, content, origin, *, new=False, variant=None):
         url = None
         if isinstance(origin, tuple):
             url = origin[1]
@@ -118,7 +118,7 @@ class LogParser:
             if not new:
                 return short_code, False
             filter_short.delete()
-        data = self.parse(content)
+        data = self.parse(content, variant=variant)
         create_data = {'origin': origin, 'url': url, 'short_code': short_code, 'log_type': self.log_type, 'data': data,
                        'content': content}
         if url and filter_url.exists():
@@ -132,9 +132,9 @@ class LogParser:
             _, created = LogRoute.objects.get_or_create(**create_data, messages=messages)
         return short_code, created
 
-    def parse(self, content):
+    def parse(self, content, *, variant=None):
         parser = getattr(self, f'_parse_{self.log_type}')
-        data = parser(content)
+        data = parser(content, variant=variant)
         return data
 
     @staticmethod
@@ -231,7 +231,7 @@ class LogParser:
 
         return data
 
-    def _parse_rowboat(self, content):
+    def _parse_rowboat(self, content, **kwargs):
         data = dict()
         matches = (re.finditer(rowboat_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
@@ -241,10 +241,14 @@ class LogParser:
 
         data = self._parse(data, match_data)
         data['type'] = 'Rowboat'
+        variant = kwargs.pop('variant')
+        if variant:
+            self.log_type = variant[0]
+            data['type'] = variant[1]
 
         return data
 
-    def _parse_rosalina_bottings(self, content):
+    def _parse_rosalina_bottings(self, content, **kwargs):
         data = dict()
         matches = (re.finditer(rosalina_bottings_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
@@ -254,7 +258,7 @@ class LogParser:
 
         return data
 
-    def _parse_giraffeduck(self, content):
+    def _parse_giraffeduck(self, content, **kwargs):
         data = dict()
         matches = (re.finditer(giraffeduck_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
@@ -292,7 +296,7 @@ class LogParser:
 
         return data
 
-    def _parse_auttaja(self, content):
+    def _parse_auttaja(self, content, **kwargs):
         content = content[:-1] if content.endswith('\n') else content
         data = dict()
         lines = content.split('\n\n')
@@ -315,7 +319,7 @@ class LogParser:
 
         return data
 
-    def _parse_logger(self, content):
+    def _parse_logger(self, content, **kwargs):
         data = dict()
         matches = (re.finditer(logger_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
@@ -330,7 +334,7 @@ class LogParser:
 
         return data
 
-    def _parse_sajuukbot(self, content):
+    def _parse_sajuukbot(self, content, **kwargs):
         data = dict()
         lines = content.split('\n')
         _matches = list()
@@ -351,7 +355,7 @@ class LogParser:
 
         return data
 
-    def _parse_vortex(self, content):
+    def _parse_vortex(self, content, **kwargs):
         data = dict()
         lines = content.split('\n\n')[1:]
         _matches = list()
@@ -372,20 +376,20 @@ class LogParser:
 
         return data
 
-    def _parse_gearboat(self, content):
+    def _parse_gearbot(self, content, **kwargs):
         data = dict()
-        matches = (re.finditer(gearboat_re, content, re.MULTILINE))
+        matches = (re.finditer(gearbot_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
             match['attach'] = self._get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
         data = self._parse(data, match_data)
-        data['type'] = 'GearBoat'
+        data['type'] = 'GearBot'
 
         return data
 
-    def _parse_capnbot(self, content):
+    def _parse_capnbot(self, content, **kwargs):
         data = dict()
         matches = (re.finditer(capnbot_re, content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
@@ -399,7 +403,7 @@ class LogParser:
 
         return data
 
-    def _parse_modmailbot(self, content):
+    def _parse_modmailbot(self, content, **kwargs):
         data = dict()
         content = '────────────────\n'.join(content.split('────────────────\n')[1:])  # Gets rid of useless header
         lines = content.split('\n')

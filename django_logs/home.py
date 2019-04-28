@@ -65,13 +65,21 @@ Format virtually any log file into an aesthetically pleasing and readable format
 + Multi-line code
 
 # Supported log types:
-+ Rowboat
-+ Logger
 + Auttaja
-+ SajuukBot
-+ GearBot
-+ Rosalina Bottings
-+ Vortex
-+ GiraffeDuck
 + CapnBot
++ GearBot
++ GiraffeDuck
++ Logger
++ Rosalina Bottings
++ Rowboat
+    - A1RPL4NE
+    - Aperture
+    - Flygbåt
+    - Heimdallr
+    - Jetski
+    - LMG Showboat
+    - Rawgoat
+    - Speedboat
++ SajuukBot
++ Vortex
 ``` | Attach: https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png, https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore | RichEmbed: {embed}"""
