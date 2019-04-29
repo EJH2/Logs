@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.discord',
 
     'django_logs'
 ]
@@ -128,6 +134,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+# AllAuth Configuration
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = 'index'
 
 # Discord Token, for fetching user avatars
 LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')

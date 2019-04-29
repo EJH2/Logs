@@ -39,6 +39,10 @@ def _request_url(url: str):
     return resp
 
 
+def login(request):
+    return render(request, 'django_logs/login.html')
+
+
 # Create your views here.
 def index(request):
     home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))

@@ -1,12 +1,14 @@
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 
 from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('login', views.login),
     path('view', views.view, name='view'),
     path('admin', admin.site.urls, name='admin'),
+    path('accounts/', include('allauth.urls')),
 
     re_path('api', views.api, name='api'),
 
