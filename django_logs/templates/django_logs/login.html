@@ -1,0 +1,46 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    {% load static %}
+    {% load socialaccount %}
+    <link rel="stylesheet" href="{% static 'django_logs/login.css' %}">
+    <script src="{% static 'django_logs/login.js' %}"></script>
+</head>
+    <body>
+        <div class="container" id="container">
+            <div class="form-container sign-up-container">
+                <form action="#">
+                    <h1>Perks</h1>
+                    <ul style="text-align: left;">
+                        <li>Extended log expiration times</li>
+                        <li>Manage created logs</li>
+                        <li>Increased log sizes</li>
+                        <li>Access to API</li>
+                        <li>Log analytics</li>
+                    </ul>
+                </form>
+            </div>
+            <div class="form-container sign-in-container">
+                <form action="{% provider_login_url 'discord' %}">
+                    <h1>Sign In</h1>
+                    <br>
+                    <button>Discord</button>
+                </form>
+            </div>
+            <div class="overlay-container">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-left">
+                        <h1>Welcome!</h1>
+                        <p>Signing in with Discord gives you access to some great features; try it!</p>
+                        <button class="ghost" id="signIn">Sign In</button>
+                    </div>
+                    <div class="overlay-panel overlay-right">
+                        <h1>Hello, Friend!</h1>
+                        <p>Signing in gives you access to more features</p>
+                        <button class="ghost" id="signUp">Check It Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
