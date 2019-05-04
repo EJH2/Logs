@@ -1,7 +1,7 @@
 import json
-import pytz
-
 from datetime import datetime
+
+import pytz
 
 embed = json.dumps({
     "description": "Heck, even attachments are included...",

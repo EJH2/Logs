@@ -1,13 +1,13 @@
 import ast
-from datetime import datetime
 import json
 import re
+from datetime import datetime
 
 import dateutil
 import requests
+from django.conf import settings
 
 from django_logs.models import LogRoute, User, SerializedMessage
-from django.conf import settings
 
 DISCORD_TOKEN = getattr(settings, 'LOG_DISCORD_TOKEN', None)
 

@@ -1,9 +1,16 @@
 import base64
-import demoji
 import html
 import re
+from datetime import timedelta, datetime
+
+import demoji
+import pytz
 
 from django_logs.emoji import EMOJI_LIST, EMOJI_REGEX
+
+if not demoji.last_downloaded_timestamp() or datetime.now(pytz.UTC) > \
+        (demoji.last_downloaded_timestamp() + timedelta(days=7)):
+    demoji.download_codes()
 
 
 def format_content_html(content: str, masked_links: bool = False, newlines: bool = True) -> str:
