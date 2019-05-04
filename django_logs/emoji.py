@@ -1569,4 +1569,6 @@ _EMOJI_LIST = {
 # Your scientists were so preoccupied with whether or not they could that they didn't stop to think if they should.
 EMOJI_LIST = json.loads(json.dumps(_EMOJI_LIST))
 
+UNICODE_LIST = {EMOJI_LIST[k]: k for k in EMOJI_LIST}
+
 EMOJI_REGEX = f'(:({"|".join(EMOJI_LIST.keys())}):)'.replace('+', '\\+')
