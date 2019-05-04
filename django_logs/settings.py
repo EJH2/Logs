@@ -41,12 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'django_logs',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.discord',
-
-    'django_logs'
+    'allauth.socialaccount.providers.discord'
 ]
 
 MIDDLEWARE = [
