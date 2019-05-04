@@ -1,10 +1,9 @@
 import base64
+import demoji
 import html
 import re
 
-import emoji_unicode
-
-from django_logs.emoji import EMOJI_LIST, UNICODE_LIST, EMOJI_REGEX
+from django_logs.emoji import EMOJI_LIST, EMOJI_REGEX
 
 
 def format_content_html(content: str, masked_links: bool = False, newlines: bool = True) -> str:
@@ -15,9 +14,7 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
         return '\x1AM' + encoded + '\x1AM'
 
     # Encode multiline codeblocks (```text```)
-    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+',
-                     encode_codeblock,
-                     content)
+    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+', encode_codeblock, content)
 
     # Encode links
     if masked_links:
@@ -37,45 +34,42 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
 
     # Encode URLs
     content = re.sub(r'(?:<)?(\b(?:(?:https?|ftp|file)://|www\.|ftp\.)(?:\([-a-zA-Z0'
-                     r'-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,\.'
-                     r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-z'
+                     r'-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,.'
+                     r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-z'
                      r'A-Z0-9+&@#/%=~_|$]))(?:>)?', encode_url, content)
 
     content = html.escape(content)
 
     def encode_inline_codeblock(m):
-        encoded = base64.b64encode(m.group(1).encode()).decode()
+        encoded = base64.b64encode(m.group(2).encode()).decode()
         return '\x1AI' + encoded + '\x1AI'
 
     # Encode inline codeblocks (`text`)
-    content = re.sub(r'`([^`]+)`', encode_inline_codeblock, content)
+    content = re.sub(r'(``?)([^`]+)\1', encode_inline_codeblock, content)
 
     def is_jumboable(pattern, text):
         return (not re.sub(r'(\s)', '', re.sub(pattern, '', text))) and (len(re.findall(pattern, text)) < 28)
 
-    def process_unicode_emojis(m, text):
-        e = emoji_unicode.Emoji(unicode=m.group('emoji'))
-        emoji_class = 'emoji emoji--large' if is_jumboable(EMOJI_REGEX, text) else 'emoji'
-        return fr'<img class="{emoji_class}" title="{UNICODE_LIST[m.group(1)].replace("_", " ")}" ' \
-               fr'src="https://twemoji.maxcdn.com/2/svg/{e.code_points}.svg" alt="{e.unicode}">'
-
-    # Process unicode emojis
-    content = re.sub(EMOJI_REGEX, lambda m: process_unicode_emojis(m, content), content)
-
-    def process_emojis(m, text):
-        if m.group(3).startswith('skin-tone-'):
-            return ''
-        if m.group(3) in EMOJI_LIST:
-            emoji = EMOJI_LIST[m.group(3)]
-            codepoint = "-".join(['%04x' % ord(_c) for _c in emoji])
-            emoji_class = 'emoji emoji--large' if is_jumboable(r'(\:)([\w-]+?)\1', text) else 'emoji'
-            return fr'<img class="{emoji_class}" title="{m.group(3).replace("_", " ")}" ' \
-                   fr'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{emoji}">'
+    def process_emojis(m):
+        if m.group(2) in EMOJI_LIST:
+            emoji = EMOJI_LIST[m.group(2)]
+            return emoji
         else:
             return m.group(1)
 
     # Process emojis (:text:)
-    content = re.sub(r'((\:)([\w-]+?)\2)', lambda m: process_emojis(m, content), content)
+    content = re.sub(EMOJI_REGEX, process_emojis, content)
+
+    def process_unicode_emojis(m, text):
+        e = m.group()
+        e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
+        emoji_class = 'emoji emoji--large' if is_jumboable(demoji._EMOJI_PAT, text) else 'emoji'
+        codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
+        return fr'<img class="{emoji_class}" title="{demoji._CODE_TO_DESC[e]}" ' \
+            fr'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
+
+    # Process unicode emojis
+    content = demoji.replace(content, lambda m: process_unicode_emojis(m, content))
 
     # Process bold (**text**)
     content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
@@ -84,18 +78,11 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     content = re.sub(r'__((?:\\[\s\S]|[^\\])+?)__(?!_)', r'<u>\1</u>', content)
 
     # Process italic (*text* or _text_)
-    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s\*\\]|\*\*)|'
-                     r'[^\s\*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
+    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s*\\]|\*\*)|'
+                     r'[^\s*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
 
     # Process strike through (~~text~~)
     content = re.sub(r'~~(?=\S)((?:\\[\s\S]|~(?!~)|[^\s\\~]|\s+(?!~~))+?)~~', r'<s>\1</s>', content)
-
-    def decode_inline_codeblock(m):
-        decoded = base64.b64decode(m.group(1).encode()).decode()
-        return '<span class="pre pre--inline">' + decoded + '</span>'
-
-    # Decode and process inline codeblocks
-    content = re.sub('\x1AI(.*?)\x1AI', decode_inline_codeblock, content)
 
     # Decode and process links
     if masked_links:
@@ -128,8 +115,7 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     content = re.sub(r'(\|\|)(?=\S)([\S\s]+?)(?<=\S)\1', spoiler_html, content)
 
     # Meta mentions (@everyone)
-    content = content.replace('@everyone',
-                              '<span class="mention">@everyone</span>')
+    content = content.replace('@everyone', '<span class="mention">@everyone</span>')
 
     # Meta mentions (@here)
     content = content.replace('@here', '<span class="mention">@here</span>')
@@ -172,9 +158,16 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{emoji_class_animated}" title="\1" src="'
                                                fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
 
+    def decode_inline_codeblock(m):
+        decoded = base64.b64decode(m.group(1).encode()).decode()
+        return '<span class="pre pre--inline">' + decoded + '</span>'
+
+    # Decode and process inline codeblocks
+    content = re.sub('\x1AI(.*?)\x1AI', decode_inline_codeblock, content)
+
     def decode_codeblock(m):
         decoded = base64.b64decode(m.group(1).encode()).decode()
-        match = re.match('([^`]*?\n)?([\s\S]+)', decoded)
+        match = re.match(r'([^`]*?\n)?([\s\S]+)', decoded)
         lang = match.group(1) or ''
         if not lang.strip(' \n\r'):
             lang = 'plaintext'
@@ -201,9 +194,7 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
         return '\x1AM' + encoded + '\x1AM'
 
     # Encode multiline codeblocks (```text```)
-    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+',
-                     encode_codeblock,
-                     content)
+    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+', encode_codeblock, content)
 
     def encode_url(m):
         encoded = base64.b64encode(m.group(1).encode()).decode()
@@ -211,41 +202,38 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
 
     # Encode URLs
     content = re.sub(r'(\b(?:(?:https?|ftp|file)://|www\.|ftp\.)(?:\([-a-zA-Z0'
-                     r'-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,\.'
-                     r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,\.\[\];]*\)|[-a-z'
+                     r'-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,.'
+                     r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-z'
                      r'A-Z0-9+&@#/%=~_|$]))', encode_url, content)
 
     content = html.escape(content)
 
     def encode_inline_codeblock(m):
-        encoded = base64.b64encode(m.group(1).encode()).decode()
+        encoded = base64.b64encode(m.group(2).encode()).decode()
         return '\x1AI' + encoded + '\x1AI'
 
     # Encode inline codeblocks (`text`)
-    content = re.sub(r'`([^`]+)`', encode_inline_codeblock, content)
-
-    emoji_pattern = re.compile(emoji_unicode.RE_PATTERN_TEMPLATE)
-
-    def process_unicode_emojis(m):
-        e = emoji_unicode.Emoji(unicode=m.group('emoji'))
-        return fr'<img class="emoji" title="{UNICODE_LIST.get(m.group(1), "").replace("_", " ")}" ' \
-               fr'src="https://twemoji.maxcdn.com/2/svg/{e.code_points}.svg" alt="{e.unicode}">'
-
-    # Process unicode emojis
-    content = re.sub(emoji_pattern, process_unicode_emojis, content)
+    content = re.sub(r'(``?)([^`]+)\1', encode_inline_codeblock, content)
 
     def process_emojis(m):
-        if m.group(2).startswith('skin-tone-'):
-            return ''
         if m.group(2) in EMOJI_LIST:
             emoji = EMOJI_LIST[m.group(2)]
-            codepoint = "-".join(['%04x' % ord(_c) for _c in emoji])
-            return fr'<img class="emoji" title="{m.group(2).replace("_", " ")}" ' \
-                   fr'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{emoji}">'
-        return f'{m.group(1)}{m.group(2)}{m.group(1)}'
+            return emoji
+        else:
+            return m.group(1)
 
     # Process emojis (:text:)
-    content = re.sub(r'(\:)([\w-]+?)\1', process_emojis, content)
+    content = re.sub(EMOJI_REGEX, process_emojis, content)
+
+    def process_unicode_emojis(m):
+        e = m.group()
+        e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
+        codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
+        return fr'<img class="emoji" title="{demoji._CODE_TO_DESC[e]}" ' \
+            fr'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
+
+    # Process unicode emojis
+    content = demoji.replace(content, process_unicode_emojis)
 
     # Process bold (**text**)
     content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
@@ -254,18 +242,11 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
     content = re.sub(r'__((?:\\[\s\S]|[^\\])+?)__(?!_)', r'<u>\1</u>', content)
 
     # Process italic (*text* or _text_)
-    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s\*\\]|\*\*)|'
-                     r'[^\s\*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
+    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s*\\]|\*\*)|'
+                     r'[^\s*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
 
     # Process strike through (~~text~~)
     content = re.sub(r'~~(?=\S)((?:\\[\s\S]|~(?!~)|[^\s\\~]|\s+(?!~~))+?)~~', r'<s>\1</s>', content)
-
-    def decode_inline_codeblock(m):
-        decoded = base64.b64decode(m.group(1).encode()).decode()
-        return '<span class="pre pre--inline">' + decoded + '</span>'
-
-    # Decode and process inline codeblocks
-    content = re.sub('\x1AI(.*?)\x1AI', decode_inline_codeblock, content)
 
     # Decode and process links
     def decode_url(m):
@@ -316,9 +297,16 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
     content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)',
                      r'<span class="mention" title="Role: \2">@\2</span>', content)
 
+    def decode_inline_codeblock(m):
+        decoded = base64.b64decode(m.group(1).encode()).decode()
+        return '<span class="pre pre--inline">' + decoded + '</span>'
+
+    # Decode and process inline codeblocks
+    content = re.sub('\x1AI(.*?)\x1AI', decode_inline_codeblock, content)
+
     def decode_codeblock(m):
         decoded = base64.b64decode(m.group(1).encode()).decode()
-        match = re.match('([^`]*?\n)?([\s\S]+)', decoded)
+        match = re.match(r'([^`]*?\n)?([\s\S]+)', decoded)
         lang = match.group(1) or ''
         if not lang.strip(' \n\r'):
             lang = 'plaintext'

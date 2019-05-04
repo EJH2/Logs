@@ -128,7 +128,11 @@ def api(request):
             return JsonResponse(resp, status=400)
         origin = ('url', url)
         variant = rowboat_types.get(urlparse(url).netloc)
-        content = resp.content.decode()
+        try:
+            content = resp.content.decode()
+        except UnicodeDecodeError:
+            resp = {'status': 400, 'message': 'Request content must be of encoding utf-8!'}
+            return JsonResponse(resp, status=400)
     elif data.get('content'):
         origin = 'raw'
         content = data.get('content')
@@ -184,7 +188,11 @@ def view(request):
     if 'text/plain' not in resp.headers['Content-Type']:
         messages.error(request, f'Content-Type of "{url}" must be of type "text/plain"!')
         return redirect('index')
-    content = resp.content.decode()
+    try:
+        content = resp.content.decode()
+    except UnicodeDecodeError:
+        resp = {'status': 400, 'message': 'Request content must be of encoding utf-8!'}
+        return JsonResponse(resp, status=400)
     if content == '':
         messages.error(request, 'You have to provide a url with text in it to parse!')
         return redirect('index')

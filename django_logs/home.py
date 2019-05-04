@@ -53,7 +53,7 @@ content = f"""[]
 [0000-00-00 00:00:00] (125370065624236033) Discord Log Viewer#0000 : Welcome to **Discord Log Viewer!**
 
 Format virtually any log file into an aesthetically pleasing and readable format. Currently, we support:
-<:yes:487035217752752129> Emojis :sunglasses:
+<:yes:487035217752752129> Emojis :sunglasses: :ok_hand::skin-tone-3:
 <:yes:487035217752752129> *Italics* 
 <:yes:487035217752752129> **Bold**
 <:yes:487035217752752129> __Underline__
