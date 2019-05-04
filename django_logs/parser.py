@@ -15,8 +15,8 @@ DISCORD_API_URL = 'https://discordapp.com/api/v7/users'
 
 DISCORD_HEADERS = {'Authorization': DISCORD_TOKEN}
 
-rowboat_re = r'(?P<time>[\d\-\: \.]{26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
-             r'(?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \((?P<attach>(?:http(?:|s):.*))?\)$'
+rowboat_re = r'(?P<time>(?:[\d-]+) (?:[\d:.]+)) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]' \
+             r'{16,18})\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \((?P<attach>(?:http(?:|s):.*))?\)$'
 
 rosalina_bottings_re = r'(?P<time>(?:[\d-]{10})T(?:[\d:.]{8,15}))(?:\+[\d:]{5}|Z) \| (?P<gname>.*?)\[(?P<gid>\d{16,' \
                        r'18})\] \|  (?P<cname>[\w-]{1,100})\[(?P<cid>\d{16,18})\] \| (?P<uname>.*?)\[(?P<uid>\d{16,' \
