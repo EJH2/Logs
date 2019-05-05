@@ -1,5 +1,7 @@
+from allauth.account.views import login, signup, logout, email_verification_sent, confirm_email
+from allauth.socialaccount.providers.discord.views import oauth2_login, oauth2_callback
 from django.contrib import admin
-from django.urls import path, re_path, include
+from django.urls import path, re_path
 
 from . import views
 
@@ -7,7 +9,14 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('view', views.view, name='view'),
     path('admin', admin.site.urls, name='admin'),
-    path('accounts/', include('allauth.urls')),
+
+    path('login', login, name='login'),
+    path('login/discord', oauth2_login, name='discord_login'),
+    path('login/callback', oauth2_callback, name='discord_callback'),
+    path('signup', signup, name='account_signup'),
+    path('logout', logout, name='account_logout'),
+    path('verifyemail', email_verification_sent, name='account_email_verification_sent'),
+    re_path('verifyemail/(?P<key>[\w\-:]+)', confirm_email, name='account_confirm_email'),
 
     re_path('api', views.api, name='api'),
 

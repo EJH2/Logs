@@ -61,7 +61,7 @@ Format virtually any log file into an aesthetically pleasing and readable format
 <:yes:487035217752752129> `Inline code`
 <:yes:487035217752752129> ||Spoilers||
 <:yes:487035217752752129> ||***__~~`A combination of all of them`~~__***||
-<:yes:487035217752752129> ```diff
+```diff
 + Multi-line code
 
 # Supported log types:

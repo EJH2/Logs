@@ -1,0 +1,20 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'django_logs/css/social.css' %}">
+    {% block js %}<script src="{% static 'django_logs/js/social.js' %}"></script>{% endblock %}
+</head>
+    <body>
+        <div class="container" id="container">
+            {% block solidright %}{% endblock %}
+            {% block solidleft %}{% endblock %}
+            <div class="overlay-container">
+                <div class="overlay">
+                    {% block ghostleft %}{% endblock %}
+                    {% block ghostright %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

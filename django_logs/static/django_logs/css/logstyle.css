@@ -115,17 +115,48 @@ img {
 }
 
 .alert {
-  position: relative;
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert.disappearing {
+    animation: disappearing 1s ease-out;
+}
+
+@keyframes disappearing {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.alert-info {
+    color: #041f85;
+    background-color: #8db3f5;
+    border-color: #5c6db3;
+}
+
+.alert-success {
+    color: #04851b;
+    background-color: #8df59a;
+    border-color: #5cb368;
 }
 
 .alert-warning {
-  color: #856404;
-  background-color: #fff3CD;
-  border-color: #B39E5C;
+    color: #856404;
+    background-color: #fff3CD;
+    border-color: #B39E5C;
+}
+
+.alert-error {
+    color: #850404;
+    background-color: #f17e7e;
+    border-color: #b35c5c;
 }
 
 .infinite-scroll-request[style='display: block;'] {
@@ -507,15 +538,15 @@ body {
 }
 
 .lightbox {
-	display: none;
-	position: fixed;
-	z-index: 999;
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	top: 0;
-	left: 0;
-	background: rgba(0,0,0,0.85);
+    display: none;
+    position: fixed;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.85);
 }
 
 .lightbox img {
@@ -528,8 +559,8 @@ body {
 }
 
 .lightbox:target {
-	outline: none;
-	display: block;
+    outline: none;
+    display: block;
 }
 
 .chatlog__attachment .horizontal {

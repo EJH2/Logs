@@ -23,8 +23,7 @@
 <br>
 {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-warning" role="alert">{{ message }}</div>
-    <br>
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
     {% endfor %}
 {% endif %}
 <div class="info">
@@ -319,6 +318,15 @@
     }
 
     loadJS();
+
+    document.querySelectorAll('.alert').forEach((alert) => {
+        setTimeout(function () {
+            alert.classList.add('disappearing');
+            setTimeout(function () {
+                alert.remove();
+            }, 1000);
+        }, 5000);
+    });
 
     function toggleDrawer(element) {
         element.classList.toggle('rotated');
