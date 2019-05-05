@@ -191,17 +191,17 @@
                                         {% endif %}
                                     </div>
                                     {% if embed.thumbnail %}
-                                        <img src="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail" style="max-width: 80px; max-height: 80px">
+                                        <img src="{{ embed.thumbnail.url }}" alt="{{ embed.thumbnail.url }}" class="chatlog__embed-thumbnail" style="max-width: 80px; max-height: 80px">
                                     {% endif %}
                                 </div>
                                 {% if embed.image %}
-                                    <img src="{{ embed.image.url }}" class="chatlog__embed-image chatlog__embed-margin-large">
+                                    <img src="{{ embed.image.url }}" alt="{{ embed.image.url }}" class="chatlog__embed-image chatlog__embed-margin-large">
                                 {% endif %}
                                 {% if embed.footer or embed.timestamp %}
                                     {% if embed.footer and not embed.timestamp %}
                                         <div class="chatlog__embed-footer">
                                             {% if embed.footer.icon_url %}
-                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}">
+                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="{{ embed.footer.icon_url }}">
                                             {% endif %}
                                             <span class="chatlog__embed-footer-text">{{ embed.footer.text }}</span>
                                         </div>
@@ -214,7 +214,7 @@
                                     {% if embed.footer and embed.timestamp %}
                                         <div class="chatlog__embed-footer">
                                             {% if embed.footer.icon_url %}
-                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}">
+                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="{{ embed.footer.icon_url }}">
                                             {% endif %}
                                             <span class="chatlog__embed-footer-text">
                                                 {{ embed.footer.text }}
@@ -231,7 +231,7 @@
                         <div class="chatlog__attachment">
                             {% if attachment.is_image %}
                                 <a href="#{{ attachment.filename }}">
-                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'django_logs/dead_attachment.svg' %}'; this.title='attachment unavailable'"/>
+                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'django_logs/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'"/>
                                 </a>
                             {% else %}
                                 <a href="{{ attachment.url }}">
@@ -266,7 +266,7 @@
         <a class="infinite-more-link" href="{{ short }}?page={{ msg_page.next_page_number }}"></a>
     </div>
     <div class="infinite-scroll-status" style="text-align: center">
-        <img class="infinite-scroll-request" src="{% static 'django_logs/icons/loading.gif' %}">
+        <img class="infinite-scroll-request" src="{% static 'django_logs/icons/loading.gif' %}" alt="">
     </div>
 {% endif %}
 <div id="lightbox_div"></div>
