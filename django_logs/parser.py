@@ -59,8 +59,16 @@ attachment_re = r'(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:
 
 class LogParser:
 
-    def __init__(self, log_type):
+    def __init__(self, log_type, content, origin=None, variant=None):
         self.log_type = log_type
+        self.variant = variant
+        self.content = content
+
+        self.url = None
+        self.origin = origin
+        if isinstance(origin, tuple):
+            self.url = origin[1]
+            self.origin = 'url'
 
     @staticmethod
     def _get_messages(data):
@@ -89,7 +97,8 @@ class LogParser:
         objects.delete()  # Wipe the row(s) so no old info is left over
         self._create_chunked(messages, create_data, short_code)
 
-    def _create_chunked(self, messages, create_data, short_code):
+    @staticmethod
+    def _create_chunked(messages, create_data, short_code):
         batch_list = list()
         for batch in range(0, len(messages), 1000):
             batch_list.append(messages[batch:batch + 1000])  # Split messages by the 1000
@@ -103,13 +112,9 @@ class LogParser:
         logs = LogRoute.objects.bulk_create(new_objects)
         return logs[0], True
 
-    def create(self, content, origin, *, new=False, variant=None):
-        url = None
-        if isinstance(origin, tuple):
-            url = origin[1]
-            origin = 'url'
-        short_code = LogRoute.generate_short_code(content)
-        filter_url = LogRoute.objects.filter(url=url).filter(url__isnull=False).order_by('id')
+    def create(self, *, new=False):
+        short_code = LogRoute.generate_short_code(self.content)
+        filter_url = LogRoute.objects.filter(url=self.url).filter(url__isnull=False).order_by('id')
         if filter_url.exists():
             if not new:
                 return short_code, False
@@ -118,10 +123,10 @@ class LogParser:
             if not new:
                 return short_code, False
             filter_short.delete()
-        data = self.parse(content, variant=variant)
-        create_data = {'origin': origin, 'url': url, 'short_code': short_code, 'log_type': self.log_type, 'data': data,
-                       'content': content}
-        if url and filter_url.exists():
+        data = self.parse()
+        create_data = {'origin': self.origin, 'url': self.url, 'short_code': short_code, 'log_type': self.log_type,
+                       'data': data, 'content': self.content}
+        if self.url and filter_url.exists():
             self._update_db(filter_url, create_data)
         messages = self._get_messages(data)
         chunked = len(messages) > 1000
@@ -132,9 +137,9 @@ class LogParser:
             _, created = LogRoute.objects.get_or_create(**create_data, messages=messages)
         return short_code, created
 
-    def parse(self, content, *, variant=None):
+    def parse(self):
         parser = getattr(self, f'_parse_{self.log_type}')
-        data = parser(content, variant=variant)
+        data = parser()
         return data
 
     @staticmethod
@@ -231,9 +236,9 @@ class LogParser:
 
         return data
 
-    def _parse_rowboat(self, content, **kwargs):
+    def _parse_rowboat(self):
         data = dict()
-        matches = (re.finditer(rowboat_re, content, re.MULTILINE))
+        matches = (re.finditer(rowboat_re, self.content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -241,16 +246,15 @@ class LogParser:
 
         data = self._parse(data, match_data)
         data['type'] = 'Rowboat'
-        variant = kwargs.pop('variant')
-        if variant:
-            self.log_type = variant[0]
-            data['type'] = variant[1]
+        if self.variant:
+            self.log_type = self.variant[0]
+            data['type'] = self.variant[1]
 
         return data
 
-    def _parse_rosalina_bottings(self, content, **kwargs):
+    def _parse_rosalina_bottings(self):
         data = dict()
-        matches = (re.finditer(rosalina_bottings_re, content, re.MULTILINE))
+        matches = (re.finditer(rosalina_bottings_re, self.content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         data = self._parse(data, match_data)
@@ -258,12 +262,12 @@ class LogParser:
 
         return data
 
-    def _parse_giraffeduck(self, content, **kwargs):
+    def _parse_giraffeduck(self):
         data = dict()
-        matches = (re.finditer(giraffeduck_re, content, re.MULTILINE))
+        matches = (re.finditer(giraffeduck_re, self.content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
-        headers = content.split('\n')[:5]
+        headers = self.content.split('\n')[:5]
         header_info = list()
         for header in headers:  # Splits headers into [('name', 'id'),...]
             _headers = list(zip(*[iter(re.split(r' \((\d{16,18})\)(?:; |)', header[1:-1])[:-1])] * 2))
@@ -296,8 +300,8 @@ class LogParser:
 
         return data
 
-    def _parse_auttaja(self, content, **kwargs):
-        content = content[:-1] if content.endswith('\n') else content
+    def _parse_auttaja(self):
+        content = self.content[:-1] if self.content.endswith('\n') else self.content
         data = dict()
         lines = content.split('\n\n')
         _matches = list()
@@ -319,9 +323,9 @@ class LogParser:
 
         return data
 
-    def _parse_logger(self, content, **kwargs):
+    def _parse_logger(self):
         data = dict()
-        matches = (re.finditer(logger_re, content, re.MULTILINE))
+        matches = (re.finditer(logger_re, self.content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -334,9 +338,9 @@ class LogParser:
 
         return data
 
-    def _parse_sajuukbot(self, content, **kwargs):
+    def _parse_sajuukbot(self):
         data = dict()
-        lines = content.split('\n')
+        lines = self.content.split('\n')
         _matches = list()
         for text in lines:
             if re.match(sajuukbot_re, text):
@@ -355,9 +359,9 @@ class LogParser:
 
         return data
 
-    def _parse_vortex(self, content, **kwargs):
+    def _parse_vortex(self):
         data = dict()
-        lines = content.split('\n\n')[1:]
+        lines = self.content.split('\n\n')[1:]
         _matches = list()
         for text in lines:
             if re.match(vortex_re, text):
@@ -376,9 +380,9 @@ class LogParser:
 
         return data
 
-    def _parse_gearbot(self, content, **kwargs):
+    def _parse_gearbot(self):
         data = dict()
-        matches = (re.finditer(gearbot_re, content, re.MULTILINE))
+        matches = (re.finditer(gearbot_re, self.content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -389,9 +393,9 @@ class LogParser:
 
         return data
 
-    def _parse_capnbot(self, content, **kwargs):
+    def _parse_capnbot(self):
         data = dict()
-        matches = (re.finditer(capnbot_re, content, re.MULTILINE))
+        matches = (re.finditer(capnbot_re, self.content, re.MULTILINE))
         match_data = list(m.groupdict() for m in matches)
 
         for match in match_data:
@@ -403,9 +407,9 @@ class LogParser:
 
         return data
 
-    def _parse_modmailbot(self, content, **kwargs):
+    def _parse_modmailbot(self):
         data = dict()
-        content = '────────────────\n'.join(content.split('────────────────\n')[1:])  # Gets rid of useless header
+        content = '────────────────\n'.join(self.content.split('────────────────\n')[1:])  # Gets rid of useless header
         lines = content.split('\n')
         _matches = list()
         for text in lines:

@@ -44,7 +44,7 @@ def index(request):
     home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))
     home.content = home.content.replace('[homepage]', f'http{"s" if request.is_secure() else ""}://'
                                                       f'{request.META["HTTP_HOST"]}')
-    data = LogParser('giraffeduck').parse(home.content)
+    data = LogParser('giraffeduck', home.content).parse()
     data['type'] = None
     data['generated_at'] = datetime.now()
     data['raw_content'] = home.content
@@ -149,7 +149,7 @@ def api(request):
     match_len = len(re.findall(types[log_type], content, re.MULTILINE))
     if match_len > 0:
         content = re.sub('\r\n', '\n', content)
-        short, created = LogParser(log_type=log_type).create(content, origin, variant=variant)
+        short, created = LogParser(log_type, content, origin=origin, variant=variant).create()
         sec = 's' if request.is_secure() else ''
         data = {
             'status': 200,
@@ -199,7 +199,7 @@ def view(request):
     if log_type and log_type in types:
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 0:
-            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True, variant=variant)
+            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
         messages.error(request, f'We can\'t seem to parse that file using log type {log_type}. Maybe try another one?')
@@ -215,7 +215,7 @@ def view(request):
                                     f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
-            short, created = LogParser(log_type=log_type).create(content, ('url', url), new=True, variant=variant)
+            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
 
