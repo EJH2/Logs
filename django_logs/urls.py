@@ -10,7 +10,7 @@ urlpatterns = [
     path('view', views.view, name='view'),
     path('admin', admin.site.urls, name='admin'),
 
-    path('login', login, name='login'),
+    path('login', login, name='account_login'),
     path('login/discord', oauth2_login, name='discord_login'),
     path('login/callback', oauth2_callback, name='discord_callback'),
     path('signup', signup, name='account_signup'),
