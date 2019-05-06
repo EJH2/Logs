@@ -1,0 +1,22 @@
+{% extends "socialbase.html" %}
+
+{% block title %}Social Network Login Failure{% endblock %}
+{% block js %}{% endblock %}
+
+{% block ghostright %}
+<div class="overlay-panel overlay-right">
+    <h1>Whoops...</h1>
+    <p>An error occurred while attempting to login via your social network account. Try again later?</p>
+</div>
+{% endblock %}
+
+{% block solidleft %}
+<div class="form-container sign-in-container">
+    <form method="get" action="{% url 'index' %}">
+    {% csrf_token %}
+        <h1>Take Me Home</h1>
+        <br>
+        <button>Home</button>
+    </form>
+</div>
+{% endblock %}
