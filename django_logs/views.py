@@ -1,7 +1,6 @@
 import time
 from urllib.parse import urlparse
 
-import pytz
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -83,7 +82,7 @@ def logs(request, short_code: str, raw=False):
             return HttpResponse(content)
         if request.session.get('cached'):
             del request.session['cached']
-            messages.warning(request, 'A log containing the same data was found, so we used that instead.')
+            messages.info(request, 'A log containing the same data was found, so we used that instead.')
         log.data['generated_at'] = log.generated_at
         log.data['messages'] = log.messages
         log.data['raw_content'] = log.content
@@ -92,7 +91,7 @@ def logs(request, short_code: str, raw=False):
                                                                  'chunked': chunked, 'msg_page': msg_page,
                                                                  'msg_len': msg_len, 'short': short_code})
     except ObjectDoesNotExist:
-        messages.error(request, 'Log not found.')
+        messages.error(request, 'Log does not exist, or has expired.')
         return redirect('index')
 
 
@@ -225,7 +224,7 @@ def view(request):
 
 
 def handle404(request, exception):
-    messages.error(request, 'Log not found.')
+    messages.error(request, 'Page not found.')
     return redirect('index')
 
 

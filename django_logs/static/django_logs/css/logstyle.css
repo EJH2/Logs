@@ -123,12 +123,15 @@ img {
 }
 
 .alert.disappearing {
-    animation: disappearing 1s ease-out;
+    animation: disappearing 2s ease-out;
 }
 
 @keyframes disappearing {
     0% {
         opacity: 1;
+    }
+    50% {
+        opacity: 0;
     }
     100% {
         opacity: 0;

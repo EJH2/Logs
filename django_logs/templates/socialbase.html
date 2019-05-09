@@ -2,6 +2,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     {% load static %}
+    <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'django_logs/css/social.css' %}">
     {% block js %}<script src="{% static 'django_logs/js/social.js' %}"></script>{% endblock %}
 </head>
