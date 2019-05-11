@@ -6,6 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from django_logs import home
 from django_logs.models import LogEntry
@@ -38,6 +40,15 @@ def _request_url(url: str):
     return resp
 
 
+def _get_expiry(data, default):
+    expires = data.get('expires', 60 * 60 * 12)
+    if isinstance(expires, str):
+        expires = int(expires) if expires.isdigit() else default
+    if expires > default:
+        return None
+    return expires
+
+
 # Create your views here.
 def index(request):
     home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))
@@ -58,6 +69,12 @@ def logs(request, short_code: str, raw=False):
         if not _log.exists():
             raise ObjectDoesNotExist
         log = _log[0]
+        if log.expires_at < datetime.now(pytz.UTC):
+            _log.delete()
+            raise ObjectDoesNotExist
+        if raw:
+            content = f"<pre>{log.content}</pre>"
+            return HttpResponse(content)
         chunked = False
         msg_page = None
         msg_len = len(log.messages)
@@ -77,9 +94,6 @@ def logs(request, short_code: str, raw=False):
             except EmptyPage:
                 msg_page = paginator.page(paginator.num_pages)
             log.messages = msg_page.object_list
-        if raw:
-            content = f"<pre>{log.content}</pre>"
-            return HttpResponse(content)
         if request.session.get('cached'):
             del request.session['cached']
             messages.info(request, 'A log containing the same data was found, so we used that instead.')
@@ -95,12 +109,10 @@ def logs(request, short_code: str, raw=False):
         return redirect('index')
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, ])
 def api(request):
     t = time.time()
-    if not request.method == 'POST':
-        resp = {'status': 405, 'message': 'This endpoint only accepts POST requests!'}
-        return JsonResponse(resp, status=405)
-
     data = request.POST
     if not all([any([any(['url', 'content']) in data, request.FILES is not None]), 'type' in data]):
         resp = {'status': 400, 'message': 'Request body must contain one of [files, url, content] and [type] '
@@ -146,14 +158,19 @@ def api(request):
 
     log_type = data.get('type')
     match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+    author = request.user if request.user.is_authenticated else None
+    default = 60 * 60 * 24 * 7 if author else 60 * 60 * 24
+    expires = _get_expiry(data, default)
+    if not expires:
+        resp = {'status': 400, 'message': f'Expiry time in seconds must not exceed {default}!'}
+        return JsonResponse(resp, status=400)
     if match_len > 0:
         content = re.sub('\r\n', '\n', content)
-        short, created = LogParser(log_type, content, origin=origin, variant=variant).create()
-        sec = 's' if request.is_secure() else ''
+        short, created = LogParser(log_type, content, origin=origin, variant=variant).create(author, expires=expires)
         data = {
             'status': 200,
             'short': short,
-            'url': f'http{sec}://{request.META["HTTP_HOST"]}/{short}',
+            'url': f'http{"s" if request.is_secure() else ""}://{request.META["HTTP_HOST"]}/{short}',
             'created': created,
             'time': time.time() - t
         }
@@ -195,10 +212,17 @@ def view(request):
     content = re.sub('\r\n', '\n', content)
     log_type = request.GET.get('type')
     variant = rowboat_types.get(urlparse(url).netloc)
+    author = request.user if request.user.is_authenticated else None
+    default = 60 * 60 * 24 * 7 if author else 60 * 60 * 24
+    expires = _get_expiry(request.GET, default)
+    if not expires:
+        messages.error(request, f'Expiry time in seconds must not exceed {default}!')
+        return redirect('index')
     if log_type and log_type in types:
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 0:
-            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(new=True)
+            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(
+                author, expires=expires, new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
         messages.error(request, f'We can\'t seem to parse that file using log type {log_type}. Maybe try another one?')
@@ -214,7 +238,8 @@ def view(request):
                                     f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
-            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(new=True)
+            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(
+                author, expires=expires, new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
 

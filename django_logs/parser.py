@@ -127,9 +127,14 @@ class LogParser:
                        'data': data, 'content': self.content}
         if self.url and filter_url.exists():
             self._update_db(filter_url, create_data, messages)
+        create_data['author'] = author
         chunked = len(messages) > 1000
         create_func = self._create_chunked if chunked else LogRoute.objects.get_or_create
         created_log, created = create_func(**create_data, messages=messages)
+        if expires:
+            expires = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires)
+            created_log.expires_at = expires
+            created_log.save()
         return short_code, created
 
     def parse(self):

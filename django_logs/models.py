@@ -3,6 +3,7 @@ from datetime import datetime
 import dateutil.parser
 import pytz
 import shortuuid
+from django.contrib.auth.models import User as DjangoUser
 from django.contrib.postgres import fields
 from django.db import models
 from natural.date import duration
@@ -12,11 +13,13 @@ from django_logs.formatter import format_content_html, format_micro_content_html
 
 
 class LogRoute(models.Model):
+    author = models.ForeignKey(DjangoUser, on_delete=models.CASCADE, null=True)
     origin = models.CharField(max_length=10, editable=False)
     url = models.TextField(editable=False, null=True)
     short_code = models.CharField(max_length=15, editable=False, unique=True)
     log_type = models.CharField(max_length=30, editable=False)
     generated_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True)
     data = fields.JSONField(editable=False, null=True)
     content = models.TextField(editable=False, null=True)
     messages = fields.JSONField(editable=False)

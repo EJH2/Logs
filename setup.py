@@ -5,7 +5,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-logs',
-    version='0.6.6',
+    version='0.6.9',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -35,6 +35,7 @@ setup(
         'shortuuid',
         'natural',
         'demoji',
-        'psycopg2'
+        'psycopg2',
+        'django-rest-framework'
     ]
 )
