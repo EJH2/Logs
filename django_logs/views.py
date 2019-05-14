@@ -51,15 +51,7 @@ def _get_expiry(data, default):
 
 # Create your views here.
 def index(request):
-    home.content = home.content.replace('0000-00-00 00:00:00', datetime.now(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S'))
-    home.content = home.content.replace('[homepage]', f'http{"s" if request.is_secure() else ""}://'
-                                                      f'{request.META["HTTP_HOST"]}')
-    data = LogParser('giraffeduck', home.content).parse()
-    data['type'] = None
-    data['generated_at'] = datetime.now()
-    data['raw_content'] = home.content
-    return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(data), 'log_type': None,
-                                                             'msg_len': 1})
+    return render(request, 'django_logs/index.html', context={'iso': datetime.now(pytz.UTC).isoformat()})
 
 
 def logs(request, short_code: str, raw=False):

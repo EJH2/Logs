@@ -1,0 +1,197 @@
+<html lang="en"><head>
+    <title>Log Entry</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="og:title" content="Discord Log Viewer">
+    <meta name="og:description" content="Message Count: 1">
+    {% load static %}
+    <meta name="og:image" content="{% static 'django_logs/icons/black_file.png' %}">
+    <link href="{% static 'django_logs/css/logstyle.css' %}" rel="stylesheet">
+    <link id="theme" href="{% static 'django_logs/css/logstyle_dark.css' %}" rel="stylesheet">
+    <link id="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="{% static 'django_logs/js/logs.js' %}"></script>
+</head>
+<body class="no-js">
+    <br>
+    <div class="info">
+        <div class="info__guild-icon-container">
+            <img class="info__guild-icon" src="{% static 'django_logs/icons/white_file.png' %}" alt="avatar">
+        </div>
+        <div class="info__metadata">
+            <div class="info__guild-name">
+                <span>Logs From File</span>
+            </div>
+                <div class="info__generated-at"><span>Generated:</span>
+                    <b>just now</b></div>
+            <div class="info__channel-message-count"><span>Message Count:</span>
+                <b>1</b></div>
+            <div class="info__user-list">
+                <span>User: </span>
+                <label class="material-icons info__user-toggle">
+                    <input type="checkbox" style="display: none" onclick="return toggleUsers()">
+                    arrow_right
+                </label>
+                <ul class="info__users">
+                    <li class="info__user tooltip">
+                        <span class="info__user-name">
+                            <b>Discord Log Viewer</b>#0000
+
+                        </span>
+                        <span class="tooltiptext pre pre--inline id">0</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="info__toolbox">
+            <label for="toolbox-toggle" class="material-icons icon-large info__toolbox-toggle" onclick="return toggleDrawer(this)">
+                settings
+            </label>
+            <input class="toggle-input" id="toolbox-toggle" type="checkbox">
+            <ul class="info__toolbox-tools">
+                <li>
+                    <div class="tooltip">
+                        <span class="material-icons md-inactive tool">open_in_browser</span>
+                        <span class="tooltiptext pre pre--inline tool-text">No Original URL</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="tooltip">
+                        <span class="material-icons md-inactive tool">assignment</span>
+                        <span class="tooltiptext pre pre--inline tool-text copy">No IDs To Copy</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="tooltip">
+                        <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
+                        <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="chatlog">
+        <div class="chatlog__message-group">
+            <div class="chatlog__author-avatar-container">
+                <img class="chatlog__author-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
+            </div>
+            <div class="chatlog__messages">
+                <div class="chatlog__header">
+                    <span>
+                        <span class="chatlog__author-name" title="Discord Log Viewer#0000">Discord Log Viewer</span>
+                    </span>
+                        <time class="chatlog__timestamp" datetime="{{ iso }}"></time>
+                </div>
+                <div class="chatlog__content">
+                    Welcome to <b>Discord Log Viewer!</b><br><br>Format virtually any log file into an aesthetically pleasing and readable format. Currently, we support:<br>
+
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> Emojis <img class="emoji" title=":sunglasses:" src="https://twemoji.maxcdn.com/2/svg/1f60e.svg" alt="😎"> <img class="emoji" title=":ok_hand:" src="https://twemoji.maxcdn.com/2/svg/1f44c-1f3fd.svg" alt="👌🏽"><br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <i>Italics</i> <br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <b>Bold</b><br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <u>Underline</u><br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <s>Strikethrough</s><br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="pre pre--inline">Inline code</span><br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="chatlog__spoiler-box chatlog__spoiler-hidden"><span class="chatlog__spoiler-text">Spoilers</span></span><br>
+                    <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="chatlog__spoiler-box chatlog__spoiler-hidden"><span class="chatlog__spoiler-text"><b><i><u><s><span class="pre pre--inline">A combination of all of them</span></s></u></i></b></span></span><br>
+
+                    <div class="pre pre--multiline diff hljs"><span class="hljs-addition">+ Multi-line code</span>
+
+# Supported log types:
+<span class="hljs-addition">+ Auttaja</span>
+<span class="hljs-addition">+ CapnBot</span>
+<span class="hljs-addition">+ GearBot</span>
+<span class="hljs-addition">+ GiraffeDuck</span>
+<span class="hljs-addition">+ Logger</span>
+<span class="hljs-addition">+ Rosalina Bottings</span>
+<span class="hljs-addition">+ Rowboat</span>
+    - A1RPL4NE
+    - Aperture
+    - Flygbåt
+    - Heimdallr
+    - Jetski
+    - LMG Showboat
+    - Rawgoat
+    - Speedboat
+<span class="hljs-addition">+ SajuukBot</span>
+<span class="hljs-addition">+ Vortex</span></div>
+                </div>
+                <div class="chatlog__embed">
+                    <div class="chatlog__embed-color-pill" style="background-color: #14C941"></div>
+                    <div class="chatlog__embed-inner">
+                        <div class="chatlog__embed-content">
+                            <div class="chatlog__embed-content-inner chatlog__content">
+                                <div class="chatlog__embed-author">
+                                    <img alt="" class="chatlog__embed-author-icon" src="https://cdn.discordapp.com/embed/avatars/4.png">
+                                    <a class="chatlog__embed-author chatlog__embed-author-name-link chatlog__embed-link" href="https://discordapp.com">Embeds too!</a>
+                                </div>
+                                <div class="chatlog__embed-description">Heck, even attachments are included...</div>
+                                <div class="chatlog__embed-fields">
+                                    <div class="chatlog__embed-field ">
+                                        <div class="chatlog__embed-field-name"><img class="emoji" title=":thinking_face:" src="https://twemoji.maxcdn.com/2/svg/1f914.svg" alt="🤔"></div>
+                                        <div class="chatlog__embed-field-value">is there anything this can't do?</div>
+                                    </div>
+                                    <div class="chatlog__embed-field ">
+                                        <div class="chatlog__embed-field-name"><img class="emoji" title=":scream:" src="https://twemoji.maxcdn.com/2/svg/1f631.svg" alt="😱"></div>
+                                        <div class="chatlog__embed-field-value">not really...</div>
+                                    </div>
+                                    <div class="chatlog__embed-field ">
+                                        <div class="chatlog__embed-field-name"><img class="emoji" title=":face_with_rolling_eyes:" src="https://twemoji.maxcdn.com/2/svg/1f644.svg" alt="🙄"></div>
+                                        <div class="chatlog__embed-field-value">if you find something we don't support, feel free to message <span class="mention user" title="125370065624236033">@EJH2</span> on <a href="https://discordapp.com">Discord</a>!</div>
+                                    </div>
+                                    <div class="chatlog__embed-field chatlog__embed-field--inline">
+                                        <div class="chatlog__embed-field-name">How do I use this?</div>
+                                        <div class="chatlog__embed-field-value">Simply go to <a href="{% url 'view' %}?url=yoururlhere">{% url 'view' %}?url=yoururlhere</a></div>
+                                    </div>
+                                    <div class="chatlog__embed-field chatlog__embed-field--inline">
+                                        <div class="chatlog__embed-field-name">What happens then?</div>
+                                        <div class="chatlog__embed-field-value">You get your own <span class="pre pre--inline">unique</span> log, looking just as cool as this!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="https://cdn.discordapp.com/embed/avatars/2.png" class="chatlog__embed-thumbnail" style="max-width: 80px; max-height: 80px">
+                        </div>
+                        <img src="https://cdn.discordapp.com/embed/avatars/3.png" alt="https://cdn.discordapp.com/embed/avatars/3.png" class="chatlog__embed-image chatlog__embed-margin-large">
+                        <div class="chatlog__embed-footer">
+                            <time class="chatlog__embed-footer-text" datetime="{{ iso }}"></time>
+                        </div>
+                    </div>
+                </div>
+                <div class="chatlog__attachment">
+                    <a href="#0.png">
+                        <img class="chatlog__attachment-thumbnail" src="https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png" alt="attachment" data-id="0.png" onerror="this.src='/static/django_logs/icons/dead_attachment.svg'; this.title='attachment unavailable'">
+                    </a>
+                </div>
+                <div class="chatlog__attachment">
+                    <a href="https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore"></a>
+                    <div class="horizontal">
+                        <a href="https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore">
+                            <img class="icon" src="/static/django_logs/icons/attachment_icon.svg" alt="Attachment file type: unknown" title="unknown">
+                        </a>
+                        <div class="chatlog__attachment-inner">
+                            <a href="https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore"></a>
+                            <div class="filename-link">
+                                <a href="https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore"></a>
+                                <a class="filename-link-inner" href="https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore">gitignore</a>
+                            </div>
+                            <div class="chatlog__attachment-size">0.00 B</div>
+                        </div>
+                        <a class="filename-link-inner" href="https://cdn.discordapp.com/attachments/352443826473795585/557034119939358751/gitignore">
+                            <svg name="Download" class="chatlog__attachment-download" width="24" height="24" viewBox="0 0 24 24">
+                                <g fill="none" fill-rule="evenodd">
+                                    <path d="M0 0h24v24H0z"></path>
+                                    <path class="fill" fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                                </g>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="lightbox_div"></div>
+</body>
+</html>
