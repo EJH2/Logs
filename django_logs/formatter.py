@@ -54,6 +54,16 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     # Encode inline codeblocks (`text` or ``text``)
     content = re.sub(r'(``?)([^`]+)\1', encode_inline_codeblock, content)
 
+    def encode_mentions(m):
+        g = m.groups()
+        encoded = base64.b64encode(m.group(1).encode()).decode()
+        return '\x1AD' + encoded + '\x1AD'
+
+    # Encode mentions
+    content = re.sub(r'((@everyone)|(@here)|(&lt;@!?(\d+)&gt;)|(&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;)|'
+                     r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
+                     r'(&lt;@&amp;(.{1,100}?)&gt;))', encode_mentions, content)
+
     def is_jumboable(pattern, text):
         return (not re.sub(r'(\s)', '', re.sub(pattern, '', text))) and (len(re.findall(pattern, text)) < 28)
 
@@ -123,6 +133,23 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     # Process spoiler (||text||)
     content = re.sub(r'(\|\|)(?=\S)([\S\s]+?)(?<=\S)\1', spoiler_html, content)
 
+    # Custom emojis (<:name:id>)
+    emoji_class = 'emoji emoji--large' if is_jumboable(r'&lt;(:.*?:)(\d*)&gt;', content) else 'emoji'
+    content = re.sub(r'&lt;(:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
+                                              fr'https://cdn.discordapp.com/emojis/\2.png" alt="\1">', content)
+
+    # Custom animated emojis (<a:name:id>)
+    emoji_class_animated = 'emoji emoji--large' if is_jumboable(r'&lt;(a:.*?:)(\d*)&gt;', content) else 'emoji'
+    content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{emoji_class_animated}" title="\1" src="'
+                                               fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
+
+    def decode_mentions(m):
+        decoded = base64.b64decode(m.group(1).encode()).decode()
+        return decoded
+
+    # Decode mentions
+    content = re.sub('\x1AD(.*?)\x1AD', decode_mentions, content)
+
     # Meta mentions (@everyone)
     content = content.replace('@everyone', '<span class="mention">@everyone</span>')
 
@@ -156,16 +183,6 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     # Role mentions (<@&name>)
     content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)',
                      r'<span class="mention" title="Role: \2">@\2</span>', content)
-
-    # Custom emojis (<:name:id>)
-    emoji_class = 'emoji emoji--large' if is_jumboable(r'&lt;(:.*?:)(\d*)&gt;', content) else 'emoji'
-    content = re.sub(r'&lt;(:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
-                                              fr'https://cdn.discordapp.com/emojis/\2.png" alt="\1">', content)
-
-    # Custom animated emojis (<a:name:id>)
-    emoji_class_animated = 'emoji emoji--large' if is_jumboable(r'&lt;(a:.*?:)(\d*)&gt;', content) else 'emoji'
-    content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{emoji_class_animated}" title="\1" src="'
-                                               fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
 
     def decode_inline_codeblock(m):
         decoded = base64.b64decode(m.group(1).encode()).decode()
@@ -224,6 +241,15 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
     # Encode inline codeblocks (`text` or ``text``)
     content = re.sub(r'(``?)([^`]+)\1', encode_inline_codeblock, content)
 
+    def encode_mentions(m):
+        encoded = base64.b64encode(m.group(1).encode()).decode()
+        return '\x1AD' + encoded + '\x1AD'
+
+    # Encode mentions
+    content = re.sub(r'((@everyone)|(@here)|(&lt;@!?(\d+)&gt;)|(&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;)|'
+                     r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
+                     r'(&lt;@&amp;(.{1,100}?)&gt;))', encode_mentions, content)
+
     def process_emojis(m):
         if m.group(2) in EMOJI_LIST:
             emoji = EMOJI_LIST[m.group(2)]
@@ -276,6 +302,13 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
 
     # Process spoiler (||text||)
     content = re.sub(r'(\|\|)(?=\S)([\S\s]+?)(?<=\S)\1', spoiler_html, content)
+
+    def decode_mentions(m):
+        decoded = base64.b64decode(m.group(1).encode()).decode()
+        return decoded
+
+    # Decode mentions
+    content = re.sub('\x1AD(.*?)\x1AD', decode_mentions, content)
 
     # Meta mentions (@everyone)
     content = content.replace('@everyone',
