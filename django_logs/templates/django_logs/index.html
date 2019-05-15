@@ -18,6 +18,11 @@
 </head>
 <body class="no-js">
     <br>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
     <div class="info">
         <div class="info__guild-icon-container">
             <img class="info__guild-icon" src="{% static 'django_logs/icons/white_file.png' %}" alt="avatar">
