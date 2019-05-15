@@ -36,6 +36,6 @@ setup(
         'natural',
         'demoji',
         'psycopg2',
-        'django-rest-framework'
+        'djangorestframework'
     ]
 )

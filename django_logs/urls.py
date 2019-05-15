@@ -3,6 +3,7 @@ from allauth.socialaccount.providers.discord.views import oauth2_login, oauth2_c
 from django.contrib import admin
 from django.urls import path, re_path
 
+from django_logs import api
 from . import views
 
 urlpatterns = [
@@ -18,7 +19,7 @@ urlpatterns = [
     path('verifyemail', email_verification_sent, name='account_email_verification_sent'),
     re_path('verifyemail/(?P<key>[\w\-:]+)', confirm_email, name='account_confirm_email'),
 
-    re_path('api', views.api, name='api'),
+    re_path('api', api.api, name='api'),
 
     re_path(r'(?P<short_code>[\w]{5})/raw', views.logs, kwargs={'raw': True}, name='raw'),
     re_path(r'(?P<short_code>[\w]{5})', views.logs, name='logs'),
