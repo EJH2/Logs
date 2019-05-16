@@ -110,13 +110,10 @@ def create_log(data: dict, **create_data):
     create_data['data'] = data
     filter_url = create_data.pop('filter_url')
     expires = create_data.pop('expires')
+    create_data['expires_at'] = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires)
     if create_data['url'] and filter_url.exists():
         update_db(filter_url, create_data, messages)
     chunked = len(messages) > 1000
     create_func = create_chunked_logs if chunked else LogRoute.objects.get_or_create
     created_log, created = create_func(**create_data, messages=messages)
-    if expires:
-        expires = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires)
-        created_log.expires_at = expires
-        created_log.save()
     return created
