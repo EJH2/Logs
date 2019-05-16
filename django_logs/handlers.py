@@ -15,7 +15,7 @@ def rowboat(content, **kwargs):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
     data['type'] = 'Rowboat'
-    if kwargs['variant']:
+    if kwargs.get('variant'):
         variant = kwargs.pop('variant')
         data['type'] = variant[1]
 
