@@ -59,6 +59,7 @@ def api(request):
         return JsonResponse(resp, status=400)
 
     log_type = data.get('type')
+    new = data.get('new')
     match_len = len(re.findall(types[log_type], content, re.MULTILINE))
     author = request.user if request.user.is_authenticated else None
     default = 60 * 60 * 24 * 7 if author else 60 * 60 * 24
@@ -68,7 +69,8 @@ def api(request):
         return JsonResponse(resp, status=400)
     if match_len > 0:
         content = re.sub('\r\n', '\n', content)
-        short, created = LogParser(log_type, content, origin=origin, variant=variant).create(author, expires=expires)
+        short, created = LogParser(log_type, content, origin=origin, variant=variant).create(author, expires=expires,
+                                                                                             new=new)
         data = {
             'status': 200,
             'short': short,
