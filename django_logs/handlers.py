@@ -11,8 +11,13 @@ def rowboat(content, **kwargs):
     matches = (re.finditer(rowboat_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'Rowboat'
     if kwargs.get('variant'):
@@ -27,6 +32,10 @@ def rosalina_bottings(content, **kwargs):
     matches = (re.finditer(rosalina_bottings_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
 
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+    progress_recorder.set_progress(total, total)
+
     data['type'] = 'Rosalina Bottings'
 
     return data, match_data
@@ -36,6 +45,9 @@ def giraffeduck(content, **kwargs):
     data = dict()
     matches = (re.finditer(giraffeduck_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
+
+    progress_recorder = kwargs['pr']
+    total = len(match_data) + 4
 
     headers = content.split('\n')[:5]
     header_info = list()
@@ -48,14 +60,18 @@ def giraffeduck(content, **kwargs):
     role_mentions = dict()
     for user in header_info[1]:
         users[user[0]] = user[1]
+    progress_recorder.set_progress(1, total)
     for mention in header_info[2]:  # Mentions
         user_mentions[mention[1]] = mention[0]  # {'id': 'user'}
+    progress_recorder.set_progress(2, total)
     for channel in header_info[3]:  # Channels
         channel_mentions[channel[1]] = channel[0]
+    progress_recorder.set_progress(3, total)
     for role in header_info[4]:  # Roles
         role_mentions[role[1]] = role[0]
+    progress_recorder.set_progress(4, total)
 
-    for match in match_data:
+    for count, match in enumerate(match_data):
         match['uid'] = users[f'{match["uname"]}#{match["disc"]}']
         _attach = match['attach'].split(', ') if match['attach'] else []
         match['attach'] = get_attach_info(_attach)
@@ -64,6 +80,8 @@ def giraffeduck(content, **kwargs):
                                   match['content'])
         match['content'] = re.sub(r'<#(\d+)>', lambda m: f'<#{channel_mentions[m.group(1)]}>', match['content'])
         match['content'] = re.sub(r'<@&(\d+)>', lambda m: f'<@&{role_mentions[m.group(1)]}>', match['content'])
+
+        progress_recorder.set_progress(count + 4, total)
 
     data['type'] = 'GiraffeDuck'
 
@@ -84,9 +102,14 @@ def auttaja(content, **kwargs):
     matches = (re.match(auttaja_re, m) for m in _matches)
     match_data = list(m.groupdict() for m in matches)
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
         match['attach'] = get_attach_info(match['attach'].split(' ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'Auttaja'
 
@@ -97,11 +120,16 @@ def logger(content, **kwargs):
     data = dict()
     matches = (re.finditer(logger_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
+    
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
 
-    for match in match_data:
+    for count, match in enumerate(match_data):
         match['embeds'] = get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
         match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'Logger'
 
@@ -121,8 +149,13 @@ def sajuukbot(content, **kwargs):
     matches = (re.match(sajuukbot_re, m) for m in _matches)
     match_data = list(m.groupdict() for m in matches)
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'SajuukBot'
 
@@ -142,8 +175,13 @@ def vortex(content, **kwargs):
     matches = (re.match(vortex_re, m) for m in _matches)
     match_data = list(m.groupdict() for m in matches)
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'Vortex'
 
@@ -155,8 +193,13 @@ def gearbot(content, **kwargs):
     matches = (re.finditer(gearbot_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'GearBot'
 
@@ -168,9 +211,14 @@ def capnbot(content, **kwargs):
     matches = (re.finditer(capnbot_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['embeds'] = get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'CapnBot'
 
@@ -191,8 +239,13 @@ def modmailbot(content, **kwargs):
     matches = (re.match(modmailbot_re, m) for m in _matches)
     match_data = list(m.groupdict() for m in matches if not m.group('bcontent'))
 
-    for match in match_data:
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count, total)
 
     data['type'] = 'ModMailBot'
 

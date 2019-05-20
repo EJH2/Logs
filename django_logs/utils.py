@@ -3,6 +3,8 @@ import json
 import re
 
 import requests
+from celery.result import AsyncResult
+from django.db.models import QuerySet
 
 from django_logs.consts import attachment_re
 from django_logs.models import LogRoute
@@ -75,10 +77,37 @@ def request_url(url: str):
     return resp
 
 
-def get_expiry(data, default):
+def get_expiry(data: dict, default: int):
     expires = data.get('expires', 60 * 60 * 12)
     if isinstance(expires, str):
         expires = int(expires) if expires.isdigit() else default
     if expires > default:
         return None
     return expires
+
+
+def get_chain_tasks(node):
+    id_chain = []
+    while node.parent:
+        id_chain.insert(0, node.id)
+        node = node.parent
+    id_chain.insert(0, node.id)
+    return id_chain
+
+
+def add_task_messages(task_list: list, messages: list = None):
+    if not messages:
+        messages = [''] * len(task_list)
+    if len(messages) == len(task_list):
+        for count, task in enumerate(task_list):
+            task_list[count] = (task, messages[count])
+    return {'tasks': task_list}
+
+
+def forget_tasks(jobs: QuerySet):
+    tasks = [task[0] for task in [subtasklist for bigtasklist in [job.data for job in jobs] for
+                                  subtasklist in bigtasklist]]
+    for task_id in tasks:
+        task = AsyncResult(id=task_id)
+        task.forget()
+    jobs.delete()

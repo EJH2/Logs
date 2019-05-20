@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Log Entry</title>
+    <meta charset="utf-8"/>
+    {% load static %}
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="og:title" content="Discord Log Viewer">
+    <meta name="og:description" content="Message Count: {{ msg_len }}">
+    <meta name="og:image" content="https://{{ request.META.HTTP_HOST }}{% static 'django_logs/icons/black_file.png' %}">
+    <link href="{% static "django_logs/css/logstyle.css" %}" rel="stylesheet">
+    <link id="theme" href="{% static "django_logs/css/logstyle_dark.css" %}" rel="stylesheet">
+    <link id="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+    <script src="{% static 'django_logs/js/logs.js' %}"></script>
+</head>
+<body class="no-js">
+<br>
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+<div class="info">
+    <div class="info__guild-icon-container">
+        <img class="info__guild-icon placeholder" src="{% static 'django_logs/icons/processing.png' %}" alt="avatar">
+    </div>
+    <div class="info__metadata">
+        <div class="info__guild-name">
+            <div class="placeholder placeholder-title"></div>
+        </div>
+            <div class="info__generated-at"><span>Generated:</span>
+                <div class="placeholder placeholder-text"></div></div>
+        <div class="info__channel-message-count"><span>Message Count:</span>
+            <div class="placeholder placeholder-text"></div></div>
+        <div class="info__user-list">
+            <span>Users: </span>
+            <div class="placeholder placeholder-text"></div>
+        </div>
+    </div>
+    <div class="info__toolbox">
+        <label for="toolbox-toggle" class="material-icons icon-large info__toolbox-toggle" onclick="return toggleDrawer(this)">
+            settings
+        </label>
+        <input class="toggle-input" id="toolbox-toggle" type="checkbox">
+        <ul class="info__toolbox-tools">
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons md-inactive tool">open_in_browser</span>
+                    <span class="tooltiptext pre pre--inline tool-text">No Original URL</span>
+                </div>
+            </li>
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons md-inactive tool">assignment</span>
+                    <span class="tooltiptext pre pre--inline tool-text copy">No IDs To Copy</span>
+                </div>
+            </li>
+            <li>
+                <div class="tooltip">
+                    <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
+                    <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="chatlog">
+    <div class="chatlog__message-group">
+        <div class="chatlog__author-avatar-container">
+            <img class="chatlog__author-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
+        </div>
+        <div class="chatlog__messages">
+            <div class="chatlog__header">
+                <span>
+                    <span class="chatlog__author-name" title="Discord Log Viewer#0000">Discord Log Viewer</span>
+                </span>
+                    <time class="chatlog__timestamp" datetime="{{ iso }}"></time>
+            </div>
+            {% for enum in task_ids %}
+            <div class="chatlog__content">
+                <div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div>
+            </div>
+            <div class="chatlog__content">
+                <div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div id="lightbox_div"></div>
+<script>
+    {% for enum in task_ids %}const progressUrl{{ enum|first }} = "{% url 'celery_progress:task_status' enum|last|first %}";
+    {% endfor %}
+    document.addEventListener("DOMContentLoaded", function () {
+        const bars = [
+            {% for enum in task_ids %}{bar: CeleryProgressBar, progressUrl: progressUrl{{enum|first}}, message: `{{ enum|last|last }}`, id: {{ enum|first }}},
+            {% endfor %}];
+
+        let initProgressBar = function (bar, progressUrl, id, message, callback) {
+            bar.initProgressBar(progressUrl, {
+                progressBarId: `progress-bar-${id}`,
+                progressBarMessageId: `progress-bar-message-${id}`,
+                pollInterval: 1000,
+                onProgress: function (progressBarElement, progressBarMessageElement, progress) {
+                    progressBarElement.style.backgroundColor = '#68a9ef';
+                    progressBarElement.style.width = progress.percent + "%";
+                    const progressMessage = message.replace('{current}', progress.current).replace('{percent}', progress.percent).replace('{total}', progress.total);
+                    progressBarMessageElement.innerHTML = progressMessage || `${progress.current} of ${progress.total} processed.`;
+                },
+                onSuccess: function (progressBarElement, progressBarMessageElement) {
+                    progressBarElement.style.backgroundColor = '#76ce60';
+                    progressBarMessageElement.innerHTML = "Success!";
+                    callback();
+                },
+                onError: function (progressBarElement, progressBarMessageElement) {
+                    progressBarElement.style.backgroundColor = '#dc4f63';
+                    progressBarMessageElement.innerHTML = `Uh-Oh, something went wrong!`;
+                    somethingBroke();
+                }
+            });
+        };
+
+        function somethingBroke() {
+            let node = document.createElement('div');
+            node.classList.add('chatlog__content');
+            node.innerHTML = 'We broke something! Please send this to EJH2#0330 on Discord so he can try and find the issue!<br>';
+            let block = document.createElement('div');
+            block.classList.add('pre', 'pre--multiline', 'hljs');
+            block.innerHTML = 'Tasks:<br>{% for enum in task_ids %}{{ enum|last|first }}<br>{% endfor %}<br>Request URI:<br>{% firstof request_uri request.build_absolute_uri %}';
+            node.appendChild(block);
+            node.innerHTML += "Once you\'re ready to go, click <a href={% url 'index' %}>here</a>.";
+            const msgDiv = document.getElementsByClassName("chatlog__messages");
+            msgDiv[0].appendChild(node);
+        }
+
+        function finishedProcessing() {
+            return new Promise(resolve => {
+            let node = document.createElement('div');
+            node.classList.add('chatlog__content');
+            node.innerText = 'Finished processing. Reloading...';
+            const msgDiv = document.getElementsByClassName("chatlog__messages");
+            msgDiv[0].appendChild(node);
+            setTimeout(function () {location.reload()}, 3000)
+        })}
+
+        function startProgressBars(bars) {
+            return new Promise(resolve => {
+                if (bars.length === 1) {
+                    initProgressBar(bars[0].bar, bars[0].progressUrl, bars[0].id, bars[0].message, () => {
+                        finishedProcessing().then(resolve)})
+                } else {
+                const bar = bars.shift();
+                initProgressBar(bar.bar, bar.progressUrl, bar.id, bar.message, () => {
+                    startProgressBars(bars).then(resolve)
+              })
+            }
+          })
+        }
+
+        startProgressBars(bars);
+    });
+</script>
+</body>
+</html>

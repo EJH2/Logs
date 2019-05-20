@@ -49,7 +49,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.discord',
 
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+
+    'celery_progress',
 ]
 
 MIDDLEWARE = [
@@ -62,11 +64,17 @@ MIDDLEWARE = [
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', True)
+
 EMAIL_HOST = config('EMAIL_HOST')
+
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
 EMAIL_PORT = config('EMAIL_PORT')
 
 ROOT_URLCONF = 'django_logs.urls'
@@ -153,10 +161,30 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-# AllAuth Configuration
+
+# Django-AllAuth configuration
+# https://django-allauth.readthedocs.io/en/latest/
+
+SOCIALACCOUNT_PROVIDERS = {
+    'discord': {
+        'SCOPE': ['email', 'identify', 'guilds'],
+        'AUTH_PARAMS': {'prompt': 'none'},
+        'METHOD': 'oauth2'
+    }
+}
+
 SITE_ID = 1
 
 LOGIN_REDIRECT_URL = 'index'
 
-# Discord Token, for fetching user avatars
-LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')
+LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')  # Discord Token, for fetching user avatars
+
+
+# Celery configuration
+# http://docs.celeryproject.org/en/latest/
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+
+CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_RESULT_SERIALIZER = 'json'

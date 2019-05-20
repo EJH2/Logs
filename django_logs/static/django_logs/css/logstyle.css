@@ -342,6 +342,44 @@ a.material-icons {
     cursor: pointer;
 }
 
+.placeholder-title {
+    width: 250px;
+    height: 30px;
+    border-radius: 15px;
+}
+
+.placeholder-text {
+    width: 100px;
+    height: 14px;
+    border-radius: 8px;
+}
+
+.placeholder {
+    display: inline-block;
+    vertical-align: inherit;
+    flex: 1 1 auto;
+    background: #72767d;
+    margin-bottom: -2px;
+    animation: placeholder-pulse 3s ease-in-out infinite;
+}
+
+@keyframes placeholder-pulse {
+    0% {
+        opacity: .2
+    }
+    50% {
+        opacity: .5
+    }
+    to {
+        opacity: .2
+    }
+}
+
+.progress-bar {
+    border-radius: 15px;
+    margin: 3px 0 3px;
+}
+
 /* === CHATLOG === */
 
 body {
@@ -506,6 +544,7 @@ body {
 .chatlog__content {
     font-size: .9375rem;
     word-wrap: break-word;
+    max-width: 95%;
 }
 
 .chatlog__spoiler-box.chatlog__spoiler-hidden {

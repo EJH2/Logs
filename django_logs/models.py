@@ -14,16 +14,16 @@ from django_logs.formatter import format_content_html, format_micro_content_html
 
 class LogRoute(models.Model):
     author = models.ForeignKey(DjangoUser, on_delete=models.CASCADE, null=True)
-    origin = models.CharField(max_length=10, editable=False)
-    url = models.TextField(editable=False, null=True)
+    origin = models.CharField(max_length=10)
+    url = models.TextField(null=True)
     short_code = models.CharField(max_length=15, editable=False, unique=True)
-    log_type = models.CharField(max_length=30, editable=False)
+    log_type = models.CharField(max_length=30)
     generated_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True)
-    data = fields.JSONField(editable=False, null=True)
-    content = models.TextField(editable=False, null=True)
-    messages = fields.JSONField(editable=False)
-    chunked = models.BooleanField(editable=False, default=False)
+    data = fields.JSONField(null=True)
+    content = models.TextField(null=True)
+    messages = fields.JSONField()
+    chunked = models.BooleanField(default=False)
 
     @classmethod
     def generate_short_code(cls, data):
@@ -31,6 +31,12 @@ class LogRoute(models.Model):
 
     def __str__(self):
         return 'Log %s' % self.short_code
+
+
+class ActiveJob(models.Model):
+    short_code = models.CharField(max_length=15, editable=False, unique=True)
+    data = fields.JSONField()
+    request_uri = models.TextField(null=True)
 
 
 class LogEntry:
@@ -231,3 +237,94 @@ class Message:
                     or other.author != self.author
             )
         return other.author != self.author
+
+
+# class User(models.Model):
+#     id = models.BigIntegerField(null=True)
+#     name = models.CharField(max_length=100)
+#     discriminator = models.CharField(max_length=4)
+#     avatar_url = models.TextField(null=True)
+#     bot = models.BooleanField(default=False)
+#
+#     @property
+#     def default_avatar_url(self):
+#         return "https://cdn.discordapp.com/embed/avatars/{}.png".format(
+#             int(self.discriminator) % 5
+#         )
+#
+#     def __str__(self):
+#         return f'{self.name}#{self.discriminator}'
+#
+#     def __eq__(self, other):
+#         return other.__dict__ == self.__dict__
+#
+#
+# class EmbedField(models.Model):
+#     name = models.CharField(max_length=256)
+#     value = models.CharField(max_length=1024)
+#     inline = models.BooleanField()
+#
+#
+# class EmbedAuthor(models.Field):
+#     name = models.CharField()
+#     url = models.CharField(null=True)
+#     icon_url = models.CharField(null=True)
+#
+#
+# class EmbedFooter(models.Model):
+#     text = models.CharField(max_length=2048, null=True)
+#     icon_url = models.TextField(null=True)
+#
+#
+# class Embed(models.Model):
+#     title = models.CharField(max_length=256, null=True)
+#     description = models.CharField(max_length=2048, null=True)
+#     type = models.CharField(max_length=25, default='rich')
+#     url = models.TextField(null=True)
+#     author = pgfields.JSONField(null=True)
+#     timestamp = models.DateTimeField(null=True)
+#     color = models.IntegerField(default=5198940)
+#     fields = pgfields.ArrayField(pgfields.JSONField(null=True), size=25)
+#     thumbnail = pgfields.JSONField(null=True)
+#     image = pgfields.JSONField(null=True)
+#     footer = pgfields.JSONField(null=True)
+#
+#
+# class Attachment(models.Model):
+#     filename = models.TextField()
+#     url = models.TextField()
+#     is_image = models.BooleanField()
+#     size = models.CharField(max_length=25)
+#
+#
+# class Message(models.Model):
+#     id = models.BigIntegerField(null=True)
+#     type = models.CharField(max_length=4, default='raw')
+#     author = models.ForeignKey(User, on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(null=True)
+#     content = models.TextField(null=True)
+#     attachments = models.ManyToManyField(Attachment)
+#     embeds = models.ManyToManyField(Embed)
+#
+#     def is_different_from(self, other):
+#         if self.created_at is not None:
+#             return (
+#                     (other.created_at - self.created_at).total_seconds() > 60
+#                     or other.author != self.author
+#             )
+#         return other.author != self.author
+#
+#     @property
+#     def created_iso(self):
+#         return self.created_at.isoformat() if self.created_at else None
+#
+#     @property
+#     def human_created_at(self):
+#         tz = self.created_at.tzinfo if self.created_at else pytz.UTC
+#         return duration(self.created_at.replace(tzinfo=tz), now=datetime.now(tz=tz)) if self.created_at else None
+#
+#     def save(self, *args, **kwargs):
+#         if self.type == 'raw':
+#             self.content = format_content_html(self.content, masked_links=True)
+#             self.type = 'rich'
+#         super(Message, self).save(*args, **kwargs)

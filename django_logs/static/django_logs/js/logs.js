@@ -47,15 +47,28 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.body.classList.remove('no-js');
 
     loadJS();
-});
 
-document.querySelectorAll('.alert').forEach((alert) => {
-    setTimeout(function () {
-        alert.classList.add('disappearing');
+    document.querySelectorAll('.alert').forEach((alert) => {
         setTimeout(function () {
-            alert.remove();
-        }, 1000);
-    }, 5000);
+            alert.classList.add('disappearing');
+            setTimeout(function () {
+                alert.remove();
+            }, 1000);
+        }, 5000);
+    });
+
+    if (typeof InfiniteScroll !== 'undefined') {
+        let infScroll = new InfiniteScroll('.infinite-container', {
+            path: '.infinite-more-link',
+            append: '.infinite-item',
+            status: '.infinite-scroll-status',
+            hideNav: '.infinite-next',
+            history: 'replace',
+        });
+        infScroll.on('append', function (response, path, items) {
+            loadJS()
+        });
+    }
 });
 
 function toggleDrawer(element) {
@@ -134,17 +147,4 @@ function copyAll(element) {
     document.execCommand("Copy");
     textArea.remove();
     element.classList.toggle('copied');
-}
-
-if (typeof InfiniteScroll !== 'undefined') {
-    let infScroll = new InfiniteScroll('.infinite-container', {
-        path: '.infinite-more-link',
-        append: '.infinite-item',
-        status: '.infinite-scroll-status',
-        hideNav: '.infinite-next',
-        history: 'replace',
-    });
-    infScroll.on('append', function (response, path, items) {
-        loadJS()
-    });
 }

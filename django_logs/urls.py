@@ -1,7 +1,7 @@
 from allauth.account.views import login, signup, logout, email_verification_sent, confirm_email
 from allauth.socialaccount.providers.discord.views import oauth2_login, oauth2_callback
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 
 from django_logs import api
 from . import views
@@ -10,6 +10,9 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('view', views.view, name='view'),
     path('admin', admin.site.urls, name='admin'),
+
+    path('celery-progress/', include('celery_progress.urls')),
+    path('tb', views.traceback, name='traceback'),
 
     path('login', login, name='account_login'),
     path('login/discord', oauth2_login, name='discord_login'),

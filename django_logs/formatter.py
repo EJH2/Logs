@@ -81,6 +81,8 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
         e = m.group()
         e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
         title_e = re.sub(r'[\U0001F3FB-\U0001F3FF]$', '', e)
+        if not title_e:
+            title_e = e
         title = UNICODE_LIST.get(title_e) or demoji._CODE_TO_DESC[title_e]
         emoji_class = 'emoji emoji--large' if is_jumboable(demoji._EMOJI_PAT, text) else 'emoji'
         codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
@@ -264,6 +266,8 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
         e = m.group()
         e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
         title_e = re.sub(r'[\U0001F3FB-\U0001F3FF]$', '', e)
+        if not title_e:
+            title_e = e
         title = UNICODE_LIST.get(title_e) or demoji._CODE_TO_DESC[title_e]
         codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
         return fr'<img class="emoji" title=":{title}:" ' \

@@ -4,16 +4,18 @@ from urllib.parse import urlparse
 
 import pytz
 import requests
-# from celery.result import AsyncResult
+from celery.result import AsyncResult
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
+from django_logs import utils
 from django_logs.consts import rowboat_types, types
-from django_logs.models import LogEntry
-from django_logs.parser import *
+from django_logs.models import LogEntry, LogRoute, ActiveJob
+from django_logs.parser import LogParser
 from django_logs.utils import request_url, get_expiry
 
 
@@ -24,10 +26,16 @@ def index(request):
 
 def logs(request, short_code: str, raw=False):
     try:
-        short_code = short_code.split('-')[0]
+        processing = ActiveJob.objects.filter(short_code=short_code)
         _log = LogRoute.objects.filter(short_code__startswith=short_code).order_by('id')
         if not _log.exists():
+            if processing.exists():
+                ids = list(enumerate(processing[0].data['tasks']))
+                req = processing[0].request_uri
+                return render(request, 'django_logs/loading.html', context={'task_ids': ids, 'request_uri': req,
+                                                                            'iso': datetime.now(pytz.UTC).isoformat()})
             raise ObjectDoesNotExist
+        utils.forget_tasks(processing)
         log = _log[0]
         if log.expires_at < datetime.now(pytz.UTC):
             _log.delete()
@@ -69,11 +77,16 @@ def logs(request, short_code: str, raw=False):
         return redirect('index')
 
 
-# def get_task_state(request, task_id):
-#     job = AsyncResult(task_id)
-#     data = job.result or job.state
-#     return JsonResponse(data)
-#
+@user_passes_test(lambda u: u.is_superuser)
+def traceback(request):
+    t = request.GET.get('t')
+    tasks = t.split(',')
+    gathered = []
+    for task in tasks:
+        t = AsyncResult(id=task)
+        gathered.append({'id': t.id, 'status': t.status, 'result': t.result, 'traceback': t.traceback})
+    return JsonResponse(gathered)
+
 
 def view(request):
     url = request.GET.get('url')
@@ -98,8 +111,8 @@ def view(request):
     try:
         content = resp.content.decode()
     except UnicodeDecodeError:
-        resp = {'status': 400, 'message': 'Request content must be of encoding utf-8!'}
-        return JsonResponse(resp, status=400)
+        messages.error(request, 'Request content must be of encoding utf-8!')
+        return redirect('index')
     if content == '':
         messages.error(request, 'You have to provide a url with text in it to parse!')
         return redirect('index')
@@ -108,6 +121,7 @@ def view(request):
     log_type = request.GET.get('type')
     variant = rowboat_types.get(urlparse(url).netloc)
     author = request.user if request.user.is_authenticated else None
+    req = request.build_absolute_uri()
     default = 60 * 60 * 24 * 7 if author else 60 * 60 * 24
     expires = get_expiry(request.GET, default)
     if not expires:
@@ -116,7 +130,7 @@ def view(request):
     if log_type and log_type in types:
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         if match_len > 0:
-            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(
+            short, created = LogParser(log_type, content, origin=('url', url), variant=variant, request_uri=req).create(
                 author, expires=expires, new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
@@ -133,7 +147,7 @@ def view(request):
                                     f'http{sec}://{request.META["HTTP_HOST"]}/api!')
             return redirect('index')
         if match_len > 0:
-            short, created = LogParser(log_type, content, origin=('url', url), variant=variant).create(
+            short, created = LogParser(log_type, content, origin=('url', url), variant=variant, request_uri=req).create(
                 author, expires=expires, new=True)
             request.session['cached'] = not created
             return redirect('logs', short_code=short)
