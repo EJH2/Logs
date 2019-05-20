@@ -118,7 +118,8 @@ def create_log(self, data: dict, extras, create_data):
         create_data['log_type'] = variant[0]
     messages = data.pop('messages')
     create_data['data'] = data
-    create_data['author'] = list(serializers.deserialize('json', create_data['author']))[0].object
+    if create_data['author']:
+        create_data['author'] = list(serializers.deserialize('json', create_data['author']))[0].object
     filter_url = extras['filter_url']
     expires = create_data.pop('expires')
     create_data['expires_at'] = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires)

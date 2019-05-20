@@ -29,7 +29,8 @@ class LogParser:
             return short_code, False
         if filter_short.exists():
             filter_short.delete()
-        author = serializers.serialize('json', [author])
+        if author:
+            author = serializers.serialize('json', [author])
         create_data = {'origin': self.origin, 'url': self.url, 'short_code': short_code, 'log_type': self.log_type,
                        'variant': self.variant, 'content': self.content, 'expires': expires, 'author': author}
         extras = {'filter_url': list(filter_url)}
