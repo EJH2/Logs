@@ -15,7 +15,7 @@ body {
     margin: -20px 0;
 }
 
-h1 {
+h1, label {
     font-weight: bold;
     margin: 0;
     color: #FFFFFF;
