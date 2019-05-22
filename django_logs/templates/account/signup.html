@@ -1,0 +1,23 @@
+{% extends "socialbase.html" %}
+{% load socialaccount %}
+
+{% block title %}Signup{% endblock %}
+{% block js %}{% endblock %}
+
+{% block ghostright %}
+<div class="overlay-panel overlay-right">
+    <h1>Almost there...</h1>
+    <p>Signing up gives you access to more features</p>
+    <a href="{% url 'perks' %}"><button class="ghost">Perks</button></a>
+</div>
+{% endblock %}
+
+{% block solidleft %}
+<div class="form-container sign-in-container">
+    <form method="GET" action="{% provider_login_url 'discord' %}">
+        <h1>Sign Up</h1>
+        <br>
+        <button>Discord</button>
+    </form>
+</div>
+{% endblock %}

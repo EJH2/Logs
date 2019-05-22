@@ -1,6 +1,6 @@
 from django.contrib import admin
 
 # Register your models here.
-from django_logs.models import LogRoute
+from django_logs.models import Log
 
-admin.site.register(LogRoute)
+admin.site.register(Log)

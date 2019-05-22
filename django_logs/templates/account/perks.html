@@ -1,0 +1,29 @@
+{% extends 'socialbase.html' %}
+
+{% block title %}Perks{% endblock %}
+{% block js %}{% endblock %}
+
+{% block ghostright %}
+<div class="overlay-panel overlay-right">
+    <h1>Perks</h1>
+    <ul style="text-align: left;">
+        <li>Extended log expiration times</li>
+        <li>Manage created logs</li>
+        <li>Increased log sizes</li>
+        <li>Access to API</li>
+        <li>Log analytics</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block solidleft %}
+<div class="form-container sign-in-container">
+    <form method="GET" action="{% url 'account_login' %}">
+        <h1>Check It Out!</h1>
+        <br>
+        <p style="color:white;">These are all the features you'd have access to if you sign up!</p>
+        <br>
+        <button type="submit">Sign In</button>
+    </form>
+</div>
+{% endblock %}

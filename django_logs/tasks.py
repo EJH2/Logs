@@ -10,7 +10,7 @@ from django.core import serializers
 
 from django_logs import handlers
 from django_logs.consts import DISCORD_API_URL, DISCORD_HEADERS, DISCORD_TOKEN
-from django_logs.models import SerializedMessage, User, LogRoute
+from django_logs.models import SerializedMessage, User, Log
 from django_logs.utils import create_chunked_logs, update_db
 
 
@@ -127,7 +127,7 @@ def create_log(self, data: dict, extras, create_data):
         update_db(filter_url, create_data, messages)
     progress_recorder.set_progress(1, 2)
     chunked = len(messages) > 1000
-    create_func = create_chunked_logs if chunked else LogRoute.objects.get_or_create
+    create_func = create_chunked_logs if chunked else Log.objects.get_or_create
     created_log, _ = create_func(**create_data, messages=messages)
     progress_recorder.set_progress(2, 2)
     return created_log.short_code

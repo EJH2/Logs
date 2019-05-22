@@ -14,7 +14,7 @@ from django.shortcuts import render, redirect
 
 from django_logs import utils
 from django_logs.consts import rowboat_types, types
-from django_logs.models import LogEntry, LogRoute, ActiveJob
+from django_logs.models import Entry, Log, Job
 from django_logs.parser import LogParser
 from django_logs.utils import request_url, get_expiry
 
@@ -26,8 +26,8 @@ def index(request):
 
 def logs(request, short_code: str, raw=False):
     try:
-        processing = ActiveJob.objects.filter(short_code=short_code)
-        _log = LogRoute.objects.filter(short_code__startswith=short_code).order_by('id')
+        processing = Job.objects.filter(short_code=short_code)
+        _log = Log.objects.filter(short_code__startswith=short_code).order_by('id')
         if not _log.exists():
             if processing.exists():
                 ids = list(enumerate(processing[0].data['tasks']))
@@ -68,7 +68,7 @@ def logs(request, short_code: str, raw=False):
         log.data['generated_at'] = log.generated_at
         log.data['messages'] = log.messages
         log.data['raw_content'] = log.content
-        return render(request, 'django_logs/logs.html', context={'log_entry': LogEntry(log.data),
+        return render(request, 'django_logs/logs.html', context={'log_entry': Entry(log.data),
                                                                  'original_url': log.url, 'log_type': log.log_type,
                                                                  'chunked': chunked, 'msg_page': msg_page,
                                                                  'msg_len': msg_len, 'short': short_code})
@@ -88,6 +88,10 @@ def traceback(request):
     return JsonResponse(gathered)
 
 
+def perks(request):
+    return render(request, 'account/perks.html')
+
+
 def view(request):
     url = request.GET.get('url')
     if not url:
@@ -95,7 +99,7 @@ def view(request):
         return redirect('index')
 
     # Cached?
-    cached = LogRoute.objects.filter(url=url)
+    cached = Log.objects.filter(url=url)
     if cached.exists() and not request.GET.get('new'):  # Cached, and user wants from cache
         request.session['cached'] = True
         return redirect('logs', short_code=cached[0].short_code.split('-')[0])

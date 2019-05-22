@@ -7,19 +7,19 @@ from celery.result import AsyncResult
 from django.db.models import QuerySet
 
 from django_logs.consts import attachment_re
-from django_logs.models import LogRoute
+from django_logs.models import Log
 
 
 def update_db(objects, create_data, messages):
     first = objects[0]
-    assert isinstance(first, LogRoute)
+    assert isinstance(first, Log)
 
     # These messages don't need chunking
     if len(messages) <= 1000 and first.chunked is False:
         return objects.update(**create_data, messages=messages)
     if len(messages) <= 1000 and first.chunked is True:
         objects.delete()
-        return LogRoute.objects.create(**create_data, messages=messages)
+        return Log.objects.create(**create_data, messages=messages)
 
     # These messages do
     objects.delete()  # Wipe the row(s) so no old info is left over
@@ -33,13 +33,13 @@ def create_chunked_logs(**create_data):
     for batch in range(0, len(messages), 1000):
         batch_list.append(messages[batch:batch + 1000])  # Split messages by the 1000
     create_data['chunked'] = True
-    new_first = LogRoute(**create_data, short_code=f'{short_code}-0', messages=batch_list[0])
+    new_first = Log(**create_data, short_code=short_code, messages=batch_list[0])
     create_data['data'] = None
     create_data['content'] = None
-    new_rest = (LogRoute(**create_data, short_code=f'{short_code}-{i}', messages=batch_list[i]) for i in range(
+    new_rest = (Log(**create_data, short_code=f'{short_code}-{i}', messages=batch_list[i]) for i in range(
         1, len(batch_list)))
     new_objects = [new_first, *new_rest]
-    logs = LogRoute.objects.bulk_create(new_objects)
+    logs = Log.objects.bulk_create(new_objects)
     return logs[0], True
 
 

@@ -5,41 +5,43 @@
 
 {% block solidright %}
 <div class="form-container sign-up-container">
-    <form action="#">
-        <h1>Perks</h1>
-        <ul style="text-align: left;">
-            <li>Extended log expiration times</li>
-            <li>Manage created logs</li>
-            <li>Increased log sizes</li>
-            <li>Access to API</li>
-            <li>Log analytics</li>
-        </ul>
+    <form method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        {{ form }}
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <p>
+            <a style="color:white;" href="{% url 'account_reset_password' %}">Forgot Password?</a><br>
+        </p>
+        <button type="submit">Sign In</button>
     </form>
 </div>
 {% endblock %}
 
 {% block solidleft %}
 <div class="form-container sign-in-container">
-    <form action="{% provider_login_url 'discord' %}">
+    <form method="GET" action="{% provider_login_url 'discord' %}">
         <h1>Sign In</h1>
         <br>
         <button>Discord</button>
+        <a id="signUp" href="#">Use Password Form</a>
     </form>
 </div>
 {% endblock %}
 
 {% block ghostleft %}
 <div class="overlay-panel overlay-left">
-    <h1>Welcome!</h1>
-    <p>Signing in with Discord gives you access to some great features; try it!</p>
-    <button class="ghost" id="signIn">Sign In</button>
+    <h1>Shh!</h1>
+    <p>This form is for spoopy users only! Beware!</p>
+    <button class="ghost" id="signIn">Go Back</button>
 </div>
 {% endblock %}
 
 {% block ghostright %}
 <div class="overlay-panel overlay-right">
     <h1>Hello, Friend!</h1>
-    <p>Signing in gives you access to more features</p>
-    <button class="ghost" id="signUp">Check It Out</button>
+    <p>Signing in with your Discord account gives you access to more features</p>
+    <a href="{% url 'perks' %}"><button class="ghost">Perks</button></a>
 </div>
 {% endblock %}

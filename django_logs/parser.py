@@ -1,7 +1,7 @@
 import celery
 from django.core import serializers
 
-from django_logs.models import LogRoute, ActiveJob
+from django_logs.models import Log, Job
 from django_logs import tasks, utils
 
 
@@ -21,10 +21,10 @@ class LogParser:
             self.origin = 'url'
 
     def create(self, author=None, *, expires=None, new=False):
-        short_code = LogRoute.generate_short_code(self.content)
-        filter_url = LogRoute.objects.filter(url=self.url).filter(url__isnull=False).order_by('id')
-        filter_short = LogRoute.objects.filter(short_code__startswith=short_code)
-        filter_job = ActiveJob.objects.filter(short_code=short_code)
+        short_code = Log.generate_short_code(self.content)
+        filter_url = Log.objects.filter(url=self.url).filter(url__isnull=False).order_by('id')
+        filter_short = Log.objects.filter(short_code__startswith=short_code)
+        filter_job = Job.objects.filter(short_code=short_code)
         if any([filter_url.exists(), filter_short.exists(), filter_job.exists()]) and not new:
             return short_code, False
         if filter_short.exists():
@@ -43,10 +43,10 @@ class LogParser:
             'Saving messages... ({percent}%)'
         ]
         data = utils.add_task_messages(task_ids, msgs)
-        job = ActiveJob.objects.filter(short_code=short_code)
+        job = Job.objects.filter(short_code=short_code)
         if job.exists():
             job[0].data = data
             job[0].save()
         else:
-            ActiveJob.objects.create(short_code=short_code, data=data, request_uri=self.request_uri)
+            Job.objects.create(short_code=short_code, data=data, request_uri=self.request_uri)
         return short_code, True
