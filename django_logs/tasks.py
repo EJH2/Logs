@@ -2,16 +2,16 @@ from datetime import datetime, timedelta
 
 import dateutil.parser
 import pytz
-import requests
+# import requests
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
 from django.core import serializers
 
 from django_logs import handlers
-from django_logs.consts import DISCORD_API_URL, DISCORD_HEADERS, DISCORD_TOKEN
-from django_logs.models import SerializedMessage, User, Log
-from django_logs.utils import create_chunked_logs, update_db
+# from django_logs.consts import DISCORD_API_URL, DISCORD_HEADERS, DISCORD_TOKEN
+from django_logs.models import SerializedMessage, User
+from django_logs.utils import create_log_entry
 
 
 @shared_task(bind=True)
@@ -21,8 +21,7 @@ def parse(self, create_data):
     parser = getattr(handlers, log_type)
     content = create_data['content']
     variant = create_data.pop('variant')
-    if variant:
-        kwargs['variant'] = variant
+    kwargs['variant'] = variant if variant else None
     data, data['match_data'] = parser(content, **kwargs)
     return data
 
@@ -61,17 +60,13 @@ def parse_messages(self, data: dict):
         if uid not in _users:
             if user.get('avatar'):  # User supplied avatar, don't bombard Discord's API
                 user['avatar'] = get_avatar()
-                pass
-            elif not DISCORD_TOKEN:  # We can't request the API, so use the default avatar
-                pass
-            else:
-                if uid.isdigit():
-                    with requests.get(f'{DISCORD_API_URL}/{uid}', headers=DISCORD_HEADERS) as r:
-                        _user = r.json()
-                        if not _user.get('message'):  # No error code, so Discord found the user
-                            user = _user
-                            if user.get('avatar') is not None:
-                                user['avatar'] = get_avatar()
+            # if uid.isdigit() and DISCORD_TOKEN:  # Probably a valid ID, let's try and hit the API
+            #     with requests.get(f'{DISCORD_API_URL}/{uid}', headers=DISCORD_HEADERS) as r:
+            #         _user = r.json()
+            #         if not _user.get('message'):  # No error code, so Discord found the user
+            #             user = _user
+            #             if user.get('avatar') is not None:
+            #                 user['avatar'] = get_avatar()
 
             user['avatar'] = user['avatar'] or get_avatar(default_avatar=True)
             _users[uid] = user
@@ -93,7 +88,7 @@ def parse_messages(self, data: dict):
 
         messages.append(SerializedMessage(message_dict).__dict__)
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     def sort_chronological(value):
         return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
@@ -111,23 +106,17 @@ def parse_messages(self, data: dict):
 
 
 @shared_task(bind=True)
-def create_log(self, data: dict, extras, create_data):
+def create_log(self, data: dict, create_data):
     progress_recorder = ProgressRecorder(self)
     variant = create_data.pop('variant')
-    if variant:
-        create_data['log_type'] = variant[0]
+    create_data['log_type'] = variant[0] if variant else create_data['log_type']
     messages = data.pop('messages')
     create_data['data'] = data
     if create_data['author']:
         create_data['author'] = list(serializers.deserialize('json', create_data['author']))[0].object
-    filter_url = extras['filter_url']
     expires = create_data.pop('expires')
     create_data['expires_at'] = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires)
-    if create_data['url'] and len(filter_url) > 0:
-        update_db(filter_url, create_data, messages)
     progress_recorder.set_progress(1, 2)
-    chunked = len(messages) > 1000
-    create_func = create_chunked_logs if chunked else Log.objects.get_or_create
-    created_log, _ = create_func(**create_data, messages=messages)
+    created_log = create_log_entry(**create_data, messages=messages)
     progress_recorder.set_progress(2, 2)
     return created_log.short_code

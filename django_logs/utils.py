@@ -7,40 +7,23 @@ from celery.result import AsyncResult
 from django.db.models import QuerySet
 
 from django_logs.consts import attachment_re
-from django_logs.models import Log
+from django_logs.models import Log, Page
 
 
-def update_db(objects, create_data, messages):
-    first = objects[0]
-    assert isinstance(first, Log)
-
-    # These messages don't need chunking
-    if len(messages) <= 1000 and first.chunked is False:
-        return objects.update(**create_data, messages=messages)
-    if len(messages) <= 1000 and first.chunked is True:
-        objects.delete()
-        return Log.objects.create(**create_data, messages=messages)
-
-    # These messages do
-    objects.delete()  # Wipe the row(s) so no old info is left over
-    create_chunked_logs(**create_data, messages=messages)
-
-
-def create_chunked_logs(**create_data):
+def create_log_entry(**create_data):
     batch_list = list()
-    short_code = create_data.pop('short_code')
     messages = create_data.pop('messages')
+    short_code = create_data.pop('short_code')
     for batch in range(0, len(messages), 1000):
+        # [[0, 1, 2...], [1000, 1001, 1002...], [2000, 2001, 2002...]...]
         batch_list.append(messages[batch:batch + 1000])  # Split messages by the 1000
-    create_data['chunked'] = True
-    new_first = Log(**create_data, short_code=short_code, messages=batch_list[0])
-    create_data['data'] = None
-    create_data['content'] = None
-    new_rest = (Log(**create_data, short_code=f'{short_code}-{i}', messages=batch_list[i]) for i in range(
-        1, len(batch_list)))
-    new_objects = [new_first, *new_rest]
-    logs = Log.objects.bulk_create(new_objects)
-    return logs[0], True
+
+    create_data['chunked'] = len(batch_list) > 1
+    log, _ = Log.objects.update_or_create(short_code=short_code, defaults=create_data)
+    pages = Page.objects.bulk_create([Page(log=log, messages=batch_list[i], page_id=i) for i in range(
+        len(batch_list))])
+    log.pages.set(pages)
+    return log
 
 
 def get_attach_info(attachments: list):
@@ -105,8 +88,7 @@ def add_task_messages(task_list: list, messages: list = None):
 
 
 def forget_tasks(jobs: QuerySet):
-    tasks = [task[0] for task in [subtasklist for bigtasklist in [job.data for job in jobs] for
-                                  subtasklist in bigtasklist]]
+    tasks = [task[0] for task in [sublist for biglist in [job.data for job in jobs] for sublist in biglist]]
     for task_id in tasks:
         task = AsyncResult(id=task_id)
         task.forget()

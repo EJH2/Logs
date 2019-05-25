@@ -27,7 +27,7 @@ def index(request):
 def logs(request, short_code: str, raw=False):
     try:
         processing = Job.objects.filter(short_code=short_code)
-        _log = Log.objects.filter(short_code__startswith=short_code).order_by('id')
+        _log = Log.objects.filter(short_code=short_code)
         if not _log.exists():
             if processing.exists():
                 ids = list(enumerate(processing[0].data['tasks']))
@@ -38,22 +38,22 @@ def logs(request, short_code: str, raw=False):
         utils.forget_tasks(processing)
         log = _log[0]
         if log.expires_at < datetime.now(pytz.UTC):
-            _log.delete()
+            log.delete()
             raise ObjectDoesNotExist
         if raw:
             content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
         chunked = False
         msg_page = None
-        msg_len = len(log.messages)
-        if _log.count() > 1 or msg_len > 100:
+        log_pages = log.pages.order_by('page_id')
+        msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
+        msg_len = len(msgs)
+        if msg_len > 100:
             chunked = True
             page = request.GET.get('page')
             if not request.is_ajax() and page:
                 return redirect('logs', short_code=short_code)
 
-            msgs = [msg for msgs in [_l.messages for _l in _log] for msg in msgs]
-            msg_len = len(msgs)
             paginator = Paginator(msgs, 100)
             try:
                 msg_page = paginator.page(page)
@@ -84,8 +84,9 @@ def traceback(request):
     gathered = []
     for task in tasks:
         t = AsyncResult(id=task)
-        gathered.append({'id': t.id, 'status': t.status, 'result': t.result, 'traceback': t.traceback})
-    return JsonResponse(gathered)
+        gathered.append({'id': t.id, 'status': t.status, 'result': t.result if not
+        isinstance(t.result, Exception) else None, 'traceback': t.traceback})
+    return JsonResponse(gathered, safe=False)
 
 
 def perks(request):

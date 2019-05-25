@@ -72,7 +72,7 @@ def api(request):
         short, created = LogParser(log_type, content, origin=origin, variant=variant).create(author, expires=expires,
                                                                                              new=new)
         data = {
-            'status': 200,
+            'status': 201 if created else 200,
             'short': short,
             'url': f'http{"s" if request.is_secure() else ""}://{request.META["HTTP_HOST"]}/{short}',
             'created': created,

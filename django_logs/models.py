@@ -20,9 +20,8 @@ class Log(models.Model):
     log_type = models.CharField(max_length=30)
     generated_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True)
-    data = fields.JSONField(null=True)
-    content = models.TextField(null=True)
-    messages = fields.JSONField()
+    data = fields.JSONField(null=True, editable=False)
+    content = models.TextField(null=True, editable=False)
     chunked = models.BooleanField(default=False)
 
     @classmethod
@@ -31,6 +30,12 @@ class Log(models.Model):
 
     def __str__(self):
         return 'Log %s' % self.short_code
+
+
+class Page(models.Model):
+    messages = fields.JSONField(editable=False)
+    page_id = models.IntegerField()
+    log = models.ForeignKey(Log, on_delete=models.CASCADE, related_name='pages')
 
 
 class Job(models.Model):

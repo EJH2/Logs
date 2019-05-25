@@ -17,7 +17,7 @@ def rowboat(content, **kwargs):
     for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'Rowboat'
     if kwargs.get('variant'):
@@ -109,7 +109,7 @@ def auttaja(content, **kwargs):
         match['time'] = datetime.strptime(match['time'], '%a %b %d %H:%M:%S %Y').isoformat()
         match['attach'] = get_attach_info(match['attach'].split(' ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'Auttaja'
 
@@ -129,7 +129,7 @@ def logger(content, **kwargs):
         match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'Logger'
 
@@ -155,7 +155,7 @@ def sajuukbot(content, **kwargs):
     for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'SajuukBot'
 
@@ -181,7 +181,7 @@ def vortex(content, **kwargs):
     for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'Vortex'
 
@@ -199,7 +199,7 @@ def gearbot(content, **kwargs):
     for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'GearBot'
 
@@ -218,7 +218,7 @@ def capnbot(content, **kwargs):
         match['embeds'] = get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'CapnBot'
 
@@ -245,7 +245,7 @@ def modmailbot(content, **kwargs):
     for count, match in enumerate(match_data):
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
-        progress_recorder.set_progress(count, total)
+        progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'ModMailBot'
 

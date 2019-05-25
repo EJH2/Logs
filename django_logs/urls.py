@@ -7,7 +7,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('view', views.view, name='view'),
-    path('admin', admin.site.urls, name='admin'),
+    path('admin/', admin.site.urls, name='admin'),
 
     path('celery-progress/', include('celery_progress.urls')),
     path('tb', views.traceback, name='traceback'),
