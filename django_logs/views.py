@@ -66,7 +66,7 @@ def logs(request, short_code: str, raw=False):
             del request.session['cached']
             messages.info(request, 'A log containing the same data was found, so we used that instead.')
         log.data['generated_at'] = log.generated_at
-        log.data['messages'] = log.messages
+        log.data['messages'] = msgs
         log.data['raw_content'] = log.content
         return render(request, 'django_logs/logs.html', context={'log_entry': Entry(log.data),
                                                                  'original_url': log.url, 'log_type': log.log_type,
