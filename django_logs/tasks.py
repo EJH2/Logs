@@ -49,9 +49,8 @@ def parse_messages(self, data: dict):
             uid = f'{user["username"]}#{user["discriminator"]}'
 
         def get_avatar(default_avatar: bool = False):
-            if not user.get('avatar') or default_avatar:
-                default = int(user['discriminator']) % 5
-                return f'https://cdn.discordapp.com/embed/avatars/{default}.png'
+            if default_avatar:
+                return f'https://cdn.discordapp.com/embed/avatars/{int(user["discriminator"]) % 5}.png'
             if match.get('asset'):
                 return f'https://discordapp.com/assets/{user["avatar"]}.png'
             ending = 'gif' if user['avatar'].startswith('a_') else 'png'
