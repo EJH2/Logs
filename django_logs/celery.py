@@ -1,6 +1,8 @@
 import os
-from celery import Celery
+from datetime import datetime
 
+import pytz
+from celery import Celery
 from decouple import config
 
 # set the default Django settings module for the 'celery' program.
@@ -26,3 +28,15 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
+
+
+@app.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(60 * 10, clean_expired.s(), name='clean expired logs')
+
+
+@app.task
+def clean_expired():
+    from django_logs.models import Log
+    logs = Log.objects.filter(expires_at__lt=datetime.now(pytz.UTC))
+    logs.delete()
