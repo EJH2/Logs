@@ -1,4 +1,3 @@
-from allauth.account.models import EmailAddress
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 
@@ -20,21 +19,12 @@ class DiscordProvider(OAuth2Provider):
     def extract_common_fields(self, data):
         return dict(
             email=data.get('email'),
-            username=data.get('username'),
+            username=data.get('username'),  # TODO: Username#Discrim as username
             name=data.get('username'),
         )
 
     def get_default_scope(self):
         return ['email', 'identify']
-
-    def extract_email_addresses(self, data):
-        ret = []
-        email = data.get('email')
-        if email and data.get('verified'):
-            ret.append(EmailAddress(email=email,
-                       verified=True,
-                       primary=True))
-        return ret
 
 
 provider_classes = [DiscordProvider]
