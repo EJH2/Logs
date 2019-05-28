@@ -120,9 +120,9 @@
         </ul>
     </div>
 </div>
-<div class="chatlog{% if chunked %} infinite-container{% endif %}">
+<div class="chatlog infinite-container">
     {% for group in log_entry.message_groups %}
-        <div class="chatlog__message-group{% if chunked %} infinite-item{% endif %}">
+        <div class="chatlog__message-group infinite-item">
             <div class="chatlog__author-avatar-container">
                 <img class="chatlog__author-avatar" src="{{ group.author.avatar_url }}" onerror="this.src='{{ group.author.default_avatar_url }}'" alt="avatar"/>
             </div>
@@ -201,7 +201,7 @@
                                     {% if embed.footer and not embed.timestamp %}
                                         <div class="chatlog__embed-footer">
                                             {% if embed.footer.icon_url %}
-                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="{{ embed.footer.icon_url }}">
+                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}">
                                             {% endif %}
                                             <span class="chatlog__embed-footer-text">{{ embed.footer.text }}</span>
                                         </div>
@@ -214,7 +214,7 @@
                                     {% if embed.footer and embed.timestamp %}
                                         <div class="chatlog__embed-footer">
                                             {% if embed.footer.icon_url %}
-                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="{{ embed.footer.icon_url }}">
+                                                <img class="chatlog__embed-footer-icon" src="{{ embed.footer.icon_url }}">
                                             {% endif %}
                                             <span class="chatlog__embed-footer-text">
                                                 {{ embed.footer.text }}
@@ -261,7 +261,7 @@
         </div>
     {% endfor %}
 </div>
-{% if chunked and msg_page.has_next %}
+{% if msg_page.has_next %}
     <div class="infinite-next">
         <a class="infinite-more-link" href="{{ short }}?page={{ msg_page.next_page_number }}"></a>
     </div>

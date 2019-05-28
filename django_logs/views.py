@@ -43,35 +43,30 @@ def logs(request, short_code: str, raw=False):
         if raw:
             content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
-        chunked = False
-        msg_page = None
         log_pages = log.pages.order_by('page_id')
         msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
         msg_len = len(msgs)
-        if msg_len > 100:
-            chunked = True
-            page = request.GET.get('page')
-            if not request.is_ajax() and page:
-                return redirect('logs', short_code=short_code)
+        page = request.GET.get('page')
+        if not request.is_ajax() and page:
+            return redirect('logs', short_code=short_code)
 
-            paginator = Paginator(msgs, 100)
-            try:
-                msg_page = paginator.page(page)
-            except PageNotAnInteger:
-                msg_page = paginator.page(1)
-            except EmptyPage:
-                msg_page = paginator.page(paginator.num_pages)
-            log.messages = msg_page.object_list
+        paginator = Paginator(msgs, 100)
+        try:
+            msg_page = paginator.page(page)
+        except PageNotAnInteger:
+            msg_page = paginator.page(1)
+        except EmptyPage:
+            msg_page = paginator.page(paginator.num_pages)
         if request.session.get('cached'):
             del request.session['cached']
             messages.info(request, 'A log containing the same data was found, so we used that instead.')
         log.data['generated_at'] = log.generated_at
-        log.data['messages'] = msgs
+        log.data['messages'] = msg_page.object_list
         log.data['raw_content'] = log.content
         return render(request, 'django_logs/logs.html', context={'log_entry': Entry(log.data),
                                                                  'original_url': log.url, 'log_type': log.log_type,
-                                                                 'chunked': chunked, 'msg_page': msg_page,
-                                                                 'msg_len': msg_len, 'short': short_code})
+                                                                 'msg_page': msg_page, 'msg_len': msg_len,
+                                                                 'short': short_code})
     except ObjectDoesNotExist:
         messages.error(request, 'Log does not exist, or has expired.')
         return redirect('index')
