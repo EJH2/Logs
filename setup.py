@@ -1,15 +1,16 @@
 import os
+
 from setuptools import find_packages, setup
 
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-logs',
-    version='1.0.0',
+    version='1.1.0',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
-    description='A simple app to beautify log files.',
+    description='A simple app to beautify Discord log files.',
     url='https://lol-sa.me',
     author='EJH2',
     author_email='me@ej.gl',
@@ -21,7 +22,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
@@ -41,5 +41,8 @@ setup(
         'celery_progress',
         'eventlet',
         'redis',
+        'coreapi',
+        'markdown',
+        'pygments',
     ]
 )

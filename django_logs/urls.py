@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, re_path, include
 
-from django_logs import api
 from . import views
 
 urlpatterns = [
@@ -14,7 +13,7 @@ urlpatterns = [
     path('auth/', include('allauth.urls')),
     path('auth/perks/', views.perks, name='perks'),
 
-    re_path('api', api.api, name='api'),
+    re_path('api/', include('api.urls')),
 
     re_path(r'(?P<short_code>[\w]{5})/raw', views.logs, kwargs={'raw': True}, name='raw'),
     re_path(r'(?P<short_code>[\w]{5})', views.logs, name='logs'),
