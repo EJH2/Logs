@@ -60,8 +60,9 @@ def request_url(url: str):
     return resp
 
 
-def get_expiry(data: dict, default: int):
-    expires = data.get('expires', 60 * 60 * 12)
+def get_expiry(data: dict):
+    default = 60 * 60 * 24 * 7 * 2  # 2 week default
+    expires = data.get('expires', default)
     if isinstance(expires, str):
         expires = int(expires) if expires.isdigit() else default
     if expires > default:

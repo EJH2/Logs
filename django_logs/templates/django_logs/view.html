@@ -1,0 +1,38 @@
+{% extends "socialbase.html" %}
+{% load socialaccount %}
+
+{% block title %}Create Log{% endblock %}
+{% block js %}{% endblock %}
+
+{% block ghostright %}
+<div class="overlay-panel overlay-right">
+    <h1>Almost there...</h1>
+    <p>Signing up gives you access to more features</p>
+    <a href="{% url 'perks' %}"><button class="ghost">Perks</button></a>
+</div>
+{% endblock %}
+
+{% block solidleft %}
+<div class="form-container sign-in-container">
+    <form method="POST" action="{% url 'view' %}">
+        {% csrf_token %}
+        <h1>Create Log</h1>
+        <br>
+        <label>URL: <input name="url" required></label>
+        <label>Expires: <input name="expires" placeholder="Seconds"></label>
+        <label>Log Type:<select name="type">
+            <option selected>-----</option>
+            <option value="auttaja">Auttaja</option>
+            <option value="capnbot">CapnBot</option>
+            <option value="gearbot">GearBot</option>
+            <option value="giraffeduck">GiraffeDuck</option>
+            <option value="logger">Logger</option>
+            <option value="rosalina_bottings">Rosalina Bottings</option>
+            <option value="rowboat">Rowboat/Clones</option>
+            <option value="sajuukbot">SajuukBot</option>
+            <option value="vortex">Vortex</option>
+        </select></label>
+        <button>Create</button>
+    </form>
+</div>
+{% endblock %}

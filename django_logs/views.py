@@ -4,12 +4,10 @@ from urllib.parse import urlparse
 
 import pytz
 import requests
-from celery.result import AsyncResult
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from django_logs import utils
@@ -72,89 +70,69 @@ def logs(request, short_code: str, raw=False):
         return redirect('index')
 
 
-@user_passes_test(lambda u: u.is_superuser)
-def traceback(request):
-    t = request.GET.get('t')
-    tasks = t.split(',')
-    gathered = []
-    for task in tasks:
-        t = AsyncResult(id=task)
-        gathered.append({'id': t.id, 'status': t.status, 'result': t.result if not
-        isinstance(t.result, Exception) else None, 'traceback': t.traceback})
-    return JsonResponse(gathered, safe=False)
-
-
 def perks(request):
     return render(request, 'account/perks.html')
 
 
 def view(request):
-    url = request.GET.get('url')
-    if not url:
-        messages.error(request, 'You have to provide a url to parse!')
-        return redirect('index')
+    if request.method == "GET":
+        return render(request, 'django_logs/view.html')
 
-    # Cached?
-    cached = Log.objects.filter(url=url)
-    if cached.exists() and not request.GET.get('new'):  # Cached, and user wants from cache
-        request.session['cached'] = True
-        return redirect('logs', short_code=cached[0].short_code.split('-')[0])
+    if request.method == "POST":
+        url = request.POST.get('url')
+        if not url:
+            messages.error(request, 'You have to provide a url to parse!')
+            return redirect('view')
 
-    resp = request_url(url)
-    if not resp:
-        messages.error(request, f'Connection to url "{url}" failed. Is it a valid url?')
-        return redirect('index')
-    assert isinstance(resp, requests.Response)
-    if 'text/plain' not in resp.headers['Content-Type']:
-        messages.error(request, f'Content-Type of "{url}" must be of type "text/plain"!')
-        return redirect('index')
-    try:
-        content = resp.content.decode()
-    except UnicodeDecodeError:
-        messages.error(request, 'Request content must be of encoding utf-8!')
-        return redirect('index')
-    if content == '':
-        messages.error(request, 'You have to provide a url with text in it to parse!')
-        return redirect('index')
+        # Cached?
+        cached = Log.objects.filter(url=url)
+        if cached.exists():  # Cached
+            request.session['cached'] = True
+            return redirect('logs', short_code=cached.first())
 
-    content = re.sub('\r\n', '\n', content)
-    log_type = request.GET.get('type')
-    variant = rowboat_types.get(urlparse(url).netloc)
-    author = request.user if request.user.is_authenticated else None
-    req = request.build_absolute_uri()
-    default = 60 * 60 * 24 * 7 if author else 60 * 60 * 24
-    expires = get_expiry(request.GET, default)
-    if not expires:
-        messages.error(request, f'Expiry time in seconds must not exceed {default}!')
-        return redirect('index')
-    if log_type and log_type in types:
-        match_len = len(re.findall(types[log_type], content, re.MULTILINE))
-        if match_len > 0:
-            short, created = LogParser(log_type, content, origin=('url', url), variant=variant, request_uri=req).create(
-                author, expires=expires, new=True)
-            request.session['cached'] = not created
-            return redirect('logs', short_code=short)
-        messages.error(request, f'We can\'t seem to parse that file using log type {log_type}. Maybe try another one?')
-        return redirect('index')
-    if log_type and log_type not in types:
-        messages.error(request, f'We can\'t seem to parse that file using log type {log_type}. Maybe try another one?')
-        return redirect('index')
-    for log_type in types.keys():  # Try all log types
-        match_len = len(re.findall(types[log_type], content, re.MULTILINE))
-        if match_len > 500:
-            sec = 's' if request.is_secure() else ''
-            messages.error(request, f'Logs with over 500 messages must be processed through the api, found at '
-                                    f'http{sec}://{request.META["HTTP_HOST"]}/api!')
-            return redirect('index')
-        if match_len > 0:
-            short, created = LogParser(log_type, content, origin=('url', url), variant=variant, request_uri=req).create(
-                author, expires=expires, new=True)
-            request.session['cached'] = not created
-            return redirect('logs', short_code=short)
+        resp = request_url(url)
+        if not resp:
+            messages.error(request, f'Connection to url "{url}" failed. Is it a valid url?')
+            return redirect('view')
+        assert isinstance(resp, requests.Response)
+        if 'text/plain' not in resp.headers['Content-Type']:
+            messages.error(request, f'Content-Type of "{url}" must be of type "text/plain"!')
+            return redirect('view')
+        try:
+            content = resp.content.decode()
+        except UnicodeDecodeError:
+            messages.error(request, 'Request content must be of encoding utf-8!')
+            return redirect('view')
+        if content == '':
+            messages.error(request, 'You have to provide a url with text in it to parse!')
+            return redirect('view')
 
-    # Mission failed, we'll get em next time
-    messages.error(request, 'We can\'t seem to parse that file. Are you sure it\'s a valid log type?')
-    return redirect('index')
+        content = re.sub('\r\n', '\n', content)
+        log_type = request.POST.get('type')
+        variant = rowboat_types.get(urlparse(url).netloc)
+        author = request.user if request.user.is_authenticated else None
+        req = request.build_absolute_uri()
+        expires = get_expiry(request.POST)
+        if not expires:
+            messages.error(request, f'Expiry time must not exceed two weeks, or {60 * 60 * 24 * 7}!')
+            return redirect('view')
+        if log_type in types:
+            match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+            if match_len > 500:
+                sec = 's' if request.is_secure() else ''
+                messages.error(request, f'Logs with over 500 messages must be processed through the api, found at '
+                                        f'http{sec}://{request.META["HTTP_HOST"]}/api!')
+                return redirect('view')
+            if match_len > 0:
+                short, created = LogParser(log_type, content, url=url, variant=variant, request_uri=req).create(
+                    author, expires=expires)
+                request.session['cached'] = not created
+                return redirect('logs', short_code=short)
+            messages.error(request, f'We can\'t parse that file using log type {log_type}. Maybe try another one?')
+            return redirect('view')
+        else:  # Mission failed, we'll get em next time
+            messages.error(request, f'Log type {log_type} doesn\'t exist. Maybe try another one?')
+            return redirect('view')
 
 
 def handle404(request, exception):

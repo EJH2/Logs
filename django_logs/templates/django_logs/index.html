@@ -8,6 +8,7 @@
     <meta name="og:image" content="{% static 'django_logs/icons/black_file.png' %}">
     <link href="{% static 'django_logs/css/logstyle.css' %}" rel="stylesheet">
     <link id="theme" href="{% static 'django_logs/css/logstyle_dark.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'django_logs/css/alert.css' %}">
     <link id="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
@@ -149,7 +150,7 @@
                                     </div>
                                     <div class="chatlog__embed-field chatlog__embed-field--inline">
                                         <div class="chatlog__embed-field-name">How do I use this?</div>
-                                        <div class="chatlog__embed-field-value">Simply go to <a href="{% url 'view' %}?url=yoururlhere">{% url 'view' %}?url=yoururlhere</a></div>
+                                        <div class="chatlog__embed-field-value">Simply go <a href="{% url 'view' %}">here</a>!</div>
                                     </div>
                                     <div class="chatlog__embed-field chatlog__embed-field--inline">
                                         <div class="chatlog__embed-field-name">What happens then?</div>

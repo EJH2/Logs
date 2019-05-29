@@ -7,20 +7,17 @@ from django_logs import tasks, utils
 
 class LogParser:
 
-    def __init__(self, log_type, content, origin=None, variant=None, request_uri=None):
+    def __init__(self, log_type, content, origin='url', url=None, variant=None, request_uri=None):
         self.log_type = log_type
         self.variant = variant
         self.content = content
 
         self.request_uri = request_uri
 
-        self.url = None
+        self.url = url
         self.origin = origin
-        if isinstance(origin, tuple):
-            self.url = origin[1]
-            self.origin = 'url'
 
-    def create(self, author=None, *, expires=None, new=False):
+    def create(self, author=None, *, expires=None, new=True):
         short_code = Log.generate_short_code(self.content)
         filter_short = Log.objects.filter(short_code=short_code)
         if any([f.exists() for f in [Log.objects.filter(url=self.url, url__isnull=False).order_by('id'), filter_short,

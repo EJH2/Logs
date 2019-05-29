@@ -1,12 +1,19 @@
-<html lang="en"><head>
-    <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
-    {% load static %}
-    <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'django_logs/css/social.css' %}">
-    {% block js %}<script src="{% static 'django_logs/js/social.js' %}"></script>{% endblock %}
-</head>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}{% endblock %}</title>
+        {% load static %}
+        <link rel="shortcut icon" href="{% static 'django_logs/icons/favicon.png' %}">
+        <link rel="stylesheet" href="{% static 'django_logs/css/social.css' %}">
+        <link rel="stylesheet" href="{% static 'django_logs/css/alert.css' %}">
+        {% block js %}<script src="{% static 'django_logs/js/social.js' %}"></script>{% endblock %}
+    </head>
     <body>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         <div class="container" id="container">
             {% block solidright %}{% endblock %}
             {% block solidleft %}{% endblock %}

@@ -10,7 +10,6 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
 
     path('celery-progress/', include('celery_progress.urls')),
-    path('tb', views.traceback, name='traceback'),
 
     path('auth/', include('allauth.urls')),
     path('auth/perks/', views.perks, name='perks'),
