@@ -5,12 +5,11 @@ import pytz
 # import requests
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
-
 from django.core import serializers
 
 from django_logs import handlers
 # from django_logs.consts import DISCORD_API_URL, DISCORD_HEADERS, DISCORD_TOKEN
-from django_logs.models import SerializedMessage, User
+from django_logs.models import SerializedMessage, User, Job
 from django_logs.utils import create_log_entry
 
 
@@ -118,4 +117,5 @@ def create_log(self, data: dict, create_data):
     progress_recorder.set_progress(1, 2)
     created_log = create_log_entry(**create_data, messages=messages)
     progress_recorder.set_progress(2, 2)
+    Job.objects.get(short_code=created_log.short_code).delete()
     return created_log.short_code

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
 
     'celery_progress',
 ]
@@ -140,6 +141,24 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        },
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+    'api_path': '/api/',
+    'exclude_namespaces': ['/api/'],
+}
+
+LOGIN_URL = 'account_login'
+LOGOUT_URL = 'account_logout'
 
 
 # Internationalization

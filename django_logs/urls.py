@@ -13,10 +13,10 @@ urlpatterns = [
     path('auth/', include('allauth.urls')),
     path('auth/perks/', views.perks, name='perks'),
 
-    re_path('api/', include('api.urls')),
+    re_path('^api/', include('api.urls')),
 
-    re_path(r'(?P<short_code>[\w]{5})/raw', views.logs, kwargs={'raw': True}, name='raw'),
-    re_path(r'(?P<short_code>[\w]{5})', views.logs, name='logs'),
+    re_path(r'^(?P<short_code>[\w]{5})/raw', views.logs, kwargs={'raw': True}, name='raw'),
+    re_path(r'^(?P<short_code>[\w]{5})', views.logs, name='logs'),
 ]
 
 handler404 = views.handle404

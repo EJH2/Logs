@@ -21,23 +21,35 @@ from django_logs.utils import get_expiry, request_url
 # Create your views here.
 class LogView(APIView):
     """
-    get:
-    Return a list of logs currently owned by the user. If `short_code` is specified, grabs the data for a specific log.
+    Return a list of logs currently owned by the user.
     """
 
     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request, short_code=None):
-        logs = Log.objects.filter(author=request.user, short_code=short_code) if short_code else \
-            Log.objects.filter(author=request.user)
+    def get(self, request):
+        logs = Log.objects.filter(author=request.user)
         serializer = LogSerializer(logs, many=True)
+        return Response(serializer.data or {'detail': 'Not found.'})
+
+
+class LogRead(APIView):
+    """
+    Grabs data for a specific log.
+    """
+
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, short_code):
+        log = get_object_or_404(Log.objects.all(), author=request.user, short_code=short_code)
+        serializer = LogSerializer(log)
         return Response(serializer.data)
 
 
 class LogCreate(APIView):
     """
-    post:
     Creates a new log.
+
+    Request body must contain log type, and either url, content, or file containing raw log text.
     """
 
     permission_classes = [IsAuthenticated, ]
@@ -83,6 +95,8 @@ class LogCreate(APIView):
             origin = 'file'
             with request.FILES[next(iter(request.FILES))].open() as f:
                 content = f.read()
+                if isinstance(content, bytes):
+                    content = content.decode()
         else:  # Nothing to parse, we've given up
             resp = {'detail': 'Request body must contain one of [files, url, content] and [type] to parse!'}
             return Response(resp, status=400)
@@ -118,7 +132,6 @@ class LogCreate(APIView):
 
 class LogDestroy(APIView):
     """
-    delete:
     Deletes a log, specified with `short_code`.
     """
 
