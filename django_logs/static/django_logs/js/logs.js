@@ -48,15 +48,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     loadJS();
 
-    document.querySelectorAll('.alert').forEach((alert) => {
-        setTimeout(function () {
-            alert.classList.add('disappearing');
-            setTimeout(function () {
-                alert.remove();
-            }, 1000);
-        }, 5000);
-    });
-
     if (typeof InfiniteScroll !== 'undefined') {
         let infScroll = new InfiniteScroll('.infinite-container', {
             path: '.infinite-more-link',

@@ -20,6 +20,7 @@
 {% block solidleft %}
 <div class="form-container sign-in-container">
     <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
         <h1>Come Back Soon!</h1>
         <br>
         <button>Sign Out</button>
