@@ -52,9 +52,11 @@ def get_embed_info(embeds: str):
 def request_url(url: str):
     try:
         try:
-            resp = requests.get(url, stream=True)
+            resp = requests.get(url, stream=True, timeout=10)
         except requests.exceptions.MissingSchema:
-            resp = requests.get('https://' + url, stream=True)
+            resp = requests.get('https://' + url, stream=True, timeout=10)
+        if resp.status_code != 200:
+            resp = None
     except requests.exceptions.ConnectionError:
         resp = None
     return resp
