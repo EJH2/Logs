@@ -1,13 +1,16 @@
 from django.urls import re_path, path
-from rest_framework_swagger.views import get_swagger_view
+from rest_framework.documentation import include_docs_urls
 
 from api import views
 
+description = """
+API provided to logged-in users. In order to use this API, users must authenticate with: 
+`Authorization: Token xxxxxxxxxxxxxxxxxxxx` in the headers of the request.
+"""
+
 urlpatterns = [
-    path('', get_swagger_view(title='Django Logs API')),
+    path('', include_docs_urls(title='Django Logs API', public=False, description=description)),
     path('logs/', views.LogView.as_view()),
-    path('logs/create/', views.LogCreate.as_view()),
-    re_path(r'logs/delete/(?P<short_code>[\w]{5})?', views.LogDestroy.as_view()),
     re_path(r'logs/(?P<short_code>[\w]{5})?', views.LogRead.as_view()),
     re_path(r'traceback/', views.traceback, name='traceback'),
 ]

@@ -21,7 +21,17 @@ from django_logs.utils import get_expiry, request_url
 # Create your views here.
 class LogView(APIView):
     """
+    get:
     Return a list of logs currently owned by the user.
+
+    post:
+    Creates a new log.
+
+    Request body must contain (log) `type`, and either `url`, `content`, or `file` containing raw log text.
+
+    Optionally, you can specify `expires` to represent the number in seconds until the log will expire. The default for
+    this is two weeks, which is also the maximum. You can also specify `new`, which will force the parser to regenerate
+    the log.
     """
 
     permission_classes = [IsAuthenticated, ]
@@ -30,29 +40,6 @@ class LogView(APIView):
         logs = Log.objects.filter(author=request.user)
         serializer = LogSerializer(logs, many=True)
         return Response(serializer.data or {'detail': 'Not found.'})
-
-
-class LogRead(APIView):
-    """
-    Grabs data for a specific log.
-    """
-
-    permission_classes = [IsAuthenticated, ]
-
-    def get(self, request, short_code):
-        log = get_object_or_404(Log.objects.all(), author=request.user, short_code=short_code)
-        serializer = LogSerializer(log)
-        return Response(serializer.data)
-
-
-class LogCreate(APIView):
-    """
-    Creates a new log.
-
-    Request body must contain log type, and either url, content, or file containing raw log text.
-    """
-
-    permission_classes = [IsAuthenticated, ]
 
     def post(self, request, **kwargs):
         if kwargs:
@@ -130,12 +117,21 @@ class LogCreate(APIView):
         return Response(resp, status=400)
 
 
-class LogDestroy(APIView):
+class LogRead(APIView):
     """
+    get:
+    Grabs data for a specific log.
+
+    delete:
     Deletes a log, specified with `short_code`.
     """
 
     permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, short_code):
+        log = get_object_or_404(Log.objects.all(), author=request.user, short_code=short_code)
+        serializer = LogSerializer(log)
+        return Response(serializer.data)
 
     def delete(self, request, short_code):
         log = get_object_or_404(Log.objects.all(), author=request.user, short_code=short_code)
