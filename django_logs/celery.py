@@ -38,5 +38,5 @@ def setup_periodic_tasks(sender, **kwargs):
 @app.task
 def clean_expired():
     from django_logs.models import Log
-    logs = Log.objects.filter(expires_at__lt=datetime.now(pytz.UTC))
+    logs = Log.objects.filter(expires_at__isnull=False, expires_at__lt=datetime.now(pytz.UTC))
     logs.delete()

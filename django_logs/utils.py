@@ -65,15 +65,17 @@ def request_url(url: str):
 def get_expiry(data: dict, premium=False):
     default = 60 * 60 * 24 * 7 * 2  # 2 week default
     expires = data.get('expires')
+    if expires is not None and premium and str(expires).lower() in ['null', '0']:
+        return None
+    if isinstance(expires, int) and expires < 0:
+        expires = None
     if isinstance(expires, str):
-        expires = int(expires) if expires.isdigit() else None
-    if (not expires and not premium) or (expires and expires > default):
-        return default
-    if expires and not premium and expires <= default:
-        return expires
+        expires = int(expires) if (expires.isdigit()) else None
     if expires and premium:
         return expires
-    return None
+    if expires and not premium and expires <= default:
+        return expires
+    return default
 
 
 def get_chain_tasks(node):
