@@ -4,17 +4,17 @@ from urllib.parse import urlparse
 
 import pytz
 import requests
+from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 
-from django_logs import utils
 from django_logs.consts import rowboat_types, types
 from django_logs.models import Entry, Log, Job
 from django_logs.parser import LogParser
-from django_logs.utils import request_url, get_expiry
+from django_logs.utils import get_expiry, request_url
 
 
 # Create your views here.
@@ -33,11 +33,14 @@ def logs(request, short_code: str, raw=False):
                 return render(request, 'django_logs/loading.html', context={'task_ids': ids, 'request_uri': req,
                                                                             'iso': datetime.now(pytz.UTC).isoformat()})
             raise ObjectDoesNotExist
-        utils.forget_tasks(processing)
         log = _log[0]
-        if log.expires_at < datetime.now(pytz.UTC):
-            log.delete()
-            raise ObjectDoesNotExist
+        if log.expires_at:
+            if log.expires_at < datetime.now(pytz.UTC):
+                log.delete()
+                raise ObjectDoesNotExist
+            if not raw:
+                messages.info(request, f'This log will expire on '
+                f'{log.expires_at.strftime("%A, %B %d, %Y at %H:%M:%S UTC")}')
         if raw:
             content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
@@ -111,11 +114,9 @@ def view(request):
         log_type = request.POST.get('type')
         variant = rowboat_types.get(urlparse(url).netloc)
         author = request.user if request.user.is_authenticated else None
+        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(request.user).first())
         req = request.build_absolute_uri()
-        expires = get_expiry(request.POST)
-        if not expires:
-            messages.error(request, f'Expiry time must not exceed two weeks, or {60 * 60 * 24 * 7}!')
-            return redirect('view')
+        expires = get_expiry(request.POST, premium)
         if log_type in types:
             match_len = len(re.findall(types[log_type], content, re.MULTILINE))
             if match_len > 500:

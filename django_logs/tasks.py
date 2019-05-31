@@ -7,7 +7,7 @@ from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 from django.core import serializers
 
-from django_logs import handlers
+from django_logs import handlers, utils
 # from django_logs.consts import DISCORD_API_URL, DISCORD_HEADERS, DISCORD_TOKEN
 from django_logs.models import SerializedMessage, User, Job
 from django_logs.utils import create_log_entry
@@ -113,9 +113,10 @@ def create_log(self, data: dict, create_data):
     if create_data['author']:
         create_data['author'] = list(serializers.deserialize('json', create_data['author']))[0].object
     expires = create_data.pop('expires')
-    create_data['expires_at'] = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires)
+    create_data['expires_at'] = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires) if expires else expires
     progress_recorder.set_progress(1, 2)
     created_log = create_log_entry(**create_data, messages=messages)
     progress_recorder.set_progress(2, 2)
-    Job.objects.get(short_code=created_log.short_code).delete()
+    job = Job.objects.filter(short_code=created_log.short_code)
+    utils.forget_tasks(job)
     return created_log.short_code

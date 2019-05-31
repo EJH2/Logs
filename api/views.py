@@ -2,6 +2,7 @@ import re
 import time
 from urllib.parse import urlparse
 
+from allauth.socialaccount.models import SocialAccount
 from celery.result import AsyncResult
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse
@@ -56,6 +57,7 @@ class LogView(APIView):
             return Response(resp, status=400)
 
         variant = None
+        url = None
         if data.get('url'):
             url = data.get('url')
             resp = request_url(url)
@@ -67,7 +69,7 @@ class LogView(APIView):
                 resp = {'detail': f'Content-Type of "{url}" must be of type "text/plain"!'}
                 return Response(resp, status=400)
 
-            origin = ('url', url)
+            origin = 'url'
             variant = rowboat_types.get(urlparse(url).netloc)
             try:
                 content = resp.content.decode()
@@ -96,19 +98,18 @@ class LogView(APIView):
         new = data.get('new')
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         author = request.user if request.user.is_authenticated else None
-        expires = get_expiry(data)
-        if not expires:
-            resp = {'detail': f'Expiry time must not exceed two weeks, or {60 * 60 * 24 * 7 * 2}!'}
-            return Response(resp, status=400)
+        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(request.user).first())
+        expires = get_expiry(data, premium)
 
         if match_len > 0:
             content = re.sub('\r\n', '\n', content)
-            short, created = LogParser(log_type, content, origin=origin, variant=variant).create(
+            short, created = LogParser(log_type, content, origin=origin, url=url, variant=variant).create(
                 author, expires=expires, new=new)
             data = {
                 'short': short,
                 'url': f'http{"s" if request.is_secure() else ""}://{request.META["HTTP_HOST"]}/{short}',
                 'created': created,
+                'expires': expires,
                 'time': time.time() - t
             }
             return Response(data, status=201 if created else 200)
