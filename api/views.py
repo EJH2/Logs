@@ -7,10 +7,10 @@ from celery.result import AsyncResult
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import GenericAPIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.serializers import LogSerializer
 from django_logs.auth import filter_query
@@ -21,7 +21,7 @@ from django_logs.utils import get_expiry, request_url
 
 
 # Create your views here.
-class LogView(GenericAPIView):
+class LogView(APIView):
     """
     get:
     Return a list of logs currently owned by the user, or are linked to a guild where a user has elevated permissions.
@@ -121,7 +121,7 @@ class LogView(GenericAPIView):
         return Response(resp, status=400)
 
 
-class LogRead(GenericAPIView):
+class LogRead(APIView):
     """
     get:
     Grabs data for a specific log.
