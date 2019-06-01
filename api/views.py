@@ -96,7 +96,6 @@ class LogView(GenericAPIView):
             return Response(resp, status=400)
 
         log_type = data.get('type')
-        new = data.get('new')
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         author = request.user if request.user.is_authenticated else None
         premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
@@ -104,8 +103,8 @@ class LogView(GenericAPIView):
 
         if match_len > 0:
             content = re.sub('\r\n', '\n', content)
-            short, created = LogParser(log_type, content, origin=origin, url=url, variant=variant).create(
-                author, expires=expires, new=new)
+            kwargs = {'expires': expires, 'origin': origin, 'variant': variant, 'guild_id': data.get('guild_id')}
+            short, created = LogParser.create(log_type, content, author, url=url, new=data.get('new'), **kwargs)
             data = {
                 'short': short,
                 'url': f'http{"s" if request.is_secure() else ""}://{request.META["HTTP_HOST"]}/{short}',

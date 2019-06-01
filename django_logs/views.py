@@ -125,8 +125,8 @@ def view(request):
                                         f'http{sec}://{request.META["HTTP_HOST"]}/api!')
                 return redirect('view')
             if match_len > 0:
-                short, created = LogParser(log_type, content, url=url, variant=variant, request_uri=req).create(
-                    author, expires=expires)
+                kwargs = {'expires': expires, 'origin': 'url', 'variant': variant}
+                short, created = LogParser.create(log_type, content, author, url=url, request_uri=req, **kwargs)
                 request.session['cached'] = not created
                 return redirect('logs', short_code=short)
             messages.error(request, f'We can\'t parse that file using log type {log_type}. Maybe try another one?')
