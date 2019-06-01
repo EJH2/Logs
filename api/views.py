@@ -24,7 +24,7 @@ from django_logs.utils import get_expiry, request_url
 class LogView(GenericAPIView):
     """
     get:
-    Return a list of logs currently owned by the user.
+    Return a list of logs currently owned by the user, or are linked to a guild where a user has elevated permissions.
 
     post:
     Creates a new log.
@@ -33,17 +33,20 @@ class LogView(GenericAPIView):
 
     Optionally, you can specify `expires` to represent the number in seconds until the log will expire. The default for
     this is two weeks, which is also the maximum. You can also specify `new`, which will force the parser to regenerate
-    the log.
+    the log. Additionally, specifying `guild_id` will link the log to a guild allowing anyone with either Manage Guild,
+    Manage Messages, or Administrator to get information or delete it.
     """
 
     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request):
-        logs = Log.objects.filter(author=request.user)
+    @staticmethod
+    def get(request):
+        logs = filter_query(request, Log.objects.all())
         serializer = LogSerializer(logs, many=True)
         return Response(serializer.data or {'detail': 'Not found.'})
 
-    def post(self, request, **kwargs):
+    @staticmethod
+    def post(request, **kwargs):
         if kwargs:
             resp = {'detail': 'POSTing to a log is not allowed!'}
             return Response(resp, status=405)
@@ -129,13 +132,15 @@ class LogRead(GenericAPIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request, short_code):
-        log = get_object_or_404(Log.objects.all(), author=request.user, short_code=short_code)
+    @staticmethod
+    def get(request, short_code):
+        log = get_object_or_404(filter_query(request, Log.objects.all()), short_code=short_code)
         serializer = LogSerializer(log)
         return Response(serializer.data)
 
-    def delete(self, request, short_code):
-        log = get_object_or_404(Log.objects.all(), author=request.user, short_code=short_code)
+    @staticmethod
+    def delete(request, short_code):
+        log = get_object_or_404(filter_query(request, Log.objects.all()), short_code=short_code)
         log.delete()
         return Response({'detail': f'Log {short_code} has been deleted.'})
 

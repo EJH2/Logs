@@ -21,6 +21,7 @@ class Log(models.Model):
     generated_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True)
     data = fields.JSONField(null=True, editable=False)
+    guild_id = models.CharField(max_length=20, null=True)
     content = models.TextField(null=True, editable=False)
     chunked = models.BooleanField(default=False)
 
