@@ -63,7 +63,7 @@ def request_url(url: str):
 
 
 def get_expiry(data: dict, premium=False):
-    default = 60 * 60 * 24 * 7 * 2  # 2 week default
+    default = 60 * 60 * 24 * 7 * (2 if premium else 1)  # 2 week default
     expires = data.get('expires')
     if expires is not None and premium and str(expires).lower() in ['null', '0']:
         return None
