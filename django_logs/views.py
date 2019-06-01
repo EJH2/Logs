@@ -114,7 +114,7 @@ def view(request):
         log_type = request.POST.get('type')
         variant = rowboat_types.get(urlparse(url).netloc)
         author = request.user if request.user.is_authenticated else None
-        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(request.user).first())
+        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
         req = request.build_absolute_uri()
         expires = get_expiry(request.POST, premium)
         if log_type in types:

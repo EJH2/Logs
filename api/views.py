@@ -7,12 +7,13 @@ from celery.result import AsyncResult
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import GenericAPIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from api.serializers import LogSerializer
+from django_logs.auth import filter_query
 from django_logs.consts import types, rowboat_types
 from django_logs.models import Log
 from django_logs.parser import LogParser
@@ -20,7 +21,7 @@ from django_logs.utils import get_expiry, request_url
 
 
 # Create your views here.
-class LogView(APIView):
+class LogView(GenericAPIView):
     """
     get:
     Return a list of logs currently owned by the user.
@@ -98,7 +99,7 @@ class LogView(APIView):
         new = data.get('new')
         match_len = len(re.findall(types[log_type], content, re.MULTILINE))
         author = request.user if request.user.is_authenticated else None
-        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(request.user).first())
+        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
         expires = get_expiry(data, premium)
 
         if match_len > 0:
@@ -118,7 +119,7 @@ class LogView(APIView):
         return Response(resp, status=400)
 
 
-class LogRead(APIView):
+class LogRead(GenericAPIView):
     """
     get:
     Grabs data for a specific log.
