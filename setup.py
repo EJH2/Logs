@@ -42,6 +42,7 @@ setup(
         'eventlet',
         'redis',
         'coreapi',
+        'coreschema',
         'markdown',
         'pygments',
     ]

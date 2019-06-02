@@ -4,14 +4,14 @@ from urllib.parse import urlparse
 
 from allauth.socialaccount.models import SocialAccount
 from celery.result import AsyncResult
-from django.contrib.auth.decorators import user_passes_test
-from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api import schema
 from api.serializers import LogSerializer
 from django_logs.auth import filter_query
 from django_logs.consts import types, rowboat_types
@@ -29,17 +29,19 @@ class LogView(APIView):
     post:
     Creates a new log.
 
-    Request body must contain (log) `type`, and either `url`, `content`, or `file` containing raw log text.
+    Request body must contain either `url`, `content`, or `file`.
 
-    Optionally, you can specify `expires` to represent the number in seconds until the log will expire. The default for
-    this is two weeks, which is also the maximum. You can also specify `new`, which will force the parser to regenerate
-    the log. Additionally, specifying `guild_id` will link the log to a guild allowing anyone with either Manage Guild,
-    Manage Messages, or Administrator to get information or delete it.
+    The default (and maximum) value for `expires` this is one week, or two weeks for premium users.
+
+    Specifying `guild_id` will link the log to a guild allowing anyone with either Manage Guild, Manage Messages, or
+    Administrator to get information or delete it.
     """
 
     permission_classes = [IsAuthenticated, ]
+    schema = schema.CustomViewSchema()
 
     @staticmethod
+    @action(schema=schema, detail=True, methods=['get'])
     def get(request):
         logs = filter_query(request, Log.objects.all())
         serializer = LogSerializer(logs, many=True)
@@ -145,20 +147,39 @@ class LogRead(APIView):
         return Response({'detail': f'Log {short_code} has been deleted.'})
 
 
-@user_passes_test(lambda u: u.is_superuser)
-def traceback(request):
-    t = request.GET.get('t')
-    tasks = t.split(',')
-    gathered = []
-    for task in tasks:
-        t = AsyncResult(id=task)
-        gathered.append({'id': t.id, 'status': t.status, 'result': t.result if not isinstance(
-            t.result, Exception) else None, 'traceback': t.traceback})
-    return JsonResponse(gathered, safe=False)
+class GetToken(APIView):
+    """
+    get:
+    Generates a token for a user account.
+    """
+
+    permission_classes = [IsAuthenticated, ]
+    schema = None
+
+    @staticmethod
+    def get(request):
+        if not request.user.is_authenticated or not request.is_ajax():
+            return Response({'detail': 'Unauthorized.'}, status=401)
+        token, created = Token.objects.update_or_create(user=request.user)
+        return Response({'token': token.key}, status=201 if created else 200)
 
 
-def get_token(request):
-    if not request.user.is_authenticated:
-        return JsonResponse(data={'detail': '401: Unauthorized'}, status=401)
-    token, created = Token.objects.update_or_create(user=request.user)
-    return JsonResponse(data={'token': token.key}, status=201 if created else 200)
+class GetTraceback(APIView):
+    """
+    get:
+    Gets data corresponding to a set of Celery keys.
+    """
+
+    permission_classes = [IsAdminUser, ]
+    schema = schema.CustomTracebackSchema()
+
+    @staticmethod
+    def get(request):
+        t = request.data.get('t')
+        tasks = t.split(',')
+        gathered = []
+        for task in tasks:
+            t = AsyncResult(id=task)
+            gathered.append({'id': t.id, 'status': t.status, 'result': t.result if not isinstance(
+                t.result, Exception) else None, 'traceback': t.traceback})
+        return Response(gathered)
