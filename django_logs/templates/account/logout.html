@@ -38,7 +38,7 @@
 
 {% block ghostright %}
 <div class="overlay-panel overlay-right">
-    <h1>Wait, {{ user.get_short_name }}!</h1>
+    <h1>Wait, {% firstof user.get_short_name user.username %}!</h1>
     <p>Staying logged in gives you access to more features</p>
     <button class="ghost" id="signUp">Check It Out</button>
 </div>
