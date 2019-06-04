@@ -185,6 +185,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # Django-AllAuth configuration
 # https://django-allauth.readthedocs.io/en/latest/
 
+def name_or_username(user):
+    return f'{user.first_name}#{user.last_name}' if all([user.first_name, user.last_name]) else user.username
+
+
+ACCOUNT_USER_DISPLAY = name_or_username
+
+
 SOCIALACCOUNT_PROVIDERS = {
     'discord': {
         'SCOPE': ['email', 'identify', 'guilds'],

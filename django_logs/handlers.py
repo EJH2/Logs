@@ -75,7 +75,7 @@ def giraffeduck(content, **kwargs):
         match['uid'] = users[f'{match["uname"]}#{match["disc"]}']
         _attach = match['attach'].split(', ') if match['attach'] else []
         match['attach'] = get_attach_info(_attach)
-        match['embeds'] = [get_embed_info(match['embeds'])] if match['embeds'] else []
+        match['embeds'] = get_embed_info(match['embeds']) if match['embeds'] else []
         match['content'] = re.sub(r'<@!?(\d+)>', lambda m: f'<@{user_mentions[m.group(1)]} ({m.group(1)})>',
                                   match['content'])
         match['content'] = re.sub(r'<#(\d+)>', lambda m: f'<#{channel_mentions[m.group(1)]}>', match['content'])

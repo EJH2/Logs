@@ -55,7 +55,6 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     content = re.sub(r'(``?)([^`]+)\1', encode_inline_codeblock, content)
 
     def encode_mentions(m):
-        g = m.groups()
         encoded = base64.b64encode(m.group(1).encode()).decode()
         return '\x1AD' + encoded + '\x1AD'
 
@@ -68,13 +67,13 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
         return (not re.sub(r'(\s)', '', re.sub(pattern, '', text))) and (len(re.findall(pattern, text)) < 28)
 
     # Custom emojis (<:name:id>)
-    emoji_class = 'emoji emoji--large' if is_jumboable(r'&lt;(:.*?:)(\d*)&gt;', content) else 'emoji'
-    content = re.sub(r'&lt;(:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
+    _emoji_class = 'emoji emoji--large' if is_jumboable(r'&lt;(:.*?:)(\d*)&gt;', content) else 'emoji'
+    content = re.sub(r'&lt;(:.*?:)(\d*)&gt;', fr'<img class="{_emoji_class}" title="\1" src="'
                                               fr'https://cdn.discordapp.com/emojis/\2.png" alt="\1">', content)
 
     # Custom animated emojis (<a:name:id>)
-    emoji_class_animated = 'emoji emoji--large' if is_jumboable(r'&lt;(a:.*?:)(\d*)&gt;', content) else 'emoji'
-    content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{emoji_class_animated}" title="\1" src="'
+    _emoji_class_animated = 'emoji emoji--large' if is_jumboable(r'&lt;(a:.*?:)(\d*)&gt;', content) else 'emoji'
+    content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{_emoji_class_animated}" title="\1" src="'
                                                fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
 
     def process_emojis(m):

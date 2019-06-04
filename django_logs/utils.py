@@ -41,12 +41,12 @@ def get_attach_info(attachments: list):
 
 def get_embed_info(embeds: str):
     try:
-        return json.loads(embeds)
+        return [json.loads(embeds)]
     except json.decoder.JSONDecodeError:
         try:
             return ast.literal_eval(embeds)  # I'M SORRY
         except AttributeError:
-            return dict()
+            return [dict()]
 
 
 def request_url(url: str):

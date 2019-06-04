@@ -39,8 +39,8 @@ def logs(request, short_code: str, raw=False):
                 log.delete()
                 raise ObjectDoesNotExist
             if not raw:
-                messages.info(request, f'This log will expire on '
-                f'{log.expires_at.strftime("%A, %B %d, %Y at %H:%M:%S UTC")}')
+                messages.info(request,
+                              f'This log will expire on {log.expires_at.strftime("%A, %B %d, %Y at %H:%M:%S UTC")}')
         if raw:
             content = f"<pre>{log.content}</pre>"
             return HttpResponse(content)
@@ -137,7 +137,7 @@ def view(request):
 
 
 def handle404(request, exception):
-    messages.error(request, 'Page not found.')
+    messages.error(request, f'Error: {exception}')
     return redirect('index')
 
 
