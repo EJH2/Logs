@@ -12,6 +12,9 @@ if not demoji.last_downloaded_timestamp() or datetime.now(pytz.UTC) > \
         (demoji.last_downloaded_timestamp() + timedelta(days=7)):
     demoji.download_codes()
 
+if not demoji._EMOJI_PAT:
+    demoji.set_emoji_pattern()
+
 
 def format_content_html(content: str, masked_links: bool = False, newlines: bool = True) -> str:
     # HTML-encode content
@@ -63,16 +66,16 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
                      r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
                      r'(&lt;@&amp;(.{1,100}?)&gt;))', encode_mentions, content)
 
-    def is_jumboable(pattern, text):
-        return (not re.sub(r'(\s)', '', re.sub(pattern, '', text))) and (len(re.findall(pattern, text)) < 28)
+    jumbo_pat = fr'&lt;(:.*?:)(\d*)&gt;|&lt;(a:.*?:)(\d*)&gt;|{demoji._EMOJI_PAT.pattern}'
+    jumbo = (not re.sub(r'(\s)', '', re.sub(jumbo_pat, '', content))) and (len(re.findall(jumbo_pat, content)) < 28)
 
     # Custom emojis (<:name:id>)
-    _emoji_class = 'emoji emoji--large' if is_jumboable(r'&lt;(:.*?:)(\d*)&gt;', content) else 'emoji'
+    _emoji_class = 'emoji emoji--large' if jumbo else 'emoji'
     content = re.sub(r'&lt;(:.*?:)(\d*)&gt;', fr'<img class="{_emoji_class}" title="\1" src="'
                                               fr'https://cdn.discordapp.com/emojis/\2.png" alt="\1">', content)
 
     # Custom animated emojis (<a:name:id>)
-    _emoji_class_animated = 'emoji emoji--large' if is_jumboable(r'&lt;(a:.*?:)(\d*)&gt;', content) else 'emoji'
+    _emoji_class_animated = 'emoji emoji--large' if jumbo else 'emoji'
     content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{_emoji_class_animated}" title="\1" src="'
                                                fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
 
@@ -86,20 +89,20 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     # Process emojis (:text:)
     content = re.sub(EMOJI_REGEX, process_emojis, content)
 
-    def process_unicode_emojis(m, text):
+    def process_unicode_emojis(m):
         e = m.group()
         e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
         title_e = re.sub(r'[\U0001F3FB-\U0001F3FF]$', '', e)
         if not title_e:
             title_e = e
         title = UNICODE_LIST.get(title_e) or demoji._CODE_TO_DESC[title_e]
-        emoji_class = 'emoji emoji--large' if is_jumboable(demoji._EMOJI_PAT, text) else 'emoji'
+        emoji_class = 'emoji emoji--large' if jumbo else 'emoji'
         codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
         return fr'<img class="{emoji_class}" title=":{title}:" ' \
             fr'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
 
     # Process unicode emojis
-    content = demoji.replace(content, lambda m: process_unicode_emojis(m, content))
+    content = demoji.replace(content, process_unicode_emojis)
 
     # Process bold (**text**)
     content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
