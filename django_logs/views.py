@@ -91,7 +91,7 @@ def view(request):
         cached = Log.objects.filter(url=url)
         if cached.exists():  # Cached
             request.session['cached'] = True
-            return redirect('logs', short_code=cached.first())
+            return redirect('logs', short_code=cached.first().short_code)
 
         resp = request_url(url)
         if not resp:
