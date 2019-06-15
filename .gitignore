@@ -110,3 +110,9 @@ venv.bak/
 .mypy_cache/
 
 /static/
+
+# VScode
+.vscode/
+
+# Docker env files
+docker-compose.env
