@@ -269,8 +269,6 @@ def invite_deleter(content, **kwargs):
     total = len(match_data)
 
     for count, match in enumerate(match_data):
-        match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
-
         progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'Invite Deleter'
