@@ -91,7 +91,8 @@ def parse_messages(self, data: dict):
     def sort_chronological(value):
         return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
 
-    messages.sort(key=sort_chronological)
+    if any([messages[0].get('timestamp'), messages[0].get('message_id')]):
+        messages.sort(key=sort_chronological)
     data['messages'] = messages
 
     def sort_alphabetical(value):

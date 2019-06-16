@@ -44,12 +44,15 @@ modmailbot_re = r'\[(?P<time>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\] (?:
                 r'.*?)(?:#(?P<disc>\d{4}))?: (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* .*? \(.*\)\n(?P<attach' \
                 r'>(?:http(?:|s):.*)))?$| (?P<bcontent>[^\n]+))'
 
+invite_deleter_re = r'\[(?P<gid>[\d]{16,18})-(?P<cid>[\d]{16,18})-(?P<uid>[\d]{16,18})\] (?P<uname>.*?)#' \
+                    r'(?P<disc>\d{4}): (?P<content>[\S\s]*?)?$'
+
 attachment_re = r'(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attachments(?:\/\d{16,18' \
                 r'}){2}|external\/[^\/]+)\/(?P<filename>.*)'
 
 types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
          'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
-         'vortex': vortex_re, 'gearbot': gearbot_re, 'modmailbot': modmailbot_re}
+         'vortex': vortex_re, 'gearbot': gearbot_re, 'modmailbot': modmailbot_re, 'invite_deleter': invite_deleter_re}
 
 rowboat_types = {
     'air.aetherya.stream': ('airplane', 'A1RPL4NE'),

@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 
 from django_logs.consts import rowboat_re, rosalina_bottings_re, giraffeduck_re, auttaja_re, logger_re, sajuukbot_re, \
-    vortex_re, gearbot_re, capnbot_re, modmailbot_re
+    vortex_re, gearbot_re, capnbot_re, modmailbot_re, invite_deleter_re
 from django_logs.utils import get_attach_info, get_embed_info
 
 
@@ -248,5 +248,31 @@ def modmailbot(content, **kwargs):
         progress_recorder.set_progress(count + 1, total)
 
     data['type'] = 'ModMailBot'
+
+    return data, match_data
+
+
+def invite_deleter(content, **kwargs):
+    data = dict()
+    lines = content.split('\n')
+    _matches = list()
+    for text in lines:
+        if re.match(invite_deleter_re, text):
+            _matches.append(text)
+        else:
+            _matches[-1] += f'\n{text}'
+
+    matches = (re.match(invite_deleter_re + r'$', m) for m in _matches)
+    match_data = list(m.groupdict() for m in matches)
+
+    progress_recorder = kwargs['pr']
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
+        match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
+
+        progress_recorder.set_progress(count + 1, total)
+
+    data['type'] = 'Invite Deleter'
 
     return data, match_data
