@@ -146,7 +146,7 @@ def sajuukbot(content, **kwargs):
         else:
             _matches[-1] += f'\n{text}'
 
-    matches = (re.match(sajuukbot_re, m) for m in _matches)
+    matches = (re.match(sajuukbot_re + r'$', m) for m in _matches)
     match_data = list(m.groupdict() for m in matches)
 
     progress_recorder = kwargs['pr']
