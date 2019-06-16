@@ -38,7 +38,7 @@ def parse_messages(self, data: dict):
 
     for count, match in enumerate(match_data):
         uid = match.get('uid')
-        message_dict = {'message_id': match.get('mid'), 'timestamp': match['time'],
+        message_dict = {'message_id': match.get('mid'), 'timestamp': match.get('time'),
                         'content': match['content']}
 
         user = {'id': uid, 'username': match.get('uname') or 'Unknown User',
