@@ -3,6 +3,12 @@ from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 
 
 class DiscordAccount(ProviderAccount):
+
+    def get_avatar_url(self):
+        user_id = self.account.extra_data.get('id')
+        avatar_hash = self.account.extra_data.get('avatar')
+        return f'https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.webp'
+
     def to_str(self):
         default = super(DiscordAccount, self).to_str()
         return self.account.extra_data.get('username', default)
