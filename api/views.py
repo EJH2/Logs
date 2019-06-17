@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from api import schema
 from api.serializers import LogSerializer
-from django_logs.auth import filter_query
+from django_logs.auth import filter_query, IsWhitelisted
 from django_logs.consts import types, rowboat_types
 from django_logs.models import Log
 from django_logs.parser import LogParser
@@ -37,7 +37,7 @@ class LogView(APIView):
     Administrator to get information or delete it.
     """
 
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, IsWhitelisted]
     schema = schema.CustomViewSchema()
 
     @staticmethod

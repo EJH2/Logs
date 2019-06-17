@@ -1,6 +1,9 @@
 from enum import Enum
 
 from allauth.socialaccount.models import SocialAccount
+from rest_framework import permissions
+
+from django.conf import settings
 
 
 class PermissionType(Enum):
@@ -74,3 +77,21 @@ def filter_query(request, queryset):
     m_logs = queryset.filter(guild_id__isnull=False)
     mod_logs = [log.short_code for log in m_logs if user_has_permission(request.user, [1, 5, 7], log.guild_id, any)]
     return queryset.filter(author=request.user) | queryset.filter(short_code__in=mod_logs)
+
+
+class IsWhitelisted(permissions.BasePermission):
+    """
+    Global permission check for whitelisted accounts for certain logs.
+    """
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if not request.data.get('type'):  # Don't quite know how to handle this, so push it further along!
+            return True
+        if request.user.is_staff:
+            return True
+        log_type = request.data['type']
+        if log_type in settings.LOG_WHITELIST and request.user.username not in settings.LOG_WHITELIST.get(log_type):
+            return False
+        return True

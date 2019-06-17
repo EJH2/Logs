@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from ast import literal_eval
 
 from decouple import config, Csv
 
@@ -191,7 +192,6 @@ def name_or_username(user):
 
 ACCOUNT_USER_DISPLAY = name_or_username
 
-
 SOCIALACCOUNT_PROVIDERS = {
     'discord': {
         'SCOPE': ['email', 'identify', 'guilds'],
@@ -204,8 +204,6 @@ SITE_ID = 1
 
 LOGIN_REDIRECT_URL = 'index'
 
-LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')  # Discord Token, for fetching user avatars
-
 
 # Celery configuration
 # http://docs.celeryproject.org/en/latest/
@@ -215,3 +213,10 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 
 CELERY_RESULT_SERIALIZER = 'json'
+
+
+# Django-logs configuration
+
+LOG_DISCORD_TOKEN = config('DISCORD_TOKEN')  # Discord Token, for fetching user avatars
+
+LOG_WHITELIST = config('WHITELIST', cast=literal_eval)
