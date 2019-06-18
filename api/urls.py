@@ -1,16 +1,11 @@
-import inspect
-
 from django.urls import re_path, path
 from rest_framework.documentation import include_docs_urls
 
 from api import views
-from django_logs.utils import get_api_token
 
 description = f"""
 API provided to logged-in users. In order to use this API, users must authenticate with: 
-`Authorization: Token xxxxxxxxxxxxxxxxxxxx` in the headers of the request. </p><br>
-{inspect.cleandoc(get_api_token())}
-<p>
+`Authorization: Token xxxxxxxxxxxxxxxxxxxx` in the headers of the request.
 """
 
 urlpatterns = [
