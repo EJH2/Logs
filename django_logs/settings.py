@@ -100,6 +100,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_logs.wsgi.application'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
