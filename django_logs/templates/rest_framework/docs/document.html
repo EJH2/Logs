@@ -18,7 +18,7 @@
                 mode: 'cors',
                 cache: 'default'
             };
-            const req = new Request('{{ request.scheme }}://{{ request.get_host }}{% url 'get_token' %}', init);
+            const req = new Request('http{% if request.is_secure %}s{% else %}{% endif %}://{{ request.get_host }}{% url 'get_token' %}', init);
             const tokenResponse = await fetch(req)
                 .catch((err) => {
                     console.error('An error has occurred:', err)
