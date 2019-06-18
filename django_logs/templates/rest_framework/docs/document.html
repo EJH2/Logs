@@ -18,6 +18,7 @@
                 mode: 'cors',
                 cache: 'default'
             };
+            console.log('{{ request.is_secure }}');
             const req = new Request('http{% if request.is_secure %}s{% else %}{% endif %}://{{ request.get_host }}{% url 'get_token' %}', init);
             const tokenResponse = await fetch(req)
                 .catch((err) => {
