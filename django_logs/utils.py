@@ -4,6 +4,8 @@ import re
 
 import requests
 from celery.result import AsyncResult
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.db.models import QuerySet
 
 from django_logs.consts import attachment_re
@@ -102,3 +104,40 @@ def forget_tasks(jobs: QuerySet):
         task = AsyncResult(id=task_id)
         task.forget()
     jobs.delete()
+
+
+def get_api_token():
+    # This is what happens when Django Rest Framework doesn't let you tinker with templates
+    html = """
+    <script>
+        function getApiKey() {
+            const e = document.getElementById("apikey");
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "token_response_url");
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            xhr.send(null);
+            xhr.onreadystatechange = function () {
+                let DONE = 4; // readyState 4 means the request is done.
+                let OK = 200; // status 200 is a successful return.
+                if (xhr.readyState === DONE) {
+                    resp = JSON.parse(xhr.responseText)
+                    if (xhr.status === OK) {
+                        e.value = resp["token"];
+                    } else {
+                        console.log("Error: " + xhr.status + ", " + resp["detail"]); 
+           // An error occurred during the request.
+                        e.value = resp["detail"];
+                    }
+                }
+            };
+        }
+        </script>
+        <label>Show API Token: <input id="apikey" style="width: 310px" type="text" readonly=""></label>
+        <button onclick="getApiKey();">Show Token</button>
+    """
+    site = Site.objects.get_current().domain
+    if site.split(':')[0] != settings.ALLOWED_HOSTS[-1].lstrip('.'):
+        site = f'{settings.ALLOWED_HOSTS[-1].lstrip(".")}:{site.split(":")[1]}'
+    token_response_url = f'http://{site}/api/token'
+    html = html.replace('token_response_url', token_response_url)
+    return html
