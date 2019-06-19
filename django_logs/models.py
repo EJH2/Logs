@@ -186,11 +186,11 @@ class Embed:
         tz = self.timestamp.tzinfo if self.timestamp else pytz.UTC
         self.human_timestamp = duration(self.timestamp.replace(tzinfo=tz), now=datetime.now(tz=tz)) if \
             self.timestamp else None
-        self.color = data.get("color", '#4F545C')
+        self.color = data.get('color')
         self.image = data.get('image')
         self.thumbnail = data.get('thumbnail')
-        self.fields = data.get('fields', [])
-        self.footer = data.get('footer', [])
+        self.fields = data.get('fields')
+        self.footer = data.get('footer')
 
     @classmethod
     def from_dict(cls, data: dict):
