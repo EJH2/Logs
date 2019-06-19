@@ -9,32 +9,41 @@ from django.core import serializers
 
 from django_logs import handlers, utils
 # from django_logs.consts import DISCORD_API_URL, DISCORD_HEADERS, DISCORD_TOKEN
+from django_logs.consts import types
 from django_logs.models import SerializedMessage, User, Job
 from django_logs.utils import create_log_entry
 
 
 @shared_task(bind=True)
 def parse(self, create_data):
-    kwargs = {'pr': ProgressRecorder(self)}
+    """
+    Convert raw log content into usable data.
+    :param self: Task instance, supplied by Celery.
+    :param create_data: Default log parameters.
+    :return: Parsed data.
+    """
     log_type = create_data['log_type']
     parser = getattr(handlers, log_type)
     content = create_data['content']
-    variant = create_data.pop('variant')
-    kwargs['variant'] = variant if variant else None
-    data, data['match_data'] = parser(content, **kwargs)
-    return data
+    match_data = parser(content, ProgressRecorder(self))
+    return match_data
 
 
 @shared_task(bind=True)
-def parse_messages(self, data: dict):
+def parse_messages(self, match_data: dict):
+    """
+    Convert parsed data into formatted data.
+    :param self: Task instance, supplied by Celery.
+    :param match_data: Parsed data.
+    :return: Formatted data.
+    """
     users = list()
     _users = dict()
     messages = list()
-
-    match_data = data.pop('match_data')
+    data = dict()
 
     total = len(match_data)
-    progress_recorder = ProgressRecorder(self)
+    progress = ProgressRecorder(self)
 
     for count, match in enumerate(match_data):
         uid = match.get('uid')
@@ -86,7 +95,7 @@ def parse_messages(self, data: dict):
 
         messages.append(SerializedMessage(message_dict).__dict__)
 
-        progress_recorder.set_progress(count + 1, total)
+        progress.set_progress(count + 1, total)
 
     def sort_chronological(value):
         return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
@@ -106,18 +115,32 @@ def parse_messages(self, data: dict):
 
 @shared_task(bind=True)
 def create_log(self, data: dict, create_data):
-    progress_recorder = ProgressRecorder(self)
+    """
+    Take formatted data and save it to a log.
+    :param self: Task instance, supplied by Celery.
+    :param data: Formatted data.
+    :param create_data: Default log parameters.
+    :return: Log short code.
+    """
+    progress = ProgressRecorder(self)
+
     variant = create_data.pop('variant')
     create_data['log_type'] = variant[0] if variant else create_data['log_type']
+    data['type'] = variant[1] if variant else types[create_data['log_type']]
+
     messages = data.pop('messages')
     create_data['data'] = data
     if create_data['author']:
         create_data['author'] = list(serializers.deserialize('json', create_data['author']))[0].object
+
     expires = create_data.pop('expires')
     create_data['expires_at'] = datetime.now(tz=pytz.UTC) + timedelta(seconds=expires) if expires else expires
-    progress_recorder.set_progress(1, 2)
+
+    progress.set_progress(1, 2)
     created_log = create_log_entry(**create_data, messages=messages)
-    progress_recorder.set_progress(2, 2)
+    progress.set_progress(2, 2)
+
     job = Job.objects.filter(short_code=created_log.short_code)
     utils.forget_tasks(job)
+
     return created_log.short_code

@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from api import schema
 from api.serializers import LogSerializer
 from django_logs.auth import filter_query, IsWhitelisted
-from django_logs.consts import types, rowboat_types
+from django_logs.consts import regexps, rowboat_types
 from django_logs.models import Log
 from django_logs.parser import LogParser
 from django_logs.utils import get_expiry, request_url
@@ -58,8 +58,8 @@ class LogView(APIView):
             resp = {'detail': 'Request body must contain one of [files, url, content] and [type] to parse!'}
             return Response(resp, status=400)
 
-        if data.get('type') not in types:
-            resp = {'detail': f'Log type must be one of [{", ".join(types.keys())}]!'}
+        if data.get('type') not in regexps:
+            resp = {'detail': f'Log type must be one of [{", ".join(regexps.keys())}]!'}
             return Response(resp, status=400)
 
         variant = None
@@ -101,7 +101,7 @@ class LogView(APIView):
             return Response(resp, status=400)
 
         log_type = data.get('type')
-        match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+        match_len = len(re.findall(regexps[log_type], content, re.MULTILINE))
         author = request.user if request.user.is_authenticated else None
         premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
         expires = get_expiry(data, premium)

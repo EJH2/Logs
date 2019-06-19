@@ -11,7 +11,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from django_logs.consts import rowboat_types, types
+from django_logs.consts import rowboat_types, regexps
 from django_logs.models import Entry, Log, Job
 from django_logs.parser import LogParser
 from django_logs.utils import get_expiry, request_url
@@ -117,8 +117,8 @@ def view(request):
         premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
         req = request.build_absolute_uri()
         expires = get_expiry(request.POST, premium)
-        if log_type in types:
-            match_len = len(re.findall(types[log_type], content, re.MULTILINE))
+        if log_type in regexps:
+            match_len = len(re.findall(regexps[log_type], content, re.MULTILINE))
             if match_len > 500:
                 sec = 's' if request.is_secure() else ''
                 messages.error(request, f'Logs with over 500 messages must be processed through the api, found at '

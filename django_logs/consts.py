@@ -50,17 +50,57 @@ invite_deleter_re = r'\[(?P<gid>[\d]{16,18})-(?P<cid>[\d]{16,18})-(?P<uid>[\d]{1
 attachment_re = r'(?:http(?:s|):\/\/)(?:images-ext-\d|cdn|media).discordapp\.(?:com|net)\/(?:attachments(?:\/\d{16,18' \
                 r'}){2}|external\/[^\/]+)\/(?P<filename>.*)'
 
-types = {'capnbot': capnbot_re, 'rowboat': rowboat_re, 'rosalina_bottings': rosalina_bottings_re,
-         'giraffeduck': giraffeduck_re, 'auttaja': auttaja_re, 'logger': logger_re, 'sajuukbot': sajuukbot_re,
-         'vortex': vortex_re, 'gearbot': gearbot_re, 'modmailbot': modmailbot_re, 'invite_deleter': invite_deleter_re}
+regexps = {
+    'auttaja': auttaja_re,
+    'capnbot': capnbot_re,
+    'gearbot': gearbot_re,
+    'giraffeduck': giraffeduck_re,
+    'invite_deleter': invite_deleter_re,
+    'logger': logger_re,
+    'modmailbot': modmailbot_re,
+    'rowboat': rowboat_re,
+    'rosalina_bottings': rosalina_bottings_re,
+    'sajuukbot': sajuukbot_re,
+    'vortex': vortex_re,
+}
+
+types = {
+    'auttaja': 'Auttaja',
+    'capnbot': 'CapnBot',
+    'gearbot': 'GearBot',
+    'giraffeduck': 'GiraffeDuck',
+    'invite_deleter': 'Invite Deleter',
+    'logger': 'Logger',
+    'modmailbot': 'ModMailBot',
+    'rosalina_bottings': 'Rosalina Bottings',
+    'rowboat': 'Rowboat',
+    'sajuukbot': 'SajuukBot',
+    'vortex': 'Vortex'
+}
 
 rowboat_types = {
-    'air.aetherya.stream': ('airplane', 'A1RPL4NE'),
-    'dashboard.aperturebot.science': ('aperture', 'Aperture'),
-    'flyg.farkasdev.com': ('flygbåt', 'Flygbåt'),
-    'mod.warframe.gg': ('heimdallr', 'Heimdallr'),
-    'jetski.ga': ('jetski', 'Jetski'),
-    'jake.dooleylabs.com': ('lmg_showboat', 'LMG Showboat'),
-    'rawgo.at': ('rawgoat', 'Rawgoat'),
-    'row.swvn.io': ('speedboat', 'Speedboat')
+    'air.aetherya.stream': (
+        'airplane', 'A1RPL4NE'
+    ),
+    'dashboard.aperturebot.science': (
+        'aperture', 'Aperture'
+    ),
+    'flyg.farkasdev.com': (
+        'flygbåt', 'Flygbåt'
+    ),
+    'mod.warframe.gg': (
+        'heimdallr', 'Heimdallr'
+    ),
+    'jetski.ga': (
+        'jetski', 'Jetski'
+    ),
+    'jake.dooleylabs.com': (
+        'lmg_showboat', 'LMG Showboat'
+    ),
+    'rawgo.at': (
+        'rawgoat', 'Rawgoat'
+    ),
+    'row.swvn.io': (
+        'speedboat', 'Speedboat'
+    )
 }
