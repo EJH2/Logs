@@ -7,22 +7,28 @@
     <p>{% render_markdown document.description %}</p>
     {% endif %}
     <script>
-    async function getApikey () {
+    async function getApikey (retry) {
+        let url = 'http://{{ request.get_host }}{% url 'get_token' %}';
+        if (retry) url = 'https://{{ request.get_host }}{% url 'get_token' %}';
         const e = document.getElementById('apikey');
 
-        const req = await fetch('{{ request.scheme }}://{{ request.get_host }}{% url 'get_token' %}', {
+        const req = await fetch(url, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             },
         }).catch((err) => {
-                console.error('An error has occurred:', err)
+            if (retry) {
+                getApikey(false);
+            } else {
+                console.error('An error has occurred:', err);
+            }
         });
-
+        console.log(url);
        e.value = (await req.json()).token
     }
     </script>
     <label>Show API Token: <input id="apikey" style="width: 310px" type="text" readonly=""></label>
-    <button onclick="getApikey();">Show Token</button>
+    <button onclick="getApikey(true);">Show Token</button>
 </div>
 <div class="col-md-6 intro-code">
     {% for html in lang_intro_htmls %}
