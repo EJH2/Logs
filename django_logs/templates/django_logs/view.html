@@ -23,15 +23,13 @@
         <label>Expires: <input name="expires" placeholder="Seconds"></label>
         <label>Log Type:<select name="type">
             <option selected>-----</option>
-            <option value="auttaja">Auttaja</option>
-            <option value="capnbot">CapnBot</option>
-            <option value="gearbot">GearBot</option>
-            <option value="giraffeduck">GiraffeDuck</option>
-            <option value="invite_deleter">Invite Deleter</option>
-            <option value="rosalina_bottings">Rosalina Bottings</option>
-            <option value="rowboat">Rowboat/Clones</option>
-            <option value="sajuukbot">SajuukBot</option>
-            <option value="vortex">Vortex</option>
+            {% for type, value in types.items %}
+                {% if type not in whitelist %}
+                <option value="{{ type }}">{{ value }}</option>
+                {% elif type in whitelist and request.user.username in whitelist.type or request.user.is_staff %}
+                <option value="{{ type }}">{{ value }}</option>
+                {% endif %}
+            {% endfor %}
         </select></label>
         <button id="create">Create</button>
     </form>

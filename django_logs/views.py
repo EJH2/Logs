@@ -5,13 +5,14 @@ from urllib.parse import urlparse
 import pytz
 import requests
 from allauth.socialaccount.models import SocialAccount
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from django_logs.consts import rowboat_types, regexps
+from django_logs.consts import rowboat_types, regexps, types
 from django_logs.models import Entry, Log, Job
 from django_logs.parser import LogParser
 from django_logs.utils import get_expiry, request_url
@@ -79,7 +80,7 @@ def perks(request):
 
 def view(request):
     if request.method == "GET":
-        return render(request, 'django_logs/view.html')
+        return render(request, 'django_logs/view.html', context={'types': types, 'whitelist': settings.LOG_WHITELIST})
 
     if request.method == "POST":
         url = request.POST.get('url')
