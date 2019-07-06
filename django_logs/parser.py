@@ -8,14 +8,13 @@ from django_logs.models import Log, Job
 class LogParser:
 
     @staticmethod
-    def create(log_type, content, author=None, url=None, request_uri=None, *, new=True, **kwargs):
+    def create(log_type, content, author=None, url=None, *, new=True, **kwargs):
         """
         Create a log using the specified data.
         :param log_type: Type of log to be generated.
         :param content: Raw content of log.
         :param author: User who requested creation of log.
         :param url: Original URL of log. May not be set if request was sent through api.
-        :param request_uri: Where log was created (api or gui)
         :param new: Whether or not to skip cache checking
         :param kwargs:
         :return: Short code of log, whether or not the log was created
@@ -40,6 +39,6 @@ class LogParser:
             '{current}/{total} messages formatted... ({percent}%)',
             'Saving messages... ({percent}%)'
         ])
-        Job.objects.update_or_create(short_code=short_code, defaults={'data': data, 'request_uri': request_uri})
+        Job.objects.update_or_create(short_code=short_code, defaults={'data': data, 'request_uri': url})
 
         return short_code, True

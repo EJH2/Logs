@@ -116,7 +116,6 @@ def view(request):
         variant = rowboat_types.get(urlparse(url).netloc)
         author = request.user if request.user.is_authenticated else None
         premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
-        req = request.build_absolute_uri()
         expires = get_expiry(request.POST, premium)
         if log_type in regexps:
             match_len = len(re.findall(regexps[log_type], content, re.MULTILINE))
@@ -127,7 +126,7 @@ def view(request):
                 return redirect('view')
             if match_len > 0:
                 kwargs = {'expires': expires, 'origin': 'url', 'variant': variant}
-                short, created = LogParser.create(log_type, content, author, url=url, request_uri=req, **kwargs)
+                short, created = LogParser.create(log_type, content, author, url=url, **kwargs)
                 request.session['cached'] = not created
                 return redirect('logs', short_code=short)
             messages.error(request, f'We can\'t parse that file using log type {log_type}. Maybe try another one?')

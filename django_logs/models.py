@@ -44,6 +44,9 @@ class Job(models.Model):
     data = fields.JSONField()
     request_uri = models.TextField(null=True)
 
+    def __str__(self):
+        return 'Job %s' % self.short_code
+
 
 class Entry:
     def __init__(self, data):
