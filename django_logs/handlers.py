@@ -105,7 +105,7 @@ def logger(content, progress):
     total = len(match_data)
 
     for count, match in enumerate(match_data):
-        match['embeds'] = get_embed_info(match['embeds'])['embeds'] if match['embeds'] else []
+        match['embeds'] = get_embed_info(match['embeds'])[0]['embeds'] if match['embeds'] else []
         match['time'] = datetime.strptime(match['time'], '%a %b %d %Y %H:%M:%S GMT%z').isoformat()
         match['attach'] = get_attach_info(match['attach'].split(', ')) if match['attach'] else []
 
