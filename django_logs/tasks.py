@@ -98,9 +98,9 @@ def parse_messages(self, match_data: dict):
         progress.set_progress(count + 1, total)
 
     def sort_chronological(value):
-        return int(value.get('message_id') or 0) or dateutil.parser.parse(value.get('timestamp'))
+        return int(value.get('id') or 0) or dateutil.parser.parse(value.get('timestamp'))
 
-    if any([messages[0].get('timestamp'), messages[0].get('message_id')]):
+    if any([messages[0].get('timestamp'), messages[0].get('id')]):
         messages.sort(key=sort_chronological)
     data['messages'] = messages
 

@@ -59,6 +59,7 @@ def giraffeduck(content, progress):
     progress.set_progress(4, total)
 
     for count, match in enumerate(match_data):
+        match['time'] = datetime.strptime(match['time'], '%Y-%d-%m %H:%M:%S').isoformat()
         match['uid'] = users[f'{match["uname"]}#{match["disc"]}']
         _attach = match['attach'].split(', ') if match['attach'] else []
         match['attach'] = get_attach_info(_attach)
