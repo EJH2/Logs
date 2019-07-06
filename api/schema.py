@@ -94,7 +94,7 @@ traceback_fields = {
         coreapi.Field(
             't',
             required=True,
-            location='path',
+            location='form',
             type='string',
             schema=coreschema.Array(
                 description='List of Celery UUIDs'
