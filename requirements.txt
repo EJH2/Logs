@@ -11,6 +11,8 @@ djangorestframework
 celery
 celery_progress
 eventlet
+sentry-sdk
+raven
 redis
 coreapi
 coreschema
