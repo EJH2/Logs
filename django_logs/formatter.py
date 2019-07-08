@@ -16,7 +16,7 @@ if not demoji._EMOJI_PAT:
     demoji.set_emoji_pattern()
 
 
-def format_content_html(content: str, masked_links: bool = False, newlines: bool = True) -> str:
+def format_content_html(content: str, users: dict, masked_links: bool = False, newlines: bool = True) -> str:
     # HTML-encode content
 
     def encode_codeblock(m):
@@ -160,9 +160,14 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
     # Meta mentions (@here)
     content = content.replace('@here', '<span class="mention">@here</span>')
 
+    def smart_mention(m):
+        if m.group(2) in users:
+            uid = m.group(2)
+            return fr'<span class="mention user" title="{uid}">@{users[uid]["username"]}</span>'
+        return fr'<span class="mention user" title="{m.group(2)}">{m.group(1)}</span>'
+
     # User mentions (<@id> and <@!id>)
-    content = re.sub(r'(&lt;@!?(\d+)&gt;)',
-                     r'<span class="mention user" title="\2">\1</span>', content)
+    content = re.sub(r'(&lt;@!?(\d+)&gt;)', smart_mention, content)
 
     # User mentions (<@user#discrim (id)>)
     content = re.sub(r'&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;',
@@ -218,7 +223,7 @@ def format_content_html(content: str, masked_links: bool = False, newlines: bool
 #    Stripped Down Version for Embeds
 # ======================================
 
-def format_micro_content_html(content: str, newlines: bool = True) -> str:
+def format_micro_content_html(content: str, users: dict, newlines: bool = True) -> str:
     def encode_codeblock(m):
         encoded = base64.b64encode(m.group(1).encode()).decode()
         return '\x1AM' + encoded + '\x1AM'
@@ -323,9 +328,14 @@ def format_micro_content_html(content: str, newlines: bool = True) -> str:
     # Meta mentions (@here)
     content = content.replace('@here', '<span class="mention">@here</span>')
 
+    def smart_mention(m):
+        if m.group(2) in users:
+            uid = m.group(2)
+            return fr'<span class="mention user" title="{uid}">@{users[uid]["username"]}</span>'
+        return fr'<span class="mention user" title="{m.group(2)}">{m.group(1)}</span>'
+
     # User mentions (<@id> and <@!id>)
-    content = re.sub(r'(&lt;@!?(\d+)&gt;)',
-                     r'<span class="mention" title="\2">\1</span>', content)
+    content = re.sub(r'(&lt;@!?(\d+)&gt;)', smart_mention, content)
 
     # User mentions (@user#discrim)
     content = re.sub(r'@((.{2,32}?)#\d{4})',

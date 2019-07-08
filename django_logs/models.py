@@ -154,13 +154,13 @@ class Attachment:
 
 
 class SerializedEmbed:
-    def __init__(self, data):
+    def __init__(self, data, users):
         self.title = data.get('title')
         if self.title:
-            self.title = format_micro_content_html(self.title)
+            self.title = format_micro_content_html(self.title, users)
         self.description = data.get('description')
         if self.description:
-            self.description = format_content_html(self.description, masked_links=True, newlines=False)
+            self.description = format_content_html(self.description, users, masked_links=True, newlines=False)
         self.url = data.get('url')
         self.type = data.get('type', 'rich')
         self.author = data.get('author')
@@ -171,8 +171,8 @@ class SerializedEmbed:
         self.fields = data.get('fields', [])
         if len(self.fields) > 0:
             for field in self.fields:
-                field['name'] = format_micro_content_html(field['name'])
-                field['value'] = format_content_html(field['value'], masked_links=True)
+                field['name'] = format_micro_content_html(field['name'], users)
+                field['value'] = format_content_html(field['value'], users, masked_links=True)
         self.footer = data.get('footer', [])
 
 
@@ -206,13 +206,13 @@ class Embed:
 
 
 class SerializedMessage:
-    def __init__(self, data):
+    def __init__(self, data, users):
         self.id = int(data['message_id']) if data.get('message_id') else None
         self.timestamp = data.get('timestamp')
         self.raw_content = data['content']
-        self.content = format_content_html(self.raw_content, masked_links=True)
+        self.content = format_content_html(self.raw_content, users, masked_links=True)
         self.attachments = [Attachment(a).__dict__ for a in data['attachments']]
-        self.embeds = [SerializedEmbed(e).__dict__ for e in data['embeds']]
+        self.embeds = [SerializedEmbed(e, users).__dict__ for e in data['embeds']]
         self.author = User(data['author']).__dict__
         self.edited = data.get('edited', False)
 

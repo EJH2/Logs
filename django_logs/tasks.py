@@ -39,6 +39,7 @@ def parse_messages(self, match_data: dict):
     """
     users = list()
     _users = dict()
+    _messages = list()
     messages = list()
     data = dict()
 
@@ -93,9 +94,12 @@ def parse_messages(self, match_data: dict):
             if len(match['embeds']) > 0 and match['embeds'][0] != '':
                 message_dict['embeds'] = match['embeds']
 
-        messages.append(SerializedMessage(message_dict).__dict__)
+        _messages.append(message_dict)
 
         progress.set_progress(count + 1, total)
+
+    for msg in _messages:
+        messages.append(SerializedMessage(msg, _users).__dict__)
 
     def sort_chronological(value):
         return int(value.get('id') or 0) or dateutil.parser.parse(value.get('timestamp'))
