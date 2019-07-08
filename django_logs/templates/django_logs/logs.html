@@ -272,5 +272,14 @@
     </div>
 {% endif %}
 <div id="lightbox_div"></div>
+{% if uid %}
+<script>
+    for (let s of document.querySelectorAll('span.mention')) {
+        if (s.title === '{{ uid }}') {
+            s.classList.add('mentioned');
+        }
+    }
+</script>
+{% endif %}
 </body>
 </html>

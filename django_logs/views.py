@@ -65,10 +65,16 @@ def logs(request, short_code: str, raw=False):
         log.data['generated_at'] = log.generated_at
         log.data['messages'] = msg_page.object_list
         log.data['raw_content'] = log.content
+        user_id = None
+        if request.user.is_authenticated:
+            try:
+                user_id = SocialAccount.objects.get(user=request.user).uid
+            except ObjectDoesNotExist:
+                pass
         return render(request, 'django_logs/logs.html', context={'log_entry': Entry(log.data),
                                                                  'original_url': log.url, 'log_type': log.log_type,
                                                                  'msg_page': msg_page, 'msg_len': msg_len,
-                                                                 'short': short_code})
+                                                                 'short': short_code, 'uid': user_id})
     except ObjectDoesNotExist:
         messages.error(request, 'Log does not exist, or has expired.')
         return redirect('index')

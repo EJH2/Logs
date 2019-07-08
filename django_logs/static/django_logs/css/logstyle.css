@@ -94,11 +94,39 @@ img {
 
 .mention {
     font-weight: 600;
+    padding: 0 2px;
 }
 
-.mention:hover {
+.mention:hover:not(.no-select) {
     cursor: pointer;
     transition: background-color 50ms ease-out, color 50ms ease-out;
+}
+
+.mentioned.mention {
+    background: transparent !important;
+}
+
+.mentioned.mention:hover {
+    text-decoration: underline;
+}
+
+.mentioned {
+    border-radius: 0 3px 3px 0;
+    position: relative;
+    margin: -.1rem -.2rem .1rem;
+    padding: .1rem .2rem;
+}
+
+.mentioned:after {
+    position: absolute;
+    top: 0;
+    left: -6px;
+    bottom: 0;
+    content: " ";
+    width: 2px;
+    background: rgba(250,166,26,.2);
+    border-left: 4px solid #faa61a;
+    border-radius: 3px 0 0 3px;
 }
 
 .bot-tag {

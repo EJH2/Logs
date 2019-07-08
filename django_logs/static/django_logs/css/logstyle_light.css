@@ -31,9 +31,13 @@ a, a.chatlog__embed-title {
     color: #7289DA;
 }
 
-.mention:hover {
+.mention:hover:not(.mentioned) {
     background-color: #7289DA;
     color: #FFF;
+}
+
+.mentioned {
+    background: rgba(250,166,26,.2);
 }
 
 /* === INFO === */

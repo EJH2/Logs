@@ -155,10 +155,10 @@ def format_content_html(content: str, users: dict, masked_links: bool = False, n
     content = re.sub('\x1AD(.*?)\x1AD', decode_mentions, content)
 
     # Meta mentions (@everyone)
-    content = content.replace('@everyone', '<span class="mention">@everyone</span>')
+    content = content.replace('@everyone', '<span class="mentioned mention no-select">@everyone</span>')
 
     # Meta mentions (@here)
-    content = content.replace('@here', '<span class="mention">@here</span>')
+    content = content.replace('@here', '<span class="mentioned mention no-select">@here</span>')
 
     def smart_mention(m):
         if m.group(2) in users:
@@ -174,12 +174,10 @@ def format_content_html(content: str, users: dict, masked_links: bool = False, n
                      r'<span class="mention user" title="\3">@\2</span>', content)
 
     # User mentions (@user#discrim)
-    content = re.sub(r'@((.{2,32}?)#\d{4})',
-                     r'<span class="mention" title="\1">@\2</span>', content)
+    content = re.sub(r'@((.{2,32}?)#\d{4})', r'<span class="mention" title="\1">@\2</span>', content)
 
     # Channel mentions (<#id>)
-    content = re.sub(r'(&lt;#\d+&gt;)',
-                     r'<span class="mention">\1</span>', content)
+    content = re.sub(r'(&lt;#\d+&gt;)', r'<span class="mention">\1</span>', content)
 
     # Channel mentions (<#name>)
     content = re.sub(r'(&lt;#(.{1,100}?)&gt;)',
@@ -322,11 +320,10 @@ def format_micro_content_html(content: str, users: dict, newlines: bool = True) 
     content = re.sub('\x1AD(.*?)\x1AD', decode_mentions, content)
 
     # Meta mentions (@everyone)
-    content = content.replace('@everyone',
-                              '<span class="mention">@everyone</span>')
+    content = content.replace('@everyone', '<span class="mentioned mention no-select">@everyone</span>')
 
     # Meta mentions (@here)
-    content = content.replace('@here', '<span class="mention">@here</span>')
+    content = content.replace('@here', '<span class="mentioned mention no-select">@here</span>')
 
     def smart_mention(m):
         if m.group(2) in users:
@@ -338,20 +335,21 @@ def format_micro_content_html(content: str, users: dict, newlines: bool = True) 
     content = re.sub(r'(&lt;@!?(\d+)&gt;)', smart_mention, content)
 
     # User mentions (@user#discrim)
-    content = re.sub(r'@((.{2,32}?)#\d{4})',
-                     r'<span class="mention" title="\1">@\2</span>', content)
+    content = re.sub(r'@((.{2,32}?)#\d{4})', r'<span class="mention" title="\1">@\2</span>', content)
+
+    # User mentions (<@user#discrim (id)>)
+    content = re.sub(r'&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;',
+                     r'<span class="mention user" title="\3">@\2</span>', content)
 
     # Channel mentions (<#id>)
-    content = re.sub(r'(&lt;#\d+&gt;)',
-                     r'<span class="mention">\1</span>', content)
+    content = re.sub(r'(&lt;#\d+&gt;)', r'<span class="mention">\1</span>', content)
 
     # Channel mentions (<#name>)
     content = re.sub(r'(&lt;#(.{1,100}?)&gt;)',
                      r'<span class="mention">#\2</span>', content)
 
     # Role mentions (<@&id>)
-    content = re.sub(r'(&lt;@&amp;(\d+)&gt;)',
-                     r'<span class="mention">\1</span>', content)
+    content = re.sub(r'(&lt;@&amp;(\d+)&gt;)', r'<span class="mention">\1</span>', content)
 
     # Role mentions (<@&name>)
     content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)',
