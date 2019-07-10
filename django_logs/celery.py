@@ -12,15 +12,13 @@ if config('SENTRY_DSN'):
     from sentry_sdk.integrations.celery import CeleryIntegration
     kwargs = {
         'dsn': config('SENTRY_DSN'),
-        'integrations': [DjangoIntegration(), CeleryIntegration()]
+        'integrations': [DjangoIntegration(), CeleryIntegration()],
+        'send_default_pii': True
     }
     if sys.platform == 'win32':
         from raven.transport.eventlet import EventletHTTPTransport
         kwargs['transport'] = EventletHTTPTransport
-    sentry_sdk.init(
-        dsn=config('SENTRY_DSN'),
-        integrations=[DjangoIntegration(), CeleryIntegration()]
-    )
+    sentry_sdk.init(**kwargs)
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_logs.settings')
