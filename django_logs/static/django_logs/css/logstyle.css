@@ -146,6 +146,138 @@ img {
     display: inline !important;
 }
 
+/* === Navbar === */
+
+nav,
+nav span,
+nav span>a,
+nav .icon,
+nav #nav-toggle~.icon {
+    -webkit-transition: all .4s ease;
+    -moz-transition: all .4s ease;
+    -o-transition: all .4s ease;
+    transition: all .4s ease
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    font-size: 16px;
+    z-index: 99;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 15%;
+    padding-right: 15%;
+}
+
+body {
+    margin-top: 60px;
+}
+
+nav+* {
+    margin-top: 48px;
+}
+
+nav span>a,
+nav span>div {
+    float: left;
+    padding: 13px;
+    text-align: center;
+    text-decoration: none;
+}
+
+nav span>div {
+    padding: 12px;
+}
+
+nav .icon {
+    float: right;
+    display: none;
+    padding: 0 15px;
+    height: 50px;
+}
+
+nav .info__toolbox,
+nav .info__toolbox-toggle {
+    padding: 0;
+    margin: 12px;
+    margin-right: 20px;
+    margin-left: 0;
+    width: 24px;
+    height: 24px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+nav .info__toolbox .material-icons {
+    font-size: 24px;
+    margin: 0;
+}
+
+nav .info__toolbox-tools li {
+    top: 12px;
+}
+
+nav .material-icons.tool {
+    margin-top: 0px;
+}
+
+nav .info__toolbox-tools {
+    position: absolute;
+    top: -28px;
+}
+
+@media screen and (max-width: 500px) {
+    nav {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    nav .info__toolbox {
+        margin-right: 0;
+    }
+
+    nav input:checked~.info__toolbox-tools li:nth-child(1) {
+        top: 45px;
+    }
+
+    nav input:checked~.info__toolbox-tools li:nth-child(2) {
+        top: 83px;
+    }
+
+    nav input:checked~.info__toolbox-tools li:nth-child(3) {
+        top: 120px;
+    }
+
+    nav input:checked~.info__toolbox-tools li:nth-child(3) .tooltiptext {
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    nav .tooltip .tooltiptext.tool-text {
+        width: 175px;
+        z-index: -1;
+        top: -6px;
+        right: -12px;
+        text-align: left;
+        padding: 5px 10px;
+        height: 27px;
+        line-height: 2;
+        border-radius: 0;
+    }
+
+    nav .info__toolbox-tools {
+        top: -19px;
+    }
+}
+
 /* === NO JS === */
 
 .no-js .info__users {
