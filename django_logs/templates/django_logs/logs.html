@@ -23,6 +23,78 @@
     <script src="{% static 'django_logs/js/logs.js' %}"></script>
 </head>
 <body class="no-js">
+    <nav>
+        <input type="checkbox" id="nav-toggle">
+        <label for="nav-toggle" class="icon">
+            <div class="hamburger-icon"></div>
+        </label>
+        <span>
+            <a href="/">Discord Log Viewer</a>
+        </span>
+        <span>
+            <div class="info__toolbox">
+                <label for="toolbox-toggle" class="material-icons icon-large info__toolbox-toggle"
+                    onclick="return toggleDrawer(this)">
+                    settings
+                </label>
+                <input class="toggle-input" id="toolbox-toggle" type="checkbox">
+                <ul class="info__toolbox-tools">
+                    {% if original_url %}
+                        <li>
+                            <div class="tooltip">
+                                <a class="material-icons tool" href="{{ original_url }}" target="_blank">open_in_browser</a>
+                                <span class="tooltiptext pre pre--inline tool-text">Original URL</span>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>
+                            <div class="tooltip">
+                                <span class="material-icons md-inactive tool">open_in_browser</span>
+                                <span class="tooltiptext pre pre--inline tool-text">No Original URL</span>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if log_entry.ids %}
+                        <li>
+                            <div class="tooltip">
+                                <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
+                                <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>
+                            <div class="tooltip">
+                                <span class="material-icons md-inactive tool">assignment</span>
+                                <span class="tooltiptext pre pre--inline tool-text copy">No IDs To Copy</span>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <div class="tooltip">
+                            <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
+                            <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            {% if not request.user.is_authenticated %}
+            <div class="info__toolbox">
+                <a href="{% url 'account_login' %}">
+                    <span class="material-icons">person_outline</span>
+                </a>
+            </div>
+            {% else %}
+            <div class="info__toolbox">
+                <a href="{% url 'account_logout' %}">
+                    <span class="material-icons">exit_to_app</span>
+                </a>
+            </div>
+            <div class="info__toolbox">
+                <span class="material-icons">person</span>
+            </div>
+            {% endif %}
+        </span>
+    </nav>
 <br>
 {% if messages %}
     {% for message in messages %}
@@ -75,51 +147,6 @@
                 {% endif %}
             </ul>
         </div>
-    </div>
-    <div class="info__toolbox">
-        <label for="toolbox-toggle" class="material-icons icon-large info__toolbox-toggle"
-               onclick="return toggleDrawer(this)">
-            settings
-        </label>
-        <input class="toggle-input" id="toolbox-toggle" type="checkbox">
-        <ul class="info__toolbox-tools">
-            {% if original_url %}
-                <li>
-                    <div class="tooltip">
-                        <a class="material-icons tool" href="{{ original_url }}" target="_blank">open_in_browser</a>
-                        <span class="tooltiptext pre pre--inline tool-text">Original URL</span>
-                    </div>
-                </li>
-            {% else %}
-                <li>
-                    <div class="tooltip">
-                        <span class="material-icons md-inactive tool">open_in_browser</span>
-                        <span class="tooltiptext pre pre--inline tool-text">No Original URL</span>
-                    </div>
-                </li>
-            {% endif %}
-            {% if log_entry.ids %}
-                <li>
-                    <div class="tooltip">
-                        <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
-                        <span class="tooltiptext pre pre--inline tool-text copy">Copy All IDs</span>
-                    </div>
-                </li>
-            {% else %}
-                <li>
-                    <div class="tooltip">
-                        <span class="material-icons md-inactive tool">assignment</span>
-                        <span class="tooltiptext pre pre--inline tool-text copy">No IDs To Copy</span>
-                    </div>
-                </li>
-            {% endif %}
-            <li>
-                <div class="tooltip">
-                    <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
-                    <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
-                </div>
-            </li>
-        </ul>
     </div>
 </div>
 <div class="chatlog infinite-container">
