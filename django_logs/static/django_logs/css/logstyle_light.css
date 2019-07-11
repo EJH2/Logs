@@ -43,8 +43,8 @@ a, a.chatlog__embed-title {
 /* === Navbar === */
 
 nav {
-    background-color: #fff;
-    color: #4f5660;
+    background-color: #FFF;
+    color: #4F5660;
     -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, .1),
         0 1.5px 0 rgba(0, 0, 0, .025),
         0 2px 0 rgba(0, 0, 0, .025);
@@ -55,12 +55,12 @@ nav {
 
 nav span>a,
 nav span>div {
-    color: #4f5660;
+    color: #4F5660;
 }
 
 @media screen and (max-width: 500px) {
     nav .tooltip .tooltiptext.tool-text {
-        background-color: #f3f3f4;
+        background-color: #F3F3F4;
         border-top: 1px solid rgba(79, 79, 79, 0.1);
     }
 }

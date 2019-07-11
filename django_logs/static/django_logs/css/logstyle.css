@@ -203,9 +203,7 @@ nav .icon {
 nav .info__toolbox,
 nav .info__toolbox-toggle {
     padding: 0;
-    margin: 12px;
-    margin-right: 20px;
-    margin-left: 0;
+    margin: 12px 20px 12px 0;
     width: 24px;
     height: 24px;
     -webkit-touch-callout: none;
