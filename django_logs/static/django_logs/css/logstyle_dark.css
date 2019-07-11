@@ -41,6 +41,28 @@ a, a.chatlog__embed-title {
     background: rgba(250,166,26,.1);
 }
 
+/* === Navbar === */
+
+nav {
+    background-color: #36393f;
+    color: #fff;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .2),
+        0 1.5px 0 rgba(0, 0, 0, .05),
+        0 2px 0 rgba(0, 0, 0, .05);
+}
+
+nav span>a,
+nav span>div {
+    color: #fff;
+}
+
+@media screen and (max-width: 500px) {
+    nav .tooltip .tooltiptext.tool-text {
+        background-color: #282b30;
+        border-top: 1px solid rgba(245, 245, 245, 0.08);
+    }
+}
+
 /* === INFO === */
 
 .tooltip .tooltiptext {
