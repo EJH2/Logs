@@ -97,6 +97,10 @@ img {
     padding: 0 2px;
 }
 
+span.mention {
+    margin: 2px 0;
+}
+
 .mention:hover:not(.no-select) {
     cursor: pointer;
     transition: background-color 50ms ease-out, color 50ms ease-out;
