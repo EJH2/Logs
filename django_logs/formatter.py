@@ -16,7 +16,7 @@ if not demoji._EMOJI_PAT:
     demoji.set_emoji_pattern()
 
 
-def format_content_html(content: str, users: dict, masked_links: bool = False, newlines: bool = True) -> str:
+def format_content_html(content: str, users: dict = None, masked_links: bool = False, newlines: bool = True) -> str:
     # HTML-encode content
 
     def encode_codeblock(m):
@@ -161,7 +161,7 @@ def format_content_html(content: str, users: dict, masked_links: bool = False, n
     content = content.replace('@here', '<span class="mentioned mention no-select">@here</span>')
 
     def smart_mention(m):
-        if m.group(2) in users:
+        if users and m.group(2) in users:
             uid = m.group(2)
             return fr'<span class="mention user" title="{uid}">@{users[uid]["username"]}</span>'
         return fr'<span class="mention user" title="{m.group(2)}">{m.group(1)}</span>'
@@ -221,7 +221,7 @@ def format_content_html(content: str, users: dict, masked_links: bool = False, n
 #    Stripped Down Version for Embeds
 # ======================================
 
-def format_micro_content_html(content: str, users: dict, newlines: bool = True) -> str:
+def format_micro_content_html(content: str, users: dict = None, newlines: bool = True) -> str:
     def encode_codeblock(m):
         encoded = base64.b64encode(m.group(1).encode()).decode()
         return '\x1AM' + encoded + '\x1AM'
@@ -326,7 +326,7 @@ def format_micro_content_html(content: str, users: dict, newlines: bool = True) 
     content = content.replace('@here', '<span class="mentioned mention no-select">@here</span>')
 
     def smart_mention(m):
-        if m.group(2) in users:
+        if users and m.group(2) in users:
             uid = m.group(2)
             return fr'<span class="mention user" title="{uid}">@{users[uid]["username"]}</span>'
         return fr'<span class="mention user" title="{m.group(2)}">{m.group(1)}</span>'

@@ -17,7 +17,7 @@ class Log(models.Model):
     origin = models.CharField(max_length=10)
     url = models.TextField(null=True)
     short_code = models.CharField(max_length=15, editable=False, unique=True)
-    log_type = models.CharField(max_length=30)
+    log_type = models.CharField(max_length=30, null=True)
     generated_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True)
     data = fields.JSONField(null=True, editable=False)
@@ -85,10 +85,11 @@ class Entry:
 class User:
     def __init__(self, data):
         self.id = int(data['id']) if data.get('id') else None
-        self.name = data['username']
+        self.username = data['username']
         self.discriminator = data['discriminator']
         self.avatar_url = data['avatar']
         self.bot = data.get('bot', False)
+        self.color = f'#{data["color"]:06X}' if data.get('color') else None
 
     @property
     def default_avatar_url(self):
@@ -106,7 +107,7 @@ class User:
         return self
 
     def __str__(self):
-        return f'{self.name}#{self.discriminator}'
+        return f'{self.username}#{self.discriminator}'
 
     def __eq__(self, other):
         return other.__dict__ == self.__dict__
@@ -142,6 +143,8 @@ class Attachment:
             self.url = data['url']
             self.is_image = data['is_image']
             self.size = filesize(data['size'])
+            self.width = data.get('width')
+            self.height = data.get('height')
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -206,20 +209,24 @@ class Embed:
 
 
 class SerializedMessage:
-    def __init__(self, data, users):
-        self.id = int(data['message_id']) if data.get('message_id') else None
+    def __init__(self, data, users=None):
+        self.id = int(data['id']) if data.get('id') else None
+        self.channel_id = int(data.get('channel_id', 0))
+        self.guild_id = int(data.get('guild_id', 0))
         self.timestamp = data.get('timestamp')
         self.raw_content = data['content']
         self.content = format_content_html(self.raw_content, users, masked_links=True)
         self.attachments = [Attachment(a).__dict__ for a in data['attachments']]
         self.embeds = [SerializedEmbed(e, users).__dict__ for e in data['embeds']]
         self.author = User(data['author']).__dict__
-        self.edited = data.get('edited', False)
+        self.edited_timestamp = data.get('edited_timestamp')
 
 
 class Message:
     def __init__(self, data):
         self.id = int(data['id']) if data.get('id') else None
+        self.channel_id = data.get('channel_id')
+        self.guild_id = data.get('guild_id')
         ts = data.get('timestamp')
         self.created_at = dateutil.parser.parse(ts, default=datetime.now(tz=pytz.UTC)) if ts else None
         self.created_iso = self.created_at.isoformat() if ts else None
@@ -231,7 +238,8 @@ class Message:
         self.attachments = [Attachment.from_dict(a) for a in data['attachments']]
         self.embeds = [Embed.from_dict(e) for e in data['embeds']]
         self.author = User.from_dict(data['author'])
-        self.edited = data.get('edited', False)
+        self.edited_timestamp = dateutil.parser.parse(data['edited_timestamp'], default=datetime.now(tz=pytz.UTC)) \
+            if data.get('edited_timestamp') else None
 
         # Check to see if the message has any content, and if not, make the message an error
         self.error = ''

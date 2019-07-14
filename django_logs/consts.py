@@ -20,9 +20,9 @@ giraffeduck_re = r'\[(?P<time>[\d\-\ \:]{19})\] \((?P<mid>\d{16,18})\) (?P<uname
 auttaja_re = r'\[(?P<time>[\w :]{24,25})\] \((?P<uname>.*?)#(?P<disc>\d{4}) - (?P<uid>\d{16,18})\) \[(?P<mid>\d{16,18' \
              r'})\]: (?P<content>[\S\s]*?)(?: (?P<attach>(?:http(?:|s):.*))?)?$'
 
-logger_re = r'(?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?:(?:https://(?:cdn\.)?discordapp\.com/(?:' \
-            r'avatars/\d{16,18}|assets)/(?P<avatar>\w+)\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) \(' \
-            r'[\w ]+\): (?P<content>[\S\s]*?) \| (?P<embeds>(?:{\"embeds\": \[.*?))? \| (?: =====> Attachment:.*?:' \
+logger_re = r'(?P<uname>.*?)#(?P<disc>\d{4}) \((?P<uid>\d{16,18})\) \| \((?P<avatar>(?:https://(?:cdn\.)?discordapp\.' \
+            r'com/(?:avatars/\d{16,18}|assets|embed/avatars)/\w+\.\w{3,4}(?:\?[\w=]+)?))\) \| (?P<time>[\w :-]{33}) ' \
+            r'\([\w ]+\): (?P<content>[\S\s]*?) \| (?P<embeds>(?:{\"embeds\": \[.*?))? \| (?: =====> Attachment:.*?:' \
             r'(?P<attach>(?:http(?:|s):.*)))?$'
 
 sajuukbot_re = r'\[(?P<time>[\w :.-]{26})\] (?P<uname>.*?)#(?P<disc>\d{4}) \((?P<mid>[\d]{16,18}) \/ (?P<uid>[\d]' \
@@ -36,8 +36,8 @@ gearbot_re = r'(?P<time>[\w\-. :]{26}) (?P<gid>\d{16,18}) - (?P<cid>\d{16,18}) -
               r'))?)?$'
 
 capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\d]{16,18}) \/ (?P<uid>[\d]{16,18})\) ' \
-             r'\((?:(?:https://(?:cdn\.)?discordapp\.com/(?:avatars/\d{16,18}|(?P<asset>assets))/(?P<avatar>\w+)\.\w' \
-             r'{3,4}(?:\?[\w=]+)?))\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?' \
+             r'\((?P<avatar>(?:https://(?:cdn\.)?discordapp\.com/(?:avatars/\d{16,18}|assets|embed/avatars)/\w+\.\w{3' \
+             r',4}(?:\?[\w=]+)?))\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?' \
              r':|s):.*))? \| (?P<embeds>(?:{\"embeds\": \[).*?)?$'
 
 modmailbot_re = r'\[(?P<time>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\] (?:\(Anonymous\) )?\(.*?\))? (?P<uname>' \

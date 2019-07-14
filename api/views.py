@@ -1,3 +1,4 @@
+import json
 import re
 import time
 from urllib.parse import urlparse
@@ -21,6 +22,54 @@ from django_logs.utils import get_expiry, request_url
 
 
 # Create your views here.
+class JsonView(APIView):
+    """
+    post:
+    Create a log based on raw json for the messages. The request parameters are the same as the other post request.
+    """
+
+    permission_classes = [IsAuthenticated, IsWhitelisted]
+    schema = schema.CustomJsonSchema()
+
+    @staticmethod
+    def post(request):
+        t = time.time()
+        data = request.POST
+        if 'json' not in data:
+            resp = {'detail': 'Request body must [json] to parse!'}
+            return Response(resp, status=400)
+
+        if data.get('type') and data.get('type') not in regexps:
+            resp = {'detail': f'Log type must be one of [{", ".join(regexps.keys())}]!'}
+            return Response(resp, status=400)
+
+        try:
+            js = json.loads(data['json'])
+        except json.decoder.JSONDecodeError:
+            resp = {'detail': 'Malformed json received!'}
+            return Response(resp, status=400)
+
+        if not js:
+            resp = {'detail': 'Log content must not be empty!'}
+            return Response(resp, status=400)
+
+        log_type = data.get('type')
+        author = request.user if request.user.is_authenticated else None
+        premium = request.user.is_staff or not bool(SocialAccount.objects.filter(user=author).first())
+        expires = get_expiry(data, premium)
+
+        kwargs = {'expires': expires, 'guild_id': data.get('guild_id')}
+        short, created = LogParser.parse(js, log_type, author, new=data.get('new'), **kwargs)
+        data = {
+            'short': short,
+            'url': f'http{"s" if request.is_secure() else ""}://{request.META["HTTP_HOST"]}/{short}',
+            'created': created,
+            'expires': expires,
+            'time': time.time() - t
+        }
+        return Response(data, status=201 if created else 200)
+
+
 class LogView(APIView):
     """
     get:

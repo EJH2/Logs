@@ -11,6 +11,7 @@ API provided to logged-in users. In order to use this API, users must authentica
 urlpatterns = [
     path('', include_docs_urls(title='Django Logs API', public=False, description=description)),
     re_path('logs/?$', views.LogView.as_view()),
+    re_path(r'json/', views.JsonView.as_view()),
     re_path('token/?$', views.GetToken.as_view(), name='get_token'),
     re_path(r'logs/(?P<short_code>[\w]{5})/?$', views.LogRead.as_view()),
     re_path(r'traceback/?$', views.GetTraceback.as_view(), name='traceback'),

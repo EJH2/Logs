@@ -7,6 +7,63 @@ def get_fields(method: str, fields: dict):
     return fields[method]
 
 
+class CustomJsonSchema(schemas.AutoSchema):
+
+    def get_manual_fields(self, path, method):
+        return self._manual_fields + get_fields(method, json_fields)
+
+
+json_fields = {
+    'POST': [
+        coreapi.Field(
+            'type',
+            required=False,
+            location='form',
+            type='integer',
+            schema=coreschema.Array(
+                description='Type of log',
+            ),
+        ),
+        coreapi.Field(
+            'new',
+            required=False,
+            location='form',
+            type='boolean',
+            schema=coreschema.Array(
+                description='Force creation of new log'
+            )
+        ),
+        coreapi.Field(
+            'json',
+            required=True,
+            location='form',
+            type='JSON object',
+            schema=coreschema.Array(
+                description='JSON object with raw message data, example found at https://mystb.in/nihubativo.json'
+            )
+        ),
+        coreapi.Field(
+            'expires',
+            required=False,
+            location='form',
+            type='integer',
+            schema=coreschema.Array(
+                description='Seconds until log expiration'
+            )
+        ),
+        coreapi.Field(
+            'guild_id',
+            required=False,
+            location='form',
+            type='integer',
+            schema=coreschema.Array(
+                description='Link log to a specific guild'
+            )
+        ),
+    ]
+}
+
+
 class CustomViewSchema(schemas.AutoSchema):
 
     def get_manual_fields(self, path, method):
