@@ -109,7 +109,7 @@ def parse_messages(self, match_data: dict):
     data['messages'] = messages
 
     def sort_alphabetical(value):
-        return value['name']
+        return value['username']
 
     users.sort(key=sort_alphabetical)
     data['users'] = users

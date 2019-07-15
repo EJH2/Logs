@@ -107,7 +107,8 @@ class User:
         return self
 
     def __str__(self):
-        return f'{self.username}#{self.discriminator}'
+        name = getattr(self, 'username', None) or getattr(self, 'name', None)
+        return f'{name}#{self.discriminator}'
 
     def __eq__(self, other):
         return other.__dict__ == self.__dict__
