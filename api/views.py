@@ -40,17 +40,21 @@ class JsonView(APIView):
             return Response(resp, status=400)
 
         if data.get('type') and data.get('type') not in regexps:
-            resp = {'detail': f'Log type must be one of [{", ".join(regexps.keys())}]!'}
+            resp = {'detail': f'Log type must be one of [{", ".join(regexps.keys())}], or omitted!'}
             return Response(resp, status=400)
 
         try:
             js = json.loads(data['json'])
         except json.decoder.JSONDecodeError:
-            resp = {'detail': 'Malformed json received!'}
+            resp = {'detail': 'Malformed JSON received!'}
             return Response(resp, status=400)
 
         if not js:
-            resp = {'detail': 'Log content must not be empty!'}
+            resp = {'detail': 'JSON must not be empty!'}
+            return Response(resp, status=400)
+
+        if not isinstance(js, list):
+            resp = {'detail': 'JSON must be a list of messages!'}
             return Response(resp, status=400)
 
         log_type = data.get('type')
