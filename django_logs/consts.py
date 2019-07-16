@@ -79,9 +79,6 @@ types = {
 }
 
 rowboat_types = {
-    'air.aetherya.stream': (
-        'airplane', 'A1RPL4NE'
-    ),
     'dashboard.aperturebot.science': (
         'aperture', 'Aperture'
     ),
