@@ -194,6 +194,35 @@
                             {% endif %}
                         </div>
                     {% endif %}
+                    {% for attachment in message.attachments %}
+                        <div class="chatlog__attachment">
+                            {% if attachment.is_image %}
+                                <a href="#{{ attachment.filename }}">
+                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'django_logs/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'"/>
+                                </a>
+                            {% else %}
+                                <a href="{{ attachment.url }}">
+                                    <div class="horizontal">
+                                        <img class="icon" src="{% static 'django_logs/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
+                                        <div class="chatlog__attachment-inner">
+                                            <div class="filename-link">
+                                                <a class="filename-link-inner" href="{{ attachment.url }}">{{ attachment.filename }}</a>
+                                            </div>
+                                            <div class="chatlog__attachment-size">{{ attachment.size }}</div>
+                                        </div>
+                                        <a class="filename-link-inner" href="{{ attachment.url }}">
+                                            <svg name="Download" class="chatlog__attachment-download" width="24" height="24" viewBox="0 0 24 24">
+                                                <g fill="none" fill-rule="evenodd">
+                                                    <path d="M0 0h24v24H0z"></path>
+                                                    <path class="fill" fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                                                </g>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                     {% for embed in message.embeds %}
                         <div class="chatlog__embed">
                             <div class="chatlog__embed-color-pill" style="background-color: {{ embed.color }}"></div>
@@ -272,35 +301,6 @@
                                     {% endif %}
                                 {% endif %}
                             </div>
-                        </div>
-                    {% endfor %}
-                    {% for attachment in message.attachments %}
-                        <div class="chatlog__attachment">
-                            {% if attachment.is_image %}
-                                <a href="#{{ attachment.filename }}">
-                                    <img class="chatlog__attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'django_logs/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'"/>
-                                </a>
-                            {% else %}
-                                <a href="{{ attachment.url }}">
-                                    <div class="horizontal">
-                                        <img class="icon" src="{% static 'django_logs/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
-                                        <div class="chatlog__attachment-inner">
-                                            <div class="filename-link">
-                                                <a class="filename-link-inner" href="{{ attachment.url }}">{{ attachment.filename }}</a>
-                                            </div>
-                                            <div class="chatlog__attachment-size">{{ attachment.size }}</div>
-                                        </div>
-                                        <a class="filename-link-inner" href="{{ attachment.url }}">
-                                            <svg name="Download" class="chatlog__attachment-download" width="24" height="24" viewBox="0 0 24 24">
-                                                <g fill="none" fill-rule="evenodd">
-                                                    <path d="M0 0h24v24H0z"></path>
-                                                    <path class="fill" fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
-                                                </g>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </a>
-                            {% endif %}
                         </div>
                     {% endfor %}
                 {% endfor %}
