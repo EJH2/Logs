@@ -27,6 +27,11 @@ h2 {
 
 ul {
     color: #FFFFFF;
+    padding: unset;
+}
+
+ul.patreon-supporters li {
+    line-height: 1.5rem
 }
 
 p {
@@ -72,6 +77,10 @@ button:hover:not(.ghost) {
 
 button:focus {
     outline: none;
+}
+
+button.ghost.patreon-supporters {
+    border-color: transparent;
 }
 
 button.ghost {

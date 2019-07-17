@@ -1,7 +1,7 @@
 {% extends 'socialbase.html' %}
 
 {% block title %}Perks{% endblock %}
-{% block js %}{% endblock %}
+{% load static %}
 
 {% block ghostright %}
 <div class="overlay-panel overlay-right">
@@ -13,6 +13,10 @@
         <li>Access to API</li>
         <li>Log analytics (coming soon!)</li>
     </ul>
+    <br>
+    <p>However... Patrons get even more cool stuff!</p>
+    <button id="signUp" class="ghost">Check it out!</button>
+
 </div>
 {% endblock %}
 
@@ -25,5 +29,28 @@
         <br>
         <button type="submit">Sign Up</button>
     </form>
+</div>
+{% endblock %}
+
+{% block solidright %}
+<div class="form-container sign-up-container">
+    <form>
+        <h1>Patreon Supporters</h1>
+        <ul class="patreon-supporters" style="list-style: none;">
+            <li style="text-align: center;">jagrosh#4824</li>
+            <li style="text-align: center;">James Bond#0007</li>
+            <li style="text-align: center;">Eagle#3636</li>
+            <li style="text-align: center;">Minimh#7719</li>
+        </ul>
+    </form>
+</div>
+{% endblock %}
+
+{% block ghostleft %}
+<div class="overlay-panel overlay-left">
+    <h1>Become a Patron!</h1>
+    <p>We offer more perks to generous people, who can donate here!</p>
+    <a href="https://www.patreon.com/bePatron?u=2802418"><img style="border-radius: 26px" alt="Become a Patron Today!" src="{% static 'django_logs/icons/become_a_patron_button.png' %}"></a>
+    <button class="ghost patreon-supporters" id="signIn">Go Back</button>
 </div>
 {% endblock %}
