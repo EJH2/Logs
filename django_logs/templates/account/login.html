@@ -2,6 +2,22 @@
 {% load socialaccount %}
 
 {% block title %}Login{% endblock %}
+{% load static %}
+{% block js %}<script src="{% static 'django_logs/js/social.js' %}"></script>
+<script>
+window.addEventListener('DOMContentLoaded', (event) => {
+    let user_keys = [];
+    const keys = '38,38,40,40,37,39,37,39,66,65';
+    document.onkeydown = function (e) {
+        user_keys.push(e.keyCode);
+
+        if (user_keys.toString().indexOf(keys) >= 0) {
+            container.classList.add("right-panel-active");
+            user_keys = [];
+        }
+    };
+});
+</script>{% endblock %}
 
 {% block solidright %}
 <div class="form-container sign-up-container">
@@ -25,7 +41,6 @@
         <h1>Sign In</h1>
         <br>
         <button>Discord</button>
-        <a id="signUp" href="#">Use Password Form</a>
     </form>
 </div>
 {% endblock %}
@@ -42,6 +57,6 @@
 <div class="overlay-panel overlay-right">
     <h1>Hello, Friend!</h1>
     <p>Signing in with your Discord account gives you access to more features</p>
-    <a href="{% url 'perks' %}"><button class="ghost">Perks</button></a>
+    <a href="{% url 'perks' %}"><button id="signUp" class="ghost">Perks</button></a>
 </div>
 {% endblock %}
