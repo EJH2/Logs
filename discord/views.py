@@ -15,7 +15,7 @@ class CustomDiscordOAuth2Adapter(DiscordAdapter):
         extra_data = requests.get(self.profile_url, headers=headers).json()
         guild_data = requests.get(self.guilds_url, headers=headers).json()
 
-        extra_data['guilds'] = guild_data if not guild_data.get('code') else []
+        extra_data['guilds'] = guild_data if isinstance(guild_data, list) else []
 
         return self.get_provider().sociallogin_from_response(
             request,
