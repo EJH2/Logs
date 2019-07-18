@@ -187,6 +187,10 @@ def parse_json(self, json_data: dict):
                 if any([a['height'], a['width'],
                         a['filename'].rsplit('.', 1)[-1] in ['png', 'jpg', 'jpeg', 'gif', 'webm', 'webp', 'mp4']]):
                     a['is_image'] = True
+                    continue
+                if re.match(r'data:(?:image/(?P<mimetype>\w+))?(?:;(?P<b64>base64))?,(?P<data>(?:[A-Za-z0-9+/]{4})'
+                            r'``*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)', a['url']):
+                    a['is_image'] = True
 
         messages.append(SerializedMessage(msg).__dict__)
 
