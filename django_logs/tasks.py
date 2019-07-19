@@ -57,26 +57,11 @@ def parse_messages(self, match_data: dict):
         if not uid:
             uid = f'{user["username"]}#{user["discriminator"]}'
 
-        def get_avatar(default_avatar: bool = False):
-            if default_avatar:
-                return f'https://cdn.discordapp.com/embed/avatars/{int(user["discriminator"]) % 5}.png'
-            if match.get('asset'):
-                return f'https://discordapp.com/assets/{user["avatar"]}.png'
-            ending = 'gif' if user['avatar'].startswith('a_') else 'png'
-            return f'https://cdn.discordapp.com/avatars/{uid}/{user["avatar"]}.{ending}'
+        def get_default():
+            return f'https://cdn.discordapp.com/embed/avatars/{int(user["discriminator"]) % 5}.png'
 
         if uid not in _users:
-            if user.get('avatar'):  # User supplied avatar, don't bombard Discord's API
-                user['avatar'] = get_avatar()
-            # if uid.isdigit() and DISCORD_TOKEN:  # Probably a valid ID, let's try and hit the API
-            #     with requests.get(f'{DISCORD_API_URL}/{uid}', headers=DISCORD_HEADERS) as r:
-            #         _user = r.json()
-            #         if not _user.get('message'):  # No error code, so Discord found the user
-            #             user = _user
-            #             if user.get('avatar') is not None:
-            #                 user['avatar'] = get_avatar()
-
-            user['avatar'] = user['avatar'] or get_avatar(default_avatar=True)
+            user['avatar'] = user['avatar'] or get_default()
             _users[uid] = user
             users.append(User(user).__dict__)
         else:
