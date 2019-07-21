@@ -44,7 +44,7 @@ class JsonView(APIView):
             return Response(resp, status=400)
 
         try:
-            js = json.loads(data['json'])
+            js = json.loads(rf"""{data['json']}""")
         except json.decoder.JSONDecodeError:
             resp = {'detail': 'Malformed JSON received!'}
             return Response(resp, status=400)
