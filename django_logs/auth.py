@@ -87,7 +87,8 @@ class IsWhitelisted(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        if not request.data.get('type'):  # Don't quite know how to handle this, so push it further along!
+        # Don't quite know how to handle this, so push it further along!
+        if not isinstance(request.data, dict) or not request.data.get('type'):
             return True
         if request.user.is_staff:
             return True
