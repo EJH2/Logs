@@ -36,11 +36,11 @@ permission_enums = {
 class Permissions:
     __slots__ = ('value',)
 
-    def __init__(self, permissions=0):
-        if not isinstance(permissions, int):
-            raise TypeError('Expected int parameter, received %s instead.' % permissions.__class__.__name__)
+    def __init__(self, perms=0):
+        if not isinstance(perms, int):
+            raise TypeError('Expected int parameter, received %s instead.' % perms.__class__.__name__)
 
-        self.value = permissions
+        self.value = perms
 
     def has_perm(self, index):
         if bool((self.value >> permission_enums.get('administrator', 0)) & 1):
@@ -48,7 +48,7 @@ class Permissions:
         return bool((self.value >> permission_enums.get(PermissionType(index).name, 0)) & 1)
 
 
-def user_has_permission(user, permissions: list, guild_id: int, any_or_all):
+def user_has_permission(user, perms: list, guild_id: int, any_or_all):
     if not user.is_authenticated:
         return False
 
@@ -65,7 +65,7 @@ def user_has_permission(user, permissions: list, guild_id: int, any_or_all):
     guild = guild[0]
     user_perms = Permissions(guild['permissions'])
     total_perms = []
-    for permission in permissions:
+    for permission in perms:
         total_perms.append(user_perms.has_perm(permission))
 
     return any_or_all(total_perms)
