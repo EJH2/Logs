@@ -104,6 +104,9 @@ def format_content_html(content: str, users: dict = None, masked_links: bool = F
     # Process unicode emojis
     content = demoji.replace(content, process_unicode_emojis)
 
+    # Process block quotes (> text or >>> te\ntx)
+    content = re.sub(r'^&gt; (.+)$|^(?:&gt;){3} ([\S\s]+)$', r'<blockquote>\1\2</blockquote>', content)
+
     # Process bold (**text**)
     content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
 

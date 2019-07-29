@@ -942,6 +942,12 @@ body {
     margin: 0 4px;
 }
 
+blockquote {
+    border-left: 4px solid transparent;
+    padding: 0 8px 0 12px;
+    margin: 8px 0;
+}
+
 .chatlog__reactions {
     display: flex;
 }

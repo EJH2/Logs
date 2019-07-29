@@ -206,6 +206,10 @@ nav span>div {
     color: #CACBCE;
 }
 
+blockquote {
+    border-color: #c7ccd1;
+}
+
 .chatlog__spoiler-box.chatlog__spoiler-hidden {
     background-color: #B9BBBE;
 }
