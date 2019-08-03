@@ -143,7 +143,7 @@ class Attachment:
             self.filename = data['filename']
             self.url = data['url']
             self.is_image = data['is_image']
-            self.size = filesize(data.get('size', 0))
+            self.size = filesize(data.get('size') or 0)
             self.width = data.get('width')
             self.height = data.get('height')
 
