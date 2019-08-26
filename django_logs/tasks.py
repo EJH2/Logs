@@ -164,7 +164,8 @@ def parse_json(self, json_data: dict):
 
         if msg.get('mentions'):
             for m in msg['mentions']:
-                re.sub(rf'<@!?{m["id"]}>', f'<@{m["username"]}#{m["discriminator"]} ({m["id"]})', msg['content'])
+                msg['content'] = re.sub(rf'<@!?{m["id"]}>', f'<@{m["username"]}#{m["discriminator"]} ({m["id"]})>',
+                                        msg['content'])
 
         if msg.get('attachments'):
             for a in msg['attachments']:
