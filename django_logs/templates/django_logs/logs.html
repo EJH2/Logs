@@ -321,7 +321,7 @@
 <script>
     for (let s of document.querySelectorAll('span.mention')) {
         if (s.title === '{{ uid }}') {
-            s.classList.add('mentioned');
+            s.parentElement.classList.add('mentioned');
         }
     }
 </script>

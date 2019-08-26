@@ -41,10 +41,6 @@ function loadJS() {
             return copyIDMention(s);
         }
     }
-
-    for (let s of document.querySelectorAll('span.mentioned')) {
-        s.parentElement.classList.add('mentioned')
-    }
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
