@@ -1,0 +1,230 @@
+/* === GENERAL === */
+
+body {
+    background-color: #2F3135;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#header-data b {
+    color: #FFFFFF;
+}
+
+a, a.message-embed-title {
+    color: #0096CF;
+}
+
+.hljs.pre--multiline {
+    background-color: #2F3136;
+}
+
+.pre {
+    background-color: #2F3136;
+}
+
+.pre--multiline {
+    border-color: #282B30;
+    color: #839496;
+    max-width: 90%;
+}
+
+.mention {
+    background-color: rgba(114, 137, 218, .1);
+    color: #7289DA;
+}
+
+.mention:hover:not(.mentioned) {
+    background-color: rgba(114, 137, 218, .7);
+    color: #FFF;
+}
+
+.mentioned {
+    background: rgba(250,166,26,.1);
+}
+
+/* === NAV BAR === */
+
+nav {
+    background-color: #36393F;
+    color: #FFF;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .2),
+        0 1.5px 0 rgba(0, 0, 0, .05),
+        0 2px 0 rgba(0, 0, 0, .05);
+}
+
+nav span>a,
+nav span>div {
+    color: #FFF;
+}
+
+@media screen and (max-width: 500px) {
+    nav .tooltip .tooltiptext.tool-text {
+        background-color: #282B30;
+        border-top: 1px solid rgba(245, 245, 245, 0.08);
+    }
+}
+
+/* === HEADER === */
+
+.tooltip .tooltiptext {
+    background-color: #555;
+    color: #FFF;
+}
+
+.material-icons.md-inactive, .material-icons.md-inactive:hover {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+#log-type {
+    color: #FFF;
+}
+
+#log-created-at span {
+    color: #FFF;
+}
+
+#message-count span {
+    color: #FFF;
+}
+
+#user-list {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#user-list span {
+    color: #FFF;
+}
+
+.material-icons {
+    color: #C2C2C4;
+}
+
+.material-icons:hover {
+    color: white;
+}
+
+.copied {
+    animation: copied .5s ease-out;
+}
+
+.copied.mention {
+    animation: copiedMention .5s ease-out;
+}
+
+@keyframes copied {
+    0% {
+        background-color: #555
+    }
+    50% {
+        background-color: #3A0
+    }
+    100% {
+        background-color: #555
+    }
+}
+
+@keyframes copiedMention {
+    0% {
+        background-color: rgba(114, 137, 218, .7);
+        color: #FFF;
+    }
+    50% {
+        background-color: #3A0;
+        color: #FFF;
+    }
+    100% {
+        background-color: rgba(114, 137, 218, .7);
+        color: #FFF;
+    }
+}
+
+/* === MESSAGES === */
+
+.message-group {
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+.author-name {
+    color: #FFF;
+}
+
+.message-timestamp {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.message-edited-timestamp {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.message-attachment .horizontal {
+    background-color: rgba(47, 49, 54, .3);
+    border-color: rgba(47, 49, 54, .6);
+}
+
+.message-attachment .filename-link {
+    color: rgba(0, 176, 244, .85);
+}
+
+.message-attachment .filename-link-inner {
+    color: #00B0F4;
+}
+
+.message-embed-inner {
+    background-color: rgba(46, 48, 54, .3);
+    border: 1px solid rgba(46, 48, 54, .6);
+}
+
+.message-embed-author-name {
+    color: #FFF;
+}
+
+.message-embed-author-name-link {
+    color: #FFF;
+}
+
+.message-embed-title {
+    color: #FFF;
+}
+
+.message-embed-description {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.message-embed-field-name {
+    color: #FFF;
+}
+
+.message-embed-field-value {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.message-embed-footer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.message-embed-footer-separator {
+    color: #4F545C;
+}
+
+.spoiler-box.spoiler-hidden {
+    background-color: #202225;
+}
+
+.spoiler-box.spoiler-hidden:hover {
+    background-color: #24262A;
+}
+
+.spoiler-box {
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+blockquote {
+    border-color: #4f545c;
+}
+
+.message-reaction {
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+.message-reaction-count {
+    color: rgba(255, 255, 255, 0.3);
+}

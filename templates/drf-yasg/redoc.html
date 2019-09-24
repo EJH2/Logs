@@ -1,0 +1,45 @@
+{% extends 'drf-yasg/redoc.html' %}
+
+{% block extra_styles %}
+    <style>
+        .bRFgPh > .diqfaT {
+            padding: 0 40px;
+        }
+        .dykNiJ:not([id]) {
+            padding: 40px 40px 0 0;
+        }
+        .dykNiJ[id^=section], .dykNiJ[id^=tag] {
+            padding: 0;
+        }
+        @media print, screen and (max-width: 85rem) {
+            div.diqfaT {
+                width: 100%;
+                padding: 0 40px 40px 40px;
+            }
+        }
+        .csNTMr[id^=operation] {
+            padding: 0 0 40px 0;
+        }
+        .csNTMr[id^=operation] ~ .csNTMr[id^=operation] {
+            padding: 40px 0;
+        }
+    </style>
+{% endblock %}
+{% block extra_scripts %}
+        <script>
+    async function getApikey (refresh) {
+        let url = '{{ request.scheme }}://{{ request.get_host }}{% url 'get_token' version='v1' %}';
+        if (refresh) url = '{{ request.scheme }}://{{ request.get_host }}{% url 'get_token' version='v1' %}?refresh=1';
+        const e = document.getElementById('apikey');
+
+        const req = await fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        }).catch((err) => {
+            console.error('An error has occurred:', err);
+        });
+        e.value = (await req.json()).token
+    }
+    </script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'discord_logview/logbase.html' %}
+{% load static %}
+{% block title %}Discord Log Viewer{% endblock %}
+{% block header-icon %}
+    <img id="header-icon" src="{% static 'discord_logview/icons/white_file.png' %}" alt="">
+{% endblock %}
+{% block header-data %}
+    <div id="log-type">
+        <span>Logs From File</span>
+    </div>
+        <div id="log-created-at"><span>Created:</span>
+            <b>just now</b></div>
+    <div id="message-count"><span>Message Count:</span>
+        <b>1</b></div>
+    <div id="user-list">
+        <span>User: </span>
+        <label id="user-list-toggle" class="material-icons">
+            <input type="checkbox" style="display: none" onclick="return toggleUsers()">
+            arrow_right
+        </label>
+        <ul id="users">
+            <li class="user tooltip">
+                <span class="info__user-name">
+                    <b>Discord Log Viewer</b>#0000
+                </span>
+                <span class="tooltiptext pre pre--inline id">0</span>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+{% block messages %}
+    <div class="message-group">
+        <div class="author-avatar-container">
+            <img class="author-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
+        </div>
+        <div class="messages">
+            <div class="author-header">
+                <span>
+                    <span class="author-name" title="Discord Log Viewer#0000">Discord Log Viewer</span>
+                </span>
+                    <time class="message-timestamp" datetime="{{ iso }}"></time>
+            </div>
+            <div class="message-content">
+                Welcome to <b>Discord Log Viewer!</b><br><br>Format virtually any log file into an aesthetically pleasing and readable format. Currently, we support:<br>
+
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> Emojis <img class="emoji" title=":sunglasses:" src="https://twemoji.maxcdn.com/2/svg/1f60e.svg" alt="😎"> <img class="emoji" title=":ok_hand:" src="https://twemoji.maxcdn.com/2/svg/1f44c-1f3fd.svg" alt="👌🏽"><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <i>Italics</i> <br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <b>Bold</b><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <u>Underline</u><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <s>Strikethrough</s><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="pre pre--inline">Inline code</span><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="spoiler-box spoiler-hidden"><span class="spoiler-text">Spoilers</span></span><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="spoiler-box spoiler-hidden"><span class="spoiler-text"><b><i><u><s><span class="pre pre--inline">A combination of all of them</span></s></u></i></b></span></span><br>
+                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> Multi-line code<br>
+                <div class="pre pre--multiline hljs">Click the image below!</div>
+            </div>
+            <div class="message-attachment">
+                <a href="#0.png">
+                    <img class="message-attachment-thumbnail" style="max-height: 50px;max-width: 50px" src="https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png" alt="attachment" data-id="0.png" onerror="this.src='/static/discord_logview/icons/dead_attachment.svg'; this.title='attachment unavailable'">
+                </a>
+            </div>
+            <div class="message-embed">
+                <div class="message-embed-color-pill" style="background-color: #14C941"></div>
+                <div class="message-embed-inner">
+                    <div class="message-embed-content">
+                        <div class="message-embed-content-inner message-content">
+                            <div class="message-embed-author">
+                                <img alt="" class="message-embed-author-icon" src="https://cdn.discordapp.com/embed/avatars/4.png">
+                                <a class="message-embed-author message-embed-author-name-link message-embed-link" href="https://discordapp.com">Embeds too!</a>
+                            </div>
+                            <div class="message-embed-description">Heck, even attachments are included...</div>
+                            <div class="message-embed-fields">
+                                <div class="message-embed-field ">
+                                    <div class="message-embed-field-name">How can I start using this? <img class="emoji" title=":thinking_face:" src="https://twemoji.maxcdn.com/2/svg/1f914.svg" alt="🤔"></div>
+                                    <div class="message-embed-field-value">Simply go <a href="{% url 'new' %}">here</a>!</div>
+                                </div>
+                                <div class="message-embed-field ">
+                                    <div class="message-embed-field-name">What can I use this with? <img class="emoji" title=":scream:" src="https://twemoji.maxcdn.com/2/svg/1f631.svg" alt="😱"></div>
+                                    <div class="message-embed-field-value"><div class="pre pre--multiline hljs"># Supported log types:
+<span class="hljs-addition">+ Auttaja</span>
+<span class="hljs-addition">+ CapnBot</span>
+<span class="hljs-addition">+ GearBot</span>
+<span class="hljs-addition">+ GiraffeDuck</span>
+<span class="hljs-addition">+ Invite Deleter</span>
+<span class="hljs-addition">+ Rosalina Bottings</span>
+<span class="hljs-addition">+ Rowboat</span>
+    - Aperture
+    - Flygbåt
+    - Heimdallr
+    - Jetski
+    - LMG Showboat
+    - Rawgoat
+    - Speedboat
+<span class="hljs-addition">+ SajuukBot</span>
+<span class="hljs-addition">+ Vortex</span></div></div>
+                                </div>
+                                <div class="message-embed-field ">
+                                    <div class="message-embed-field-name">Want to contact me?</div>
+                                    <div class="message-embed-field-value">If you find something we don't support, or just want to chat, feel free to message EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a>!</div>
+                                </div>
+                                <div class="message-embed-field message-embed-field-inline">
+                                    <div class="message-embed-field-name">Feeling generous?</div>
+                                    <div class="message-embed-field-value">I created this as a hobby, but it has expanded to much more than that. If you enjoy this, please consider donating on my <a href="https://patreon.com/logview">Patreon</a>!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="message-embed-footer">
+                        <time class="message-embed-footer-text" datetime="{{ iso }}"></time>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

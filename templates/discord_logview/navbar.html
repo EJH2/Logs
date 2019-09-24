@@ -1,0 +1,76 @@
+<nav>
+    <input type="checkbox" id="nav-toggle">
+    <label for="nav-toggle" class="icon">
+        <span class="hamburger-icon"></span>
+    </label>
+    <span>
+        <a href="{% url 'index' %}">Discord Log Viewer</a>
+    </span>
+    <span>
+        <div class="toolbox">
+            <label id="toolbox-toggle-label" for="toggle-input" class="material-icons icon-large"
+                onclick="return toggleDrawer(this)">
+                settings
+            </label>
+            <input id="toggle-input" type="checkbox">
+            <ul class="toolbox-tools">
+                {% if log.raw_content %}
+                    <li>
+                        <div class="tooltip">
+                            {% if log.is_preview %}
+                                <a class="material-icons tool" href="{% url 'log-preview-raw' pk=log.uuid %}" target="_blank">open_in_browser</a>
+                            {% else %}
+                                <a class="material-icons tool" href="{% url 'log-raw' pk=log.uuid %}" target="_blank">open_in_browser</a>
+                            {% endif %}
+                            <span class="tooltiptext pre pre--inline tool-text">Raw Content</span>
+                        </div>
+                    </li>
+                {% else %}
+                    <li>
+                        <div class="tooltip">
+                            <span class="material-icons md-inactive tool">open_in_browser</span>
+                            <span class="tooltiptext pre pre--inline tool-text">No Raw Content</span>
+                        </div>
+                    </li>
+                {% endif %}
+                {% if log.users %}
+                    <li>
+                        <div class="tooltip">
+                            <span class="material-icons tool" onclick="return copyAllMenu(this)">assignment</span>
+                            <span class="tooltiptext pre pre--inline tool-text copy">Copy All User IDs</span>
+                        </div>
+                    </li>
+                {% else %}
+                    <li>
+                        <div class="tooltip">
+                            <span class="material-icons md-inactive tool">assignment</span>
+                            <span class="tooltiptext pre pre--inline tool-text copy">No User IDs To Copy</span>
+                        </div>
+                    </li>
+                {% endif %}
+                <li>
+                    <div class="tooltip">
+                        <span class="material-icons tool" onclick="return toggleTheme()">brightness_medium</span>
+                        <span class="tooltiptext pre pre--inline tool-text">Change Theme</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        {% if not request.user.is_authenticated %}
+        <div class="toolbox">
+            <a href="{% url 'account_login' %}">
+                <span class="material-icons">person_outline</span>
+            </a>
+        </div>
+        {% else %}
+        <div class="toolbox">
+            <a href="{% url 'account_logout' %}">
+                <span class="material-icons">exit_to_app</span>
+            </a>
+        </div>
+        <div class="toolbox">
+            <span class="material-icons">person</span>
+        </div>
+        {% endif %}
+    </span>
+</nav>

@@ -1,0 +1,34 @@
+{% extends 'discord_logview/logbase.html' %}
+{% load static %}
+{% block header-icon %}
+    <img id="header-icon" class="placeholder" src="{% static 'discord_logview/icons/processing.png' %}" alt="">
+{% endblock %}
+{% block header-data %}
+    <div id="log-type">
+        <div class="placeholder placeholder-title"></div>
+    </div>
+        <div id="log-created-at"><span>Created:</span>
+            <div class="placeholder placeholder-text"></div></div>
+    <div id="message-count"><span>Message Count:</span>
+        <div class="placeholder placeholder-text"></div></div>
+    <div id="user-list">
+        <span>Users: </span>
+        <div class="placeholder placeholder-text" style="margin-bottom: -3px;"></div>
+    </div>
+{% endblock %}
+{% block messages %}
+    <div class="message-group">
+        <div class="author-avatar-container">
+            <img class="author-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="">
+        </div>
+        <div class="messages">
+            <div class="author-header">
+                <span>
+                    <span class="author-name" title="Discord Log Viewer#0000">Discord Log Viewer</span>
+                </span>
+                    <time class="message-timestamp" datetime="{{ iso }}"></time>
+            </div>
+            {% block messages_inner %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

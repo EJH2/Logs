@@ -1,0 +1,88 @@
+{% extends 'discord_logview/loadingbase.html' %}
+{% load static %}
+{% block title %}Loading...{% endblock %}
+{% block messages_inner %}
+    {% for enum in task_ids %}
+    <div class="message-content">
+        <div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div>
+    </div>
+    <div class="message-content">
+        <div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div>
+    </div>
+    {% endfor %}
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+    <script>
+        {% for enum in task_ids %}const progressUrl{{ enum|first }} = "{% url 'celery_progress:task_status' enum|last|first %}";
+        {% endfor %}
+        document.addEventListener("DOMContentLoaded", function () {
+            const bars = [
+                {% for enum in task_ids %}{bar: CeleryProgressBar, progressUrl: progressUrl{{enum|first}}, message: `{{ enum|last|last }}`, id: {{ enum|first }}},
+                {% endfor %}];
+
+            let initProgressBar = function (bar, progressUrl, id, message, callback) {
+                bar.initProgressBar(progressUrl, {
+                    progressBarId: `progress-bar-${id}`,
+                    progressBarMessageId: `progress-bar-message-${id}`,
+                    pollInterval: 1000,
+                    onProgress: function (progressBarElement, progressBarMessageElement, progress) {
+                        progressBarElement.style.backgroundColor = '#68a9ef';
+                        progressBarElement.style.width = progress.percent + "%";
+                        const progressMessage = message.replace('{current}', progress.current).replace('{percent}', progress.percent).replace('{total}', progress.total);
+                        progressBarMessageElement.innerHTML = progressMessage || `${progress.current} of ${progress.total} processed.`;
+                    },
+                    onSuccess: function (progressBarElement, progressBarMessageElement) {
+                        progressBarElement.style.backgroundColor = '#76ce60';
+                        progressBarMessageElement.innerHTML = "Success!";
+                        callback();
+                    },
+                    onError: function (progressBarElement, progressBarMessageElement) {
+                        progressBarElement.style.backgroundColor = '#dc4f63';
+                        progressBarMessageElement.innerHTML = `Uh-Oh, something went wrong!`;
+                        somethingBroke();
+                    }
+                });
+            };
+
+            function somethingBroke() {
+                let node = document.createElement('div');
+                node.classList.add('message-content');
+                node.innerHTML = 'We broke something! Please send this to EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a> so he can try and find the issue!<br>';
+                let block = document.createElement('div');
+                block.classList.add('pre', 'pre--multiline', 'hljs');
+                block.innerHTML = 'Tasks:<br>{% for enum in task_ids %}{{ enum|last|first }}<br>{% endfor %}';
+                node.appendChild(block);
+                node.innerHTML += "Once you\'re ready to go, click <a href={% url 'index' %}>here</a>.";
+                const msgDiv = document.getElementsByClassName("messages");
+                msgDiv[0].appendChild(node);
+            }
+
+            function finishedProcessing() {
+                return new Promise(resolve => {
+                let node = document.createElement('div');
+                node.classList.add('message-content');
+                node.innerText = 'Finished processing. Reloading...';
+                const msgDiv = document.getElementsByClassName("messages");
+                msgDiv[0].appendChild(node);
+                setTimeout(function () {location.reload()}, 3000)
+            })}
+
+            function startProgressBars(bars) {
+                return new Promise(resolve => {
+                    if (bars.length === 1) {
+                        initProgressBar(bars[0].bar, bars[0].progressUrl, bars[0].id, bars[0].message, () => {
+                            finishedProcessing().then(resolve)})
+                    } else {
+                    const bar = bars.shift();
+                    initProgressBar(bar.bar, bar.progressUrl, bar.id, bar.message, () => {
+                        startProgressBars(bars).then(resolve)
+                  })
+                }
+              })
+            }
+
+            startProgressBars(bars);
+        });
+    </script>
+{% endblock %}

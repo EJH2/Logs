@@ -1,0 +1,223 @@
+@import url(https://fonts.googleapis.com/css?family=Press+Start+2P);
+@import url(https://fonts.googleapis.com/css?family=Press+Start+2P);
+@import url(https://fonts.googleapis.com/css?family=Press+Start+2P);
+
+.flex-align-center {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.flex-justify-center {
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center
+}
+
+.flex-wrap {
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap
+}
+
+.flex {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+.glitch-wrapper {
+    height: 150px;
+    padding: 20px 0;
+    -webkit-box-ordinal-group: 3;
+    -ms-flex-order: 2;
+    order: 2
+}
+
+.glitch {
+    font-family: ArchivoBlack,Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    color: rgba(246,246,247,.3);
+    font-size: 150px;
+    position: relative;
+    display: inline-block;
+    user-select: none;
+}
+
+.glitch:after,.glitch:before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #2F3135;
+}
+
+.glitch:before {
+    left: 2px;
+    text-shadow: -2px 0 #e3e7f8;
+    clip: rect(24px,550px,90px,0);
+}
+
+.glitch:after {
+    left: -2px;
+    text-shadow: -2px 0 rgba(114,137,218,.3);
+    clip: rect(85px,550px,140px,0);
+}
+
+.weight-light {
+    font-weight: 300
+}
+
+.weight-bold {
+    font-weight: 700
+}
+
+.page-wrap {
+    background-color: #f6f6f7;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap
+}
+
+@media screen and (max-width: 848px) {
+    .page-wrap {
+        overflow:auto;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap
+    }
+}
+
+.text-section {
+    max-width: 500px;
+    padding-left: 20px;
+}
+
+@media screen and (max-width: 848px) {
+    .text-section {
+        text-align:center;
+        margin: 10px;
+        padding: 0 5px;
+        -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+        order: 2
+    }
+}
+
+.header {
+    font-size: 25px;
+    line-height: 40px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.suggestion-text {
+    font-size: 20px;
+    color: #b9bbbe;
+    line-height: 35px;
+    text-align: left
+}
+
+.links-section {
+    margin-top: 20px
+}
+
+.links {
+    font-size: 18px;
+    line-height: 35px;
+    text-transform: uppercase;
+    text-decoration: none;
+    -webkit-transition: .1s ease-in-out;
+    transition: .1s ease-in-out;
+    position: relative
+}
+
+.links,.links:visited {
+    color: #c7d0f0
+}
+
+.links:hover {
+    color: #7289da
+}
+
+a,abbr,acronym,address,applet,big,blockquote,body,button,caption,cite,code,dd,del,dfn,div,dl,dt,em,fieldset,form,h1,h2,h3,h4,h5,h6,html,iframe,img,input,ins,kbd,label,legend,li,object,ol,p,pre,q,s,samp,small,span,strike,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,tt,ul,var {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-family: inherit;
+    font-size: 100%;
+    vertical-align: baseline
+}
+
+a {
+    color: #2196F3;
+}
+
+ol,ul {
+    list-style: none
+}
+
+.margin-top-8 {
+    margin-top: 8px
+}
+
+.margin-bottom-8 {
+    margin-bottom: 8px
+}
+
+.margin-top-80 {
+    margin-top: 80px
+}
+
+.margin-bottom-80 {
+    margin-bottom: 80px
+}
+
+html {
+    overflow-scrolling: touch;
+    height: 100%
+}
+
+body {
+    min-width: 1000px
+}
+
+@font-face {
+    font-family: Whitney;
+    font-weight: 300;
+    src: url(/static/discord_logview/fonts/whitney300.woff) format("woff")
+}
+
+@font-face {
+    font-family: Whitney;
+    font-weight: 400;
+    src: url(/static/discord_logview/fonts/whitney400.woff) format("woff")
+}
+
+@font-face {
+    font-family: Whitney;
+    font-weight: 700;
+    src: url(/static/discord_logview/fonts/whitney700.woff) format("woff")
+}
+
+@font-face {
+    font-family: ArchivoBlack;
+    src: url(/static/discord_logview/fonts/archivoblack.woff) format("woff")
+}
+
+body {
+    text-rendering: optimizeLegibility;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    line-height: 1.15
+}
+
+body,p {
+    font-weight: 400
+}

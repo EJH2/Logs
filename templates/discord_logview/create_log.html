@@ -1,0 +1,76 @@
+{% extends 'discord_logview/loadingbase.html' %}
+{% load static %}
+{% block title %}Create A Log{% endblock %}
+{% block extra_css %}
+    <link rel='stylesheet' href="{% static 'discord_logview/css/create_form.css' %}">
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'discord_logview/js/create_form.js' %}"></script>
+{% endblock %}
+{% block messages_inner %}
+<form action="{% url 'new' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_erorrs }}
+	<div class="option-box first">
+	    <div class="option-left">Log File:</div>
+	    <div class="option-right">
+            {{ form.url.errors }}
+	        <label>{{ form.url }}</label>
+	        <div class="option-right-small">
+	            Or choose a file:
+	        {{ form.file }}</div>
+	    </div>
+        <div class="option-hint">
+            This is the file you got from the bot. Drag and drop is enabled over the file field.
+        </div>
+	</div>
+    <div class="option-box">
+        <div class="option-left">
+            Log Type:
+        </div>
+        <div class="option-right">
+            {{ form.type.errors }}
+            <label>{{ form.type }}</label>
+        </div>
+        <div class="option-hint">
+            This is where you got the log from. This is important because it tells the parser how to parse!
+        </div>
+	</div>
+	<div class="option-box">
+	    <div class="option-left">
+            Privacy Settings:
+	    </div>
+	    <div class="option-right">
+            {{ form.privacy.errors }}
+            {{ form.privacy }}
+	    </div>
+        <div class="option-hint">
+            Who can access this log. <b style="color: darkgrey; text-decoration: underline;">This is still a work in progress!</b>
+        </div>
+	</div>
+	<div class="option-box">
+        <div class="option-left">
+            Expiration:
+        </div>
+        <div class="option-right">
+            {{ form.expires.errors }}
+            <label>{{ form.expires }}</label>
+        </div>
+        <div class="option-hint">
+            How long this log will last on our servers before it is deleted.
+        </div>
+	</div>
+    <input id="preview-button" type="submit" name="submit_type" value="Preview" class="button">
+
+    <input id="submit-button" type="submit" name="submit_type" value="Convert" class="button">
+    <div class="option-hint">
+        Previewing a log offers a <a href="https://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG option</a>, where you can decide whether or not you want to save it. It cannot be shared.
+        Converting a log will save it to our database, allowing other people to view it.
+    </div>
+	<div class="bottom-hint">
+	    <div style="margin-top:1em;font-size:1.2em">
+            If you find this helpful, please <a href="https://www.patreon.com/logview" style="text-decoration: underline;">support me on Patreon!</a>
+	    </div>
+	</div>
+</form>
+{% endblock %}
