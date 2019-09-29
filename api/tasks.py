@@ -42,6 +42,8 @@ def parse_json(self, json_data: dict):
     users.sort(key=sort_alphabetical)
     data['users'] = users
 
+    progress.set_progress(total, total)
+
     return data
 
 
