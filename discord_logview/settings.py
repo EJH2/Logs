@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.discord',
+    'discord',
 
     'celery_progress',
     'rest_framework',
@@ -67,12 +67,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'discord_logview.urls'
 
 SITE_ID = 2
-
-LOGIN_REDIRECT_URL = '/'
-
-ACCOUNT_EMAIL_REQUIRED = True
-
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -209,3 +203,23 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+# Django-AllAuth configuration
+# https://django-allauth.readthedocs.io/en/latest/
+
+
+def name_or_username(user):
+    return f'{user.first_name}#{user.last_name}' if user.first_name and user.last_name else user.username
+
+
+ACCOUNT_USER_DISPLAY = name_or_username
+
+SOCIALACCOUNT_PROVIDERS = {
+    'discord': {
+        'SCOPE': ['email', 'identify', 'guilds'],
+        'AUTH_PARAMS': {'prompt': 'none'},
+        'METHOD': 'oauth2'
+    }
+}
+
+LOGIN_REDIRECT_URL = '/'
