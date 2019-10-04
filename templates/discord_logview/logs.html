@@ -52,7 +52,7 @@
         <a href="{% url 'log-preview-save' pk=log.uuid %}" class="material-icons icon-large far-button" title="Save Log">save</a>
     </div>
     {% endif %}
-    {% if log.is_owner %}
+    {% if log.delete_token %}
     <div class="far-button-container">
         <a href="{% url 'log-delete' pk=log.uuid %}?token={{ log.delete_token }}" class="material-icons icon-large far-button" title="Delete Log">delete_outline</a>
     </div>

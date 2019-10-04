@@ -18,7 +18,6 @@ class LogRenderer:
         self.page = data.get('page')
         self.chunked = data.get('chunked')
         self.is_preview = data.get('is_preview')
-        self.is_owner = data.get('is_owner', self.is_preview)
         self.delete_token = data.get('delete_token')
 
     @property

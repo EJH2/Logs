@@ -54,10 +54,9 @@ def log_html(request, pk):
             'iso': timezone.now().isoformat()
         })
 
-    is_owner = log.owner == request.user
     data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
-            'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None, 'is_owner': is_owner,
-            'delete_token': signer.dumps(f'log.{pk}')}
+            'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None,
+            'delete_token': signer.dumps(f'log.{pk}') if log.owner == request.user else None}
 
     log_pages = log.pages.order_by('index')
     if log_pages.count() > 1:
