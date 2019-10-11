@@ -1,4 +1,5 @@
 import requests
+from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -29,9 +30,17 @@ def new(request):
         if form.is_valid():
             if form.cleaned_data.get('file'):
                 content = form.cleaned_data['file'].read()
+                if isinstance(content, bytes):
+                    content = content.decode()
             else:
                 content = requests.get(form.cleaned_data['url']).text
-            data = {'content': content, 'log_type': form.cleaned_data['type'], 'expires': form.cleaned_data['expires']}
+            data = {
+                'content': content,
+                'log_type': form.cleaned_data['type'],
+                'expires': form.cleaned_data['expires'],
+                'privacy': form.cleaned_data['privacy'],
+                'guild': form.cleaned_data['guild']
+            }
             if request.POST['submit_type'] == 'Convert':
                 log = create_log(**data, owner=request.user)
                 return redirect('log-html', pk=log.pk)
@@ -46,8 +55,32 @@ def new(request):
     })
 
 
+def _get_privacy(log, request):
+    if log.owner == request.user or request.user.is_staff:
+        return
+    privacy = log.data.get('privacy')
+    if not privacy or privacy[0] in ['public', 'invite']:
+        # TODO: Add invite setting logic
+        return
+    if not request.user.is_authenticated:
+        return redirect('/accounts/login/?next=%s' % request.path)
+    social_user = SocialAccount.objects.filter(user=request.user).first()
+    if social_user and social_user.extra_data.get('guilds'):
+        if privacy[1] in [g['id'] for g in social_user.extra_data.get('guilds')]:
+            if not privacy[0] == 'mods':
+                return
+            if [g for g in social_user.extra_data.get('guilds') if g['id'] == privacy[1] and
+                    bool((g['permissions'] >> 13) & 1)]:
+                return
+    raise Http404('Log not found!')
+
+
 def log_html(request, pk):
     log = get_object_or_404(Log, pk=pk)
+    error = _get_privacy(log, request)
+    if error:
+        return error
+
     if log.data.get('tasks'):
         return render(request, 'discord_logview/loading.html', context={
             'task_ids': list(enumerate(log.data.get('tasks'))),
