@@ -10,8 +10,10 @@ class Log(models.Model):
     created = models.DateTimeField(auto_now_add=True, help_text='Log creation date.')
     expires = models.DateTimeField(null=True, help_text='Log expiration date.')
     content = models.TextField(editable=False, help_text='Raw log content.')
-    type = models.CharField(max_length=30, null=True, help_text='Log type.')
+    type = models.CharField(max_length=40, null=True, help_text='Log type.')
     users = fields.JSONField(default=list, help_text='List of users in log.')
+    privacy = models.CharField(max_length=10, default='public')
+    guild = models.IntegerField(null=True)
     data = fields.JSONField(default=dict, help_text='Extraneous data.')
 
     class Meta:
