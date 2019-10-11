@@ -81,7 +81,7 @@ def log_html(request, pk):
     if error:
         return error
 
-    if log.data.get('tasks'):
+    if log.data.get('tasks') and not log.pages.count() > 0:
         return render(request, 'discord_logview/loading.html', context={
             'task_ids': list(enumerate(log.data.get('tasks'))),
             'iso': timezone.now().isoformat()

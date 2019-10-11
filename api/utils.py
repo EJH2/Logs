@@ -36,16 +36,6 @@ def get_chain_tasks(node) -> list:
     return id_chain
 
 
-def forget_tasks(log):
-    task_list = log.data['tasks']
-    del log.data['tasks']
-    tasks = [task[0] for task in task_list]
-    for task_id in tasks:
-        task = AsyncResult(id=task_id)
-        task.forget()
-    log.save()
-
-
 def validate_expires(user, value):
     exp = list(expiry_times.keys())[:5]
     if user.has_perm('log.extended_expiry'):
