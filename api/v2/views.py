@@ -70,7 +70,8 @@ class LogViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.data
-        log = create_log(content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'])
+        log = create_log(content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'],
+                         privacy=data['privacy'], guild=data['guild'])
         serializer = LogListSerializer(log, context={'request': request})
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 

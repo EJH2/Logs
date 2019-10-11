@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from api.models import Log
-from api.v2.parser import create_log
+from api.v1.parser import create_log
 from api.permissions import HasAPIAccess
 from api.v1 import schemas
 from api.v1.serializers import LogListSerializer, LogCreateSerializer
@@ -38,7 +38,10 @@ class LogViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.data
-        log = create_log(content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'])
+        log = create_log(
+            content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'],
+            privacy=data['privacy'], guild=data['guild']
+        )
         serializer = LogListSerializer(log, context={'request': request})
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 

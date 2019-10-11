@@ -24,7 +24,7 @@ def create_preview(content, log_type, expires, **kwargs) -> dict:
             'expires': (timezone.now() + timedelta(seconds=int(expires))).isoformat() if expires else None}
 
     result = celery.chain(v1_tasks.parse_text.s(log_type, content), tasks.parse_json.s())()
-    data['data'] = result.get()
+    data['data'] = {**result.get(), **kwargs}
 
     return data
 
@@ -38,10 +38,13 @@ def save_preview(data, owner) -> Log:
     """
     data['expires'] = dateutil.parser.parse(data['expires']) if data['expires'] else None
     data['owner'] = owner
-    log_data = data.pop('data')
+    log_data = data.get('data')
+    pages_data = {'messages': log_data.pop('messages'), 'users': log_data.pop('users')}
 
-    result = tasks.create_pages.delay(log_data, data['uuid'])
+    result = tasks.create_pages.delay(pages_data, data['uuid'])
 
-    data['data'] = {'tasks': utils.add_task_messages([result.id], messages=['Saving messages... ({percent}%)'])}
+    data['data'] = {
+        'tasks': utils.add_task_messages([result.id], messages=['Saving messages... ({percent}%)']), **log_data
+    }
 
     return Log.objects.create(**data)
