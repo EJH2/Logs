@@ -109,7 +109,7 @@ input[type='radio']:checked + .r-text { color: #494; }
     line-height: 1.5em;
 }
 
-input#url, select#type, select#expires {
+input#url, select#type, select#guild, select#expires {
     border-color: rgba(0, 0, 0, 0.3);
     background-color: rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
