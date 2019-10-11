@@ -11,3 +11,21 @@ function clear_file() {
 function clear_url() {
     document.getElementById('url').value = '';
 }
+
+const privacyRadios = document.logForm.privacy;
+const guildDiv = document.getElementById('guildDiv');
+const guildOption = document.getElementById('guild');
+function guildVisibility(value) {
+    if (!(['guild', 'mods'].includes(value))) {
+        guildDiv.style.display = 'none';
+        guildOption.required = false;
+    }
+    else {
+        guildDiv.style.display = 'block';
+        guildOption.required = true;
+    }
+}
+guildVisibility(document.logForm.privacy.value);
+for (let i = 0; i < privacyRadios.length; i++) {
+    privacyRadios[i].addEventListener('change', function () {guildVisibility(this.value)})
+}
