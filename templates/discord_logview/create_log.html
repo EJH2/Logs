@@ -8,7 +8,7 @@
     <script src="{% static 'discord_logview/js/create_form.js' %}"></script>
 {% endblock %}
 {% block messages_inner %}
-<form action="{% url 'new' %}" method="POST" enctype="multipart/form-data">
+<form name="logForm" action="{% url 'new' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.non_field_erorrs }}
 	<div class="option-box first">
@@ -45,7 +45,25 @@
             {{ form.privacy }}
 	    </div>
         <div class="option-hint">
-            Who can access this log. <b style="color: darkgrey; text-decoration: underline;">This is still a work in progress!</b>
+            Who can access this log.
+            <ul>
+                <li><b style="color: darkgrey;">Public</b> - Anyone with the link can view.</li>
+                <li><b style="color: darkgrey;">Guild Only</b> - Only guild members can view.</li>
+                <li><b style="color: darkgrey;">Mods Only</b> - Only guild members with manage messages can view.</li>
+                <li><b style="color: darkgrey;">Invite Only</b> - Only people that have been invited to view the log can view.</li>
+            </ul>
+        </div>
+	</div>
+    <div id="guildDiv" class="option-box">
+        <div class="option-left">
+            Linked Guild:
+        </div>
+        <div class="option-right">
+            {{ form.guild.errors }}
+            <label>{{ form.guild }}</label>
+        </div>
+        <div class="option-hint">
+            Which guild to link this log to. <b style="color: darkgrey; text-decoration: underline;">This only applies if you have selected "Guild Only" or "Mods Only".</b>
         </div>
 	</div>
 	<div class="option-box">
