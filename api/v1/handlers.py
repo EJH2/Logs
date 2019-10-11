@@ -51,7 +51,7 @@ def rosalina_bottings(content, progress):
             'author': {
                 'id': match['user_id'],
                 'username': match['username'],
-                'discriminator': match['discriminator']
+                'discriminator': '0000'
             },
             'content': match['content'],
             'timestamp': match['timestamp'],
@@ -106,7 +106,7 @@ def auttaja(content, progress):
 
         progress.set_progress(count + 1, total)
 
-    return match_data
+    return message_array
 
 
 def gearbot(content, progress):
@@ -152,7 +152,7 @@ def modmailbot(content, progress):
             _matches[-1] += f'\n{text}'
 
     matches = (re.match(consts.modmailbot_re, m) for m in _matches)
-    match_data = list(m.groupdict() for m in matches if not m.group('bcontent'))
+    match_data = list(m.groupdict() for m in matches if not m.group('bot_content'))
     message_array = []
 
     total = len(match_data)
@@ -177,4 +177,4 @@ def modmailbot(content, progress):
 
         progress.set_progress(count + 1, total)
 
-    return match_data
+    return message_array
