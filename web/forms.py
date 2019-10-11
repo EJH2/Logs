@@ -1,8 +1,9 @@
 import requests
+from allauth.socialaccount.models import SocialAccount
 from django import forms
 from django.core.exceptions import ValidationError
 
-from api.consts import form_types, form_expiry_times, privacy_types, expiry_times
+from api.consts import form_types, form_expiry_times, form_privacy_types, expiry_times
 
 
 def validate_url(value):
@@ -26,6 +27,12 @@ class LogCreateForm(forms.Form):
         if user.has_perm('api.no_expiry'):
             choices = self.fields['expires'].choices
         self.fields['expires'].choices = choices
+
+        social_user = SocialAccount.objects.filter(user=user).first()
+        if social_user and social_user.extra_data.get('guilds'):
+            self.fields['guild'].choices = [
+                ('', ' -- select a guild -- '), *[(g['id'], g['name']) for g in social_user.extra_data['guilds']]
+            ]
 
     type = forms.ChoiceField(
         choices=[
@@ -53,8 +60,12 @@ class LogCreateForm(forms.Form):
     )
     privacy = forms.ChoiceField(
         initial='public',
-        choices=privacy_types,
+        choices=form_privacy_types,
         widget=forms.RadioSelect
+    )
+    guild = forms.ChoiceField(
+        choices=[],
+        required=False
     )
     expires = forms.ChoiceField(
         choices=form_expiry_times,
@@ -64,5 +75,10 @@ class LogCreateForm(forms.Form):
         cleaned_data = self.cleaned_data
         if not cleaned_data.get('url') and not cleaned_data.get('file'):
             self.add_error('url', 'You must specify either a URL or file to parse!')
-        cleaned_data['expires'] = expiry_times[cleaned_data['expires']]
+        if cleaned_data.get('expires'):
+            cleaned_data['expires'] = expiry_times[cleaned_data['expires']]
+        if cleaned_data['privacy'] not in ['public', 'invite'] and not cleaned_data.get('guild'):
+            self.add_error('guild', 'You must specify a guild to link to!')
+        else:
+            cleaned_data['guild'] = None
         return cleaned_data
