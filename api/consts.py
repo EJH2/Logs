@@ -20,19 +20,22 @@ modmailbot_re = r'\[(?P<timestamp>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\
                 r'(?P<username>.*?)(?:#(?P<discriminator>\d{4}))?: (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* ' \
                 r'.*? \(.*\)\n(?P<attachments>(?:http(?:|s):.*)))?$| (?P<bot_content>[^\n]+))'
 
+vortex_re = r'\[(?P<timestamp>[\w, :]{28,29})\] (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,18})' \
+            r'\) : (?P<content>[\S\s]*?)(?P<attachments>(?:\n(?:http(?:|s):.*)|)*?)$'
+
 regexps = {
     'auttaja': auttaja_re,
     'gearbot': gearbot_re,
     'modmailbot': modmailbot_re,
     'rowboat': rowboat_re,
     'rosalina_bottings': rosalina_bottings_re,
+    'vortex': vortex_re
 }
 
 
 private_types = {
     'giraffeduck': 'GiraffeDuck',
     'logger': 'Logger',
-    'vortex': 'Vortex',
 }
 
 
@@ -42,6 +45,7 @@ public_types = {
     'modmailbot': 'ModMailBot',
     'rosalina_bottings': 'Rosalina Bottings',
     'rowboat': 'Rowboat',
+    'vortex': 'Vortex',
 }
 
 

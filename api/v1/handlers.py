@@ -142,6 +142,46 @@ def gearbot(content, progress):
     return message_array
 
 
+def vortex(content, progress):
+    lines = content.split('\n\n')[1:]
+    _matches = list()
+    for text in lines:
+        if re.match(consts.vortex_re, text):
+            _matches.append(text)
+        else:
+            _matches[-1] += f'\n\n{text}'
+
+    print(_matches)
+    matches = (re.match(consts.vortex_re, m) for m in _matches)
+    match_data = list(m.groupdict() for m in matches)
+    print(match_data)
+    message_array = []
+
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
+        message_array.append({
+            'author': {
+                'id': match['user_id'],
+                'username': match['username'],
+                'discriminator': match['discriminator']
+            },
+            'content': match['content'],
+            'timestamp': datetime.strptime(match['timestamp'], '%a, %d %b %Y %H:%M:%S %Z').isoformat(),
+            'attachments': [
+                {
+                    'filename': url.rsplit('/', 1)[1],
+                    'url': url
+                }
+                for url in (match['attachments'].split('\n')[1:] if match.get('attachments') else [])
+            ]
+        })
+
+        progress.set_progress(count + 1, total)
+
+    return message_array
+
+
 def modmailbot(content, progress):
     content = '────────────────\n'.join(content.split('────────────────\n')[1:])  # Gets rid of useless header
     _matches = list()

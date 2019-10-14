@@ -1,7 +1,6 @@
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
-from api import utils
 from api.models import Log, Page
 from api.serializers import MessageSerializer
 
