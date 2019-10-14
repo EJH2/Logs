@@ -75,4 +75,4 @@ def create_pages(self, data: dict, uuid: str):
     log.pages.set(pages)
     progress.set_progress(total, total)
 
-    return utils.forget_tasks(log) or uuid
+    return uuid
