@@ -151,10 +151,8 @@ def vortex(content, progress):
         else:
             _matches[-1] += f'\n\n{text}'
 
-    print(_matches)
     matches = (re.match(consts.vortex_re, m) for m in _matches)
     match_data = list(m.groupdict() for m in matches)
-    print(match_data)
     message_array = []
 
     total = len(match_data)
