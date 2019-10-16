@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 from datetime import datetime, timedelta
 
 import pytz
@@ -20,10 +19,6 @@ if config('SENTRY_DSN'):
         'integrations': [DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
         'send_default_pii': True
     }
-    if sys.platform == 'win32':
-        from raven.transport.eventlet import EventletHTTPTransport
-
-        init_kwargs['transport'] = EventletHTTPTransport
     sentry_sdk.init(**init_kwargs)
 
 # set the default Django settings module for the 'celery' program.
