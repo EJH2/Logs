@@ -67,8 +67,7 @@ def create_pages(self, data: dict, uuid: str):
         # [[0, 1, 2...], [1000, 1001, 1002...], [2000, 2001, 2002...]...]
         batch_list.append(messages[batch:batch + 1000])  # Split messages by the 1000
 
-    log = Log.objects.get(uuid=uuid)
-    log.users = data.pop('users')
+    log = Log.objects.get_or_create(uuid=uuid, defaults={'users': data.pop('users')})[0]
     pages = Page.objects.bulk_create([Page(log=log, messages=batch_list[i], index=i) for i in range(
         len(batch_list))])
     log.pages.set(pages)
