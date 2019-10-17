@@ -13,7 +13,7 @@ class LogCreateSerializer(serializers.Serializer):
     messages = serializers.JSONField(help_text='Array of Discord message objects.')
     expires = serializers.CharField(allow_null=True, default='30min', help_text='Log expiration.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
-    guild = serializers.IntegerField(allow_null=True, help_text='Linked guild of log.')
+    guild = serializers.IntegerField(allow_null=True, default=None, help_text='Linked guild of log. Must be set if privacy setting is either guild or mods.')
 
     @staticmethod
     def validate_messages(value):
@@ -49,6 +49,8 @@ class LogArchiveCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     url = serializers.URLField(help_text='URL containing valid JSON array of Discord message objects.')
     expires = serializers.CharField(allow_null=True, default='30min', help_text='Log expiration.')
+    privacy = serializers.CharField(default='public', help_text='Log privacy.')
+    guild = serializers.IntegerField(allow_null=True, default=None, help_text='Linked guild of log. Must be set if privacy setting is either guild or mods.')
 
     @staticmethod
     def validate_url(value):
@@ -61,9 +63,18 @@ class LogArchiveCreateSerializer(serializers.Serializer):
         """Check if expiry time is within parameters"""
         return utils.validate_expires(self.context['user'], value)
 
+    @staticmethod
+    def validate_privacy(value):
+        """Check if privacy value is within parameters"""
+        if value not in privacy_types:
+            raise serializers.ValidationError(f'Privacy value must be one of {", ".join(privacy_types)}!')
+        return value
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['expires'] = expiry_times[ret['expires']]
+        if ret['privacy'] in ['public', 'invite']:
+            ret['guild'] = None
         return ret
 
 

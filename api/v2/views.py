@@ -38,7 +38,8 @@ def un_archive(request, signed_data: str):
     except BadSignature:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     data['messages'] = json.loads(requests.get(data['url']).text)
-    log = create_log(content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'])
+    log = create_log(content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'],
+                     privacy=data['privacy'], guild=data['guild'])
     return redirect('log-html', pk=log.uuid)
 
 

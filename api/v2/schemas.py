@@ -23,6 +23,9 @@ archive_responses = {
                 ],
                 'expires': [
                     'Expiry time must be one of 10min, 30min, 1hour, 1day, 1week!'
+                ],
+                'privacy': [
+                    'Privacy value must be one of public, guild, mods, invite!'
                 ]
             }
         }
@@ -48,6 +51,9 @@ create_responses = {
                 ],
                 'expires': [
                     'Expiry time must be one of 10min, 30min, 1hour, 1day, 1week!'
+                ],
+                'privacy': [
+                    'Privacy value must be one of public, guild, mods, invite!'
                 ]
             }
         }

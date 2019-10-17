@@ -20,7 +20,7 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
     :type expires: Union[int, None]
     :param privacy: Log privacy setting.
     :type privacy: str
-    :param guild: Linked guild of log.
+    :param guild: Linked guild of log. Must be set if privacy setting is either guild or mods.
     :type guild: int
     :param kwargs: Extraneous data.
     """
