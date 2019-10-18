@@ -52,7 +52,9 @@ class LogArchiveCreateSerializer(serializers.Serializer):
     url = serializers.URLField(help_text='URL containing valid JSON array of Discord message objects.')
     expires = serializers.CharField(allow_null=True, default='30min', help_text='Log expiration.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
-    guild = serializers.IntegerField(allow_null=True, default=None, help_text='Linked guild of log. Must be set if privacy setting is either guild or mods.')
+    guild = serializers.IntegerField(allow_null=True, default=None,
+                                     help_text='Linked guild of log. Must be set if privacy '
+                                               'setting is either guild or mods.')
 
     @staticmethod
     def validate_url(value):
