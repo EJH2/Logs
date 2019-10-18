@@ -19,31 +19,33 @@
     {% endif %}
     <div id="message-count"><span>Message Count:</span> <b>{{ log.total_messages }}</b></div>
     <div id="user-list">
-        <span>User{% if log.users|length != 1 %}s: {% else %}: {% endif %}</span>
-        <label id="user-list-toggle" class="material-icons">
-            <input type="checkbox" style="display: none" onclick="return toggleUsers()">
-            arrow_right
-        </label>
-        <ul id="users">
-            {% if log.users %}
+        {% if log.users %}
+            <span>User{% if log.users|length != 1 %}s: {% else %}: {% endif %}</span>
+            <label id="user-list-toggle" class="material-icons">
+                <input type="checkbox" style="display: none" onclick="return toggleUsers()">
+                arrow_right
+            </label>
+            <ul id="users">
                 <li id="copyall" style="list-style: none">
                     <span class="tooltip">
                         <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)" style="opacity: 1;">Copy All User IDs</span>
                     </span>
                 </li>
-            {% endif %}
-            {% for user in log.users %}
-                <li class="user tooltip">
-                    <span class="info__user-name"{% if user.id %} onclick="return copyID(this.parentElement)"{% endif %}>
-                        <b>{{ user.username|escape }}</b>#{{ user.discriminator }}
-                        {% if user.bot %}
-                            <span class="bot-tag">BOT</span>
-                        {% endif %}
-                    </span>
-                    <span class='tooltiptext pre pre--inline id'>{{ user.id }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+                {% for user in log.users %}
+                    <li class="user tooltip">
+                        <span class="info__user-name"{% if user.id %} onclick="return copyID(this.parentElement)"{% endif %}>
+                            <b>{{ user.username|escape }}</b>#{{ user.discriminator }}
+                            {% if user.bot %}
+                                <span class="bot-tag">BOT</span>
+                            {% endif %}
+                        </span>
+                        <span class='tooltiptext pre pre--inline id'>{{ user.id }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span>No Users</span>
+        {% endif %}
     </div>
 {% endblock %}
 {% block far-buttons %}
