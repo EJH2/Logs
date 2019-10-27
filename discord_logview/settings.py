@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
+
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -224,3 +226,22 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 LOGIN_REDIRECT_URL = '/'
+
+# Django Channels configuration
+# https://channels.readthedocs.io/en/latest/installation.html
+
+ASGI_APPLICATION = 'discord_logview.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [
+                {
+                    'address': (config('REDIS_HOST'), config('REDIS_PORT', cast=int)),
+                    'db': config('REDIS_DB', cast=int)
+                }
+            ],
+        },
+    },
+}

@@ -13,12 +13,13 @@
 {% endblock %}
 {% block extra_js %}
     <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+    <script src="{% static 'celery_progress/celery_progress_websockets.js' %}"></script>
     <script>
-        {% for enum in task_ids %}const progressUrl{{ enum|first }} = "{% url 'celery_progress:task_status' enum|last|first %}";
+        {% for enum in task_ids %}const progressUrl{{ enum|first }} = "/ws/progress/{{ enum|last|first }}/";
         {% endfor %}
         document.addEventListener("DOMContentLoaded", function () {
             const bars = [
-                {% for enum in task_ids %}{bar: CeleryProgressBar, progressUrl: progressUrl{{enum|first}}, message: `{{ enum|last|last }}`, id: {{ enum|first }}},
+                {% for enum in task_ids %}{bar: CeleryWebSocketProgressBar, progressUrl: progressUrl{{enum|first}}, message: `{{ enum|last|last }}`, id: {{ enum|first }}},
                 {% endfor %}];
 
             let initProgressBar = function (bar, progressUrl, id, message, callback) {
