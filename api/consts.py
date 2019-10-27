@@ -33,13 +33,13 @@ regexps = {
 }
 
 
-private_types = {
+_private_types = {
     'giraffeduck': 'GiraffeDuck',
     'logger': 'Logger',
 }
 
 
-public_types = {
+_public_types = {
     'auttaja': 'Auttaja',
     'gearbot': 'Gearbot',
     'modmailbot': 'ModMailBot',
@@ -58,9 +58,9 @@ rowboat_types = {
     'speedboat': 'Speedboat',
 }
 
-all_types = {**public_types, **private_types, **rowboat_types}
+all_types = {**_public_types, **_private_types, **rowboat_types}
 
-form_types = {**public_types, **rowboat_types}
+form_types = {k: all_types[k] for k in sorted({**_public_types, **rowboat_types})}
 
 expiry_times = {
     '10min': 60 * 10,
