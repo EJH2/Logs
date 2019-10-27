@@ -41,3 +41,7 @@ class Page(models.Model):
     def __str__(self):
         return f'Log {self.log.uuid} Page {self.index}'
 
+
+class Whitelist(models.Model):
+    log_type = models.CharField(max_length=40, help_text='Whitelisted log type.')
+    users = models.ManyToManyField('auth.User', related_name='whitelists', help_text='User whitelists.')

@@ -23,7 +23,7 @@ class AuthorSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField(min_length=2, max_length=32)
     discriminator = serializers.CharField(min_length=4, max_length=4)
-    avatar = serializers.CharField(default=None)
+    avatar = serializers.CharField(default=None, allow_null=True)
     bot = serializers.BooleanField(default=False)
     color = serializers.IntegerField(default=None)
 
@@ -50,8 +50,8 @@ class AttachmentSerializer(serializers.Serializer):
     filename = serializers.CharField()
     url = serializers.CharField()
     size = serializers.IntegerField(default=0)
-    width = serializers.IntegerField(default=None)
-    height = serializers.IntegerField(default=None)
+    width = serializers.IntegerField(default=None, allow_null=True)
+    height = serializers.IntegerField(default=None, allow_null=True)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -74,9 +74,9 @@ class AttachmentSerializer(serializers.Serializer):
 
 class ImageSerializer(serializers.Serializer):
     url = serializers.URLField()
-    proxy_url = serializers.URLField(default=None)
-    width = serializers.IntegerField(default=None)
-    height = serializers.IntegerField(default=None)
+    proxy_url = serializers.URLField(default=None, allow_null=True)
+    width = serializers.IntegerField(default=None, allow_null=True)
+    height = serializers.IntegerField(default=None, allow_null=True)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -90,10 +90,10 @@ class ImageSerializer(serializers.Serializer):
 
 
 class EmbedAuthorSerializer(serializers.Serializer):
-    name = serializers.CharField(default=None)
-    url = serializers.URLField(default=None)
-    icon_url = serializers.URLField(default=None)
-    proxy_icon_url = serializers.URLField(default=None)
+    name = serializers.CharField(default=None, allow_null=True)
+    url = serializers.URLField(default=None, allow_null=True)
+    icon_url = serializers.URLField(default=None, allow_null=True)
+    proxy_icon_url = serializers.URLField(default=None, allow_null=True)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -125,9 +125,9 @@ class EmbedFieldSerializer(serializers.Serializer):
 
 
 class EmbedFooterSerializer(serializers.Serializer):
-    text = serializers.CharField(default=None)
-    icon_url = serializers.URLField(default=None)
-    proxy_icon_url = serializers.URLField(default=None)
+    text = serializers.CharField(default=None, allow_null=True)
+    icon_url = serializers.URLField(default=None, allow_null=True)
+    proxy_icon_url = serializers.URLField(default=None, allow_null=True)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -141,17 +141,17 @@ class EmbedFooterSerializer(serializers.Serializer):
 
 
 class EmbedSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=256, default=None)
-    description = serializers.CharField(max_length=2048, default=None)
-    url = serializers.URLField(default=None)
+    title = serializers.CharField(max_length=256, default=None, allow_null=True)
+    description = serializers.CharField(max_length=2048, default=None, allow_null=True)
+    url = serializers.URLField(default=None, allow_null=True)
     type = serializers.CharField(max_length=20, default='rich')
-    timestamp = serializers.DateTimeField(default=None)
+    timestamp = serializers.DateTimeField(default=None, allow_null=True)
     color = serializers.IntegerField(default=5198940)
-    image = ImageSerializer(default=None)
-    thumbnail = ImageSerializer(default=None)
-    author = EmbedAuthorSerializer(default=None)
-    fields = EmbedFieldSerializer(many=True, default=[])
-    footer = EmbedFooterSerializer(required=False, default={})
+    image = ImageSerializer(default=None, allow_null=True)
+    thumbnail = ImageSerializer(default=None, allow_null=True)
+    author = EmbedAuthorSerializer(default=None, allow_null=True)
+    fields = EmbedFieldSerializer(many=True, default=[], allow_null=True)
+    footer = EmbedFooterSerializer(required=False, default={}, allow_null=True)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -177,8 +177,8 @@ class MessageSerializer(serializers.Serializer):
     author = AuthorSerializer()
     mentions = AuthorSerializer(many=True, default=[])
     timestamp = serializers.DateTimeField(default=None)
-    edited_timestamp = serializers.DateTimeField(default=None)
-    content = serializers.CharField(default='')
+    edited_timestamp = serializers.DateTimeField(default=None, allow_null=True)
+    content = serializers.CharField(default='', allow_blank=True)
     attachments = AttachmentSerializer(many=True, default=[])
     embeds = EmbedSerializer(many=True, default=[])
 

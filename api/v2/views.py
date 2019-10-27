@@ -9,7 +9,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from api.models import Log
+from api.models import Log, Whitelist
 from api.permissions import HasAPIAccess
 from api.utils import signer
 from api.v2 import schemas
@@ -24,7 +24,12 @@ def archive(request):
     serializer = LogArchiveCreateSerializer(data=request.data, context={'user': request.user})
     if not serializer.is_valid():
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-    signed_data = signer.dumps(serializer.data)
+    data = serializer.data
+    whitelist = Whitelist.objects.filter(log_type=data['type']).first()
+    if whitelist and request.user not in whitelist.users.all():
+        return Response({'errors': {'type': [f'You are not authorized to use log type "{data["type"]}"!']}},
+                        status=status.HTTP_400_BAD_REQUEST)
+    signed_data = signer.dumps(data)
     url = request.build_absolute_uri(reverse('v2:un-archive', kwargs={'signed_data': signed_data}))
     return Response(data={'url': url}, status=status.HTTP_201_CREATED)
 
@@ -71,6 +76,10 @@ class LogViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.data
+        whitelist = Whitelist.objects.filter(log_type=data['type']).first()
+        if whitelist and request.user not in whitelist.users.all():
+            return Response({'errors': {'type': [f'You are not authorized to use log type "{data["type"]}"!']}},
+                            status=status.HTTP_400_BAD_REQUEST)
         log = create_log(content=data['messages'], log_type=data['type'], owner=request.user, expires=data['expires'],
                          privacy=data['privacy'], guild=data['guild'])
         serializer = LogListSerializer(log, context={'request': request})

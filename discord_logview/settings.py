@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'discord_logview',
     'api',
+    'web',
 
     'allauth',
     'allauth.account',
