@@ -10,10 +10,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from api.models import Log
-from api.utils import signer
-from api.v2.parser import create_log
 from api.permissions import HasAPIAccess
+from api.utils import signer
 from api.v2 import schemas
+from api.v2.parser import create_log
 from api.v2.serializers import LogListSerializer, LogCreateSerializer, LogArchiveCreateSerializer
 
 

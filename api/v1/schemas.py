@@ -3,7 +3,7 @@ from datetime import datetime
 from drf_yasg import openapi
 from rest_framework import status
 
-from api.v2 import serializers
+from api.v1 import serializers
 
 now = datetime.now().isoformat()
 
