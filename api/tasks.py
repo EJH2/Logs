@@ -1,3 +1,5 @@
+import time
+
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
@@ -14,6 +16,7 @@ def parse_json(self, json_data: dict):
     :return: Parsed data.
     """
     messages = list()
+    bad_messages = list()
     data = dict()
 
     users = [dict(t) for t in {tuple(d['author'].items()) for d in json_data}]
@@ -25,6 +28,8 @@ def parse_json(self, json_data: dict):
         msg = MessageSerializer(data=msg, context={'users': users})
         if msg.is_valid():
             messages.append(msg.data)
+        else:
+            bad_messages.append((msg.initial_data, msg.errors))
 
         progress.set_progress(count, total)
 
@@ -67,6 +72,8 @@ def create_pages(self, data: dict, uuid: str):
         # [[0, 1, 2...], [1000, 1001, 1002...], [2000, 2001, 2002...]...]
         batch_list.append(messages[batch:batch + 1000])  # Split messages by the 1000
 
+    while not Log.objects.filter(uuid=uuid).exists():
+        time.sleep(1)
     log = Log.objects.update_or_create(uuid=uuid, defaults={'users': data.pop('users')})[0]
     pages = Page.objects.bulk_create([Page(log=log, messages=batch_list[i], index=i) for i in range(
         len(batch_list))])

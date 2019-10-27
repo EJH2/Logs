@@ -41,4 +41,4 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
     task_ids = utils.get_chain_tasks(result)
     data['data'] = {'tasks': utils.add_task_messages(task_ids, messages=messages), **kwargs}
 
-    return Log.objects.update_or_create(uuid=uuid, defaults=data)[0]
+    return Log.objects.create(**data)
