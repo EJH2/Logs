@@ -1,12 +1,10 @@
 import json
 import os
-from datetime import datetime, timedelta
+import pendulum
 
-import pytz
 import redis
 from celery import Celery
 from decouple import config
-from django.utils import timezone
 
 if config('SENTRY_DSN'):
     import sentry_sdk
@@ -60,13 +58,12 @@ def setup_periodic_tasks(sender, **kwargs):
 def clean_old_tasks():
     for key in redis_app.keys('celery-task-meta-*'):
         data = json.loads(redis_app.get(key))
-        if data['status'] == 'SUCCESS' and data['date_done'] < \
-                (timezone.now().replace(tzinfo=None) + timedelta(minutes=5)).isoformat():
+        if data['status'] == 'SUCCESS' and data['date_done'] < pendulum.now().add(minutes=5).isoformat():
             redis_app.delete(key)
 
 
 @app.task
 def clean_expired_logs():
     from api.models import Log
-    logs = Log.objects.filter(expires__isnull=False, expires__lt=datetime.now(pytz.UTC))
+    logs = Log.objects.filter(expires__isnull=False, expires__lt=pendulum.now())
     logs.delete()

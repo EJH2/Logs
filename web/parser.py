@@ -1,8 +1,5 @@
-from datetime import timedelta
-
 import celery
-import dateutil.parser
-from django.utils import timezone
+import pendulum
 
 from api import tasks, utils
 from api.models import Log
@@ -21,7 +18,7 @@ def create_preview(content, log_type, expires, **kwargs) -> dict:
     :param kwargs: Extraneous data.
     """
     data = {'type': log_type, 'content': content, 'uuid': Log.generate_uuid(content),
-            'expires': (timezone.now() + timedelta(seconds=int(expires))).isoformat() if expires else None}
+            'expires': pendulum.now().add(seconds=int(expires)).isoformat() if expires else None}
 
     result = celery.chain(v1_tasks.parse_text.s(log_type, content), tasks.parse_json.s())()
     data['data'] = {**result.get(), **kwargs}
@@ -36,7 +33,7 @@ def save_preview(data, owner) -> Log:
     :type data: dict
     :param owner: Log owner.
     """
-    data['expires'] = dateutil.parser.parse(data['expires']) if data['expires'] else None
+    data['expires'] = pendulum.parse(data['expires']) if data['expires'] else None
     data['owner'] = owner
     log_data = data.get('data')
     pages_data = {'messages': log_data.pop('messages'), 'users': log_data.pop('users')}

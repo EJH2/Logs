@@ -1,5 +1,4 @@
-import dateutil.parser
-from django.utils.timezone import now
+import pendulum
 
 from natural.date import duration
 
@@ -22,7 +21,7 @@ class LogRenderer:
 
     @property
     def human_created(self):
-        return duration(self.created, now=now()) if self.created else None
+        return duration(self.created, now=pendulum.now()) if self.created else None
 
     @property
     def message_groups(self):
@@ -90,7 +89,7 @@ class Embed:
         self.url = data.get('url')
         self.type = data.get('type', 'rich')
         self.author = data.get('author')
-        self.timestamp_ = dateutil.parser.parse(data['timestamp']) if data.get('timestamp') else None
+        self.timestamp_ = pendulum.parse(data['timestamp']) if data.get('timestamp') else None
         self.color = data.get('color')
         self.image = data.get('image')
         self.thumbnail = data.get('thumbnail')
@@ -103,7 +102,7 @@ class Embed:
 
     @property
     def human_timestamp(self):
-        return duration(self.timestamp_, now=now()) if self.timestamp_ else None
+        return duration(self.timestamp_, now=pendulum.now()) if self.timestamp_ else None
 
 
 class Message:
@@ -112,7 +111,7 @@ class Message:
         self.channel_id = kwargs.get('channel_id')
         self.guild_id = kwargs.get('guild_id')
         self.author = User(kwargs.get('author'))
-        self.timestamp_ = dateutil.parser.parse(kwargs['timestamp']) if kwargs.get('timestamp') else None
+        self.timestamp_ = pendulum.parse(kwargs['timestamp']) if kwargs.get('timestamp') else None
         self.raw_content = kwargs.get('_content')
         self.content = kwargs.get('content')
         self.attachments = kwargs.get('attachments')
@@ -129,7 +128,7 @@ class Message:
 
     @property
     def human_timestamp(self):
-        return duration(self.timestamp_, now=now()) if self.timestamp_ else None
+        return duration(self.timestamp_, now=pendulum.now()) if self.timestamp_ else None
 
     def is_different_from(self, other):
         if self.timestamp_ is not None:

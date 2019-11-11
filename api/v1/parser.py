@@ -1,11 +1,8 @@
-from datetime import timedelta
-
 import celery
-from django.utils import timezone
+import pendulum
 
 from api import tasks, utils
 from api.models import Log
-
 from api.v1 import tasks as v1_tasks
 
 
@@ -30,7 +27,7 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
     if Log.objects.filter(uuid=uuid).exists():
         return Log.objects.get(uuid=uuid)
 
-    data['expires'] = timezone.now() + timedelta(seconds=int(expires)) if expires else None
+    data['expires'] = pendulum.now().add(seconds=int(expires)) if expires else None
 
     messages = ['{current}/{total} messages parsed... ({percent}%)',
                 '{current}/{total} messages formatted... ({percent}%)', 'Saving messages... ({percent}%)']

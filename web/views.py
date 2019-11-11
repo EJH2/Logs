@@ -1,3 +1,4 @@
+import pendulum
 import requests
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
@@ -5,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
 from itsdangerous import BadSignature
 from sentry_sdk import capture_exception
 
@@ -20,7 +20,7 @@ from web.parser import create_preview, save_preview
 
 # Create your views here.
 def index(request):
-    return render(request, 'discord_logview/index.html', context={'iso': timezone.now().isoformat()})
+    return render(request, 'discord_logview/index.html', context={'iso': pendulum.now().isoformat()})
 
 
 @login_required
@@ -51,7 +51,7 @@ def new(request):
         form = LogCreateForm(user=request.user)
     return render(request, 'discord_logview/create_log.html', context={
         'form': form,
-        'iso': timezone.now().isoformat()
+        'iso': pendulum.now().isoformat()
     })
 
 
@@ -84,7 +84,7 @@ def log_html(request, pk):
     if log.data.get('tasks') and not log.pages.count() > 0:
         return render(request, 'discord_logview/loading.html', context={
             'task_ids': list(enumerate(log.data.get('tasks'))),
-            'iso': timezone.now().isoformat()
+            'iso': pendulum.now().isoformat()
         })
 
     data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
@@ -144,7 +144,7 @@ def log_preview(request, pk):
     if not data:
         raise Http404('That log could not be found!')
 
-    data = {'uuid': data['uuid'], 'created': timezone.now(), 'users': data['data']['users'],
+    data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
             'messages': data['data']['messages'], 'raw_content': data['content'], 'raw_type': data['type'],
             'type': all_types.get(data['type']), 'user_id': None, 'is_preview': True,
             'delete_token': signer.dumps(f'preview.{pk}')}

@@ -1,11 +1,10 @@
-from datetime import datetime
-
+import pendulum
 from drf_yasg import openapi
 from rest_framework import status
 
 from api.v2 import serializers
 
-now = datetime.now().isoformat()
+now = pendulum.now().isoformat()
 
 archive_responses = {
     status.HTTP_201_CREATED: openapi.Response('URL Created', serializers.LogArchiveSerializer, examples={

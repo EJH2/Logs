@@ -1,5 +1,6 @@
 import re
-from datetime import datetime
+
+import pendulum
 
 from api import consts
 
@@ -21,7 +22,7 @@ def rowboat(content, progress):
                 'discriminator': match['discriminator']
             },
             'content': match['content'],
-            'timestamp': datetime.strptime(match['timestamp'], '%Y-%m-%d %H:%M:%S.%f').isoformat(),
+            'timestamp': pendulum.from_format(match['timestamp'], 'YYYY-MM-DD HH:mm:ss.SSSSSS').isoformat(),
             'attachments': [
                 {
                     'filename': url.rsplit('/', 1)[1],
@@ -54,7 +55,7 @@ def rosalina_bottings(content, progress):
                 'discriminator': '0000'
             },
             'content': match['content'],
-            'timestamp': match['timestamp'],
+            'timestamp': pendulum.parse(match['timestamp']),
             'attachments': [
                 {
                     'filename': url.rsplit('/', 1)[1],
@@ -94,7 +95,7 @@ def auttaja(content, progress):
                 'discriminator': match['discriminator']
             },
             'content': match['content'],
-            'timestamp': datetime.strptime(match['timestamp'], '%a %b %d %H:%M:%S %Y').isoformat(),
+            'timestamp': pendulum.from_format(match['timestamp'], 'ddd MMM DD HH:mm:ss YYYY').isoformat(),
             'attachments': [
                 {
                     'filename': url.rsplit('/', 1)[1],
@@ -127,7 +128,7 @@ def gearbot(content, progress):
                 'discriminator': match['discriminator']
             },
             'content': match['content'],
-            'timestamp': datetime.strptime(match['timestamp'], '%Y-%m-%d %H:%M:%S.%f').isoformat(),
+            'timestamp': pendulum.from_format(match['timestamp'], 'YYYY-MM-DD HH:mm:ss.SSSSSS').isoformat(),
             'attachments': [
                 {
                     'filename': url.rsplit('/', 1)[1],
@@ -165,7 +166,7 @@ def vortex(content, progress):
                 'discriminator': match['discriminator']
             },
             'content': match['content'],
-            'timestamp': datetime.strptime(match['timestamp'], '%a, %d %b %Y %H:%M:%S %Z').isoformat(),
+            'timestamp': pendulum.from_format(match['timestamp'], 'ddd, D MMM YYYY HH:mm:ss z').isoformat(),
             'attachments': [
                 {
                     'filename': url.rsplit('/', 1)[1],
@@ -203,7 +204,7 @@ def modmailbot(content, progress):
                 'discriminator': match.get('discriminator', '0000')
             },
             'content': match['content'],
-            'timestamp': datetime.strptime(match['timestamp'], '%Y-%m-%d %H:%M:%S').isoformat(),
+            'timestamp': pendulum.from_format(match['timestamp'], 'YYYY-MM-DD HH:mm:ss').isoformat(),
             'attachments': [
                 {
                     'filename': url.rsplit('/', 1)[1],

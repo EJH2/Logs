@@ -1,15 +1,14 @@
 import base64
 import html
 import re
-from datetime import timedelta, datetime
 
 import demoji
-import pytz
+import pendulum
 
 from api.emoji import EMOJI_LIST, EMOJI_REGEX, UNICODE_LIST
 
-if not demoji.last_downloaded_timestamp() or datetime.now(pytz.UTC) > \
-        (demoji.last_downloaded_timestamp() + timedelta(days=7)):
+if not demoji.last_downloaded_timestamp() or pendulum.now() > \
+        (pendulum.instance(demoji.last_downloaded_timestamp()).add(days=7)):
     demoji.download_codes()
 
 if not demoji._EMOJI_PAT:

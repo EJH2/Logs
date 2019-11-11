@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block head_title %}{% endblock %}</title>
+  <style>
+      @font-face {
+    font-family: Whitney;
+    font-style: light;
+    font-weight: 300;
+    src: url(https://discordapp.com/assets/6c6374bad0b0b6d204d8d6dc4a18d820.woff) format('woff');
+}
+
+@font-face {
+    font-family: Whitney;
+    font-style: normal;
+    font-weight: 500;
+    src: url(https://discordapp.com/assets/e8acd7d9bf6207f99350ca9f9e23b168.woff) format('woff');
+}
+
+@font-face {
+    font-family: Whitney;
+    font-style: medium;
+    font-weight: 600;
+    src: url(https://discordapp.com/assets/3bdef1251a424500c1b3a78dea9b7e57.woff) format('woff');
+}
+
+@font-face {
+    font-family: WhitneyMedium;
+    font-style: medium;
+    font-weight: 600;
+    src: url(https://discordapp.com/assets/be0060dafb7a0e31d2a1ca17c0708636.woff) format('woff');
+}
+
+@font-face {
+    font-family: Whitney;
+    font-style: bold;
+    font-weight: 700;
+    src: url(https://discordapp.com/assets/8e12fb4f14d9c4592eb8ec9f22337b04.woff) format('woff');
+}
+
+body {
+    background: #2F3135;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: "Whitney", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+a {
+    color: #00b0f4;
+    text-decoration: none;
+}
+
+ul {
+    list-style-type: none;
+}
+
+strong, .login-or {
+    display: none;
+}
+
+h1 {
+    text-align: center;
+    color: white;
+    font-weight: 300;
+    font-size: 26px;
+}
+
+div:first-child ul {
+    border-bottom: 1px solid #5f5f5f;
+    padding-bottom: 25px;
+}
+
+div:first-child ul li {
+    padding-inline-start: 0px;
+    display: inline-block;
+    width: 49%;
+    text-align: center;
+
+}
+
+div:first-child ul li a {
+    color: #fff;
+}
+
+.login {
+    padding-top: 20px;
+}
+
+#id_login, #id_password {
+    background: #0000001a;
+    border: 1px solid #0000004d;
+    width: 100%;
+    padding: 10px;
+    height: 40px;
+    box-sizing: border-box;
+    color:  white;
+    font-family: Whitney;
+    font-size: 16px;
+}
+
+label[for="id_login"], label[for="id_password"] {
+    color: #8e9297;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.secondaryAction {
+    display: block;
+    width:  100%;
+}
+
+.primaryAction {
+    background: #677bc4;
+    width: 100%;
+    border: none;
+    color: #fff;
+    line-height: 24px;
+    height: 44px;
+    border-radius: 3px;
+    font-family: Whitney;
+    font-size: 16px;
+    margin-top: 20px
+}
+
+p {
+    margin-bottom: 5px;
+}
+  </style>
+    {% block extra_head %}
+    {% endblock %}
+  </head>
+  <body>
+    {% block body %}
+
+    {% if messages %}
+    <div>
+      <strong>Messages:</strong>
+      <ul>
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div>
+      <strong>Menu:</strong>
+      <ul>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+        {% else %}
+        <li><a href="{% url 'account_login' %}">Sign In</a></li>
+        <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+        {% endif %}
+      </ul>
+    </div>
+    {% block content %}
+    {% endblock %}
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
+  </body>
+</html>
