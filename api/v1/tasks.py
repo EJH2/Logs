@@ -1,7 +1,7 @@
 import re
 
 from celery import shared_task
-from celery_progress.backend import ProgressRecorder
+from celery_progress.websockets.backend import WebSocketProgressRecorder
 
 from api.consts import rowboat_types
 from api.v1 import handlers
@@ -21,7 +21,7 @@ def parse_text(self, log_type: str, content: str):
     if log_type in rowboat_types:
         log_type = 'rowboat'
     parser = getattr(handlers, log_type)
-    message_array = parser(content, ProgressRecorder(self))
+    message_array = parser(content, WebSocketProgressRecorder(self))
     if not message_array:
         raise IndexError('No messages match this pattern!')
     return message_array

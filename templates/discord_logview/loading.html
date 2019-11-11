@@ -13,7 +13,7 @@
 {% endblock %}
 {% block extra_js %}
     <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
-    <script src="{% static 'celery_progress/celery_progress_websockets.js' %}"></script>
+    <script src="{% static 'celery_progress/websockets.js' %}"></script>
     <script>
         {% for enum in task_ids %}const progressUrl{{ enum|first }} = "/ws/progress/{{ enum|last|first }}/";
         {% endfor %}

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'discord',
 
     'celery_progress',
+    'celery_progress.websockets',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',

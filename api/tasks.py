@@ -1,7 +1,7 @@
 import time
 
 from celery import shared_task
-from celery_progress.backend import ProgressRecorder
+from celery_progress.websockets.backend import WebSocketProgressRecorder
 
 from api.models import Log, Page
 from api.serializers import MessageSerializer
@@ -22,7 +22,7 @@ def parse_json(self, json_data: dict):
     users = [dict(t) for t in {tuple(d['author'].items()) for d in json_data}]
 
     total = len(json_data)
-    progress = ProgressRecorder(self)
+    progress = WebSocketProgressRecorder(self)
 
     for count, msg in enumerate(json_data):
         msg = MessageSerializer(data=msg, context={'users': users})
@@ -60,7 +60,7 @@ def create_pages(self, data: dict, uuid: str):
     :param uuid: Log uuid.
     :return: Log uuid.
     """
-    progress = ProgressRecorder(self)
+    progress = WebSocketProgressRecorder(self)
 
     messages = data.pop('messages')
 
