@@ -1,3 +1,10 @@
+"""
+using code from <https://github.com/kyb3r/modmail-api/blob/8759fa08c6ffb838fa2405b5addb676b9c640b2c/core/formatter.py>
+© 2018 Kyber
+modified by https://github.com/EJH2
+© 2019 EJH2
+"""
+
 import base64
 import html
 import re
