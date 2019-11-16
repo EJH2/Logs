@@ -19,6 +19,9 @@ if not demoji.last_downloaded_timestamp() or pendulum.now() > \
     demoji.download_codes()
 
 demoji.set_emoji_pattern()
+# This is taken from the Demoji module, because they decided to make the emoji pattern private
+esc = (re.escape(c) for c in sorted(dict(demoji.stream_unicodeorg_emojifile(demoji.URL)), key=len, reverse=True))
+UNICODE_EMOJI_PAT = re.compile(r"|".join(esc))
 
 
 def _encode_codeblock(m):
@@ -53,8 +56,8 @@ def _process_unicode_emojis(m, emoji_class):
     title_e = re.sub(r'[\U0001F3FB-\U0001F3FF]$', '', e) or e
     title = UNICODE_LIST.get(title_e, demoji.findall(title_e)[title_e])
     codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
-    return fr'<img class="{emoji_class}" title=":{title}:" ' \
-        fr'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
+    return f'<img class="{emoji_class}" title=":{title}:" ' \
+        f'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
 
 
 def _decode_link(m):
@@ -75,10 +78,18 @@ def _decode_mentions(m):
 
 def _smart_mention(m, users):
     uid = m.group(2)
-    if users and uid in [u['id'] for u in users]:
-        user = next(item for item in users if str(item["id"]) == uid)
-        return fr'<span class="mention user" title="{uid}">@{user["username"]}</span>'
-    return fr'<span class="mention user" title="{uid}">{m.group(1)}</span>'
+    user = next((item for item in users if str(item['id']) == uid), None)
+    if user:
+        return f'<span class="mention user" title="{uid}">@{user["username"]}</span>'
+    return f'<span class="mention user" title="{uid}">{m.group(1)}</span>'
+
+
+def _find_id_by_name(m, users):
+    name, disc = m.groups()
+    user = next((item for item in users if item['username'] == name and item['discriminator'] == disc), None)
+    if user:
+        return f'<span class="mention user" title="{user["id"]}">@{name}</span>'
+    return f'<span class="mention" title="{name}#{disc}">@{name}</span>'
 
 
 def _decode_inline_codeblock(m):
@@ -121,7 +132,7 @@ def _format_content(content: str, users: dict = None, newlines: bool = True):
     content = re.sub(r'(&lt;@!?(\d+)&gt;)', lambda m: _smart_mention(m, users), content)
 
     # User mentions (@user#discrim)
-    content = re.sub(r'@((.{2,32}?)#\d{4})', r'<span class="mention" title="\1">@\2</span>', content)
+    content = re.sub(r'@(.{2,32}?)#(\d{4})', lambda m: _find_id_by_name(m, users), content)
 
     # User mentions (<@user#discrim (id)>)
     content = re.sub(r'&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;',
@@ -131,15 +142,13 @@ def _format_content(content: str, users: dict = None, newlines: bool = True):
     content = re.sub(r'(&lt;#\d+&gt;)', r'<span class="mention">\1</span>', content)
 
     # Channel mentions (<#name>)
-    content = re.sub(r'(&lt;#(.{1,100}?)&gt;)',
-                     r'<span class="mention">#\2</span>', content)
+    content = re.sub(r'(&lt;#(.{1,100}?)&gt;)', r'<span class="mention">#\2</span>', content)
 
     # Role mentions (<@&id>)
     content = re.sub(r'(&lt;@&amp;(\d+)&gt;)', r'<span class="mention">\1</span>', content)
 
     # Role mentions (<@&name>)
-    content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)',
-                     r'<span class="mention" title="Role: \2">@\2</span>', content)
+    content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)', r'<span class="mention" title="Role: \2">@\2</span>', content)
 
     # Decode and process inline codeblocks
     content = re.sub('\x1AI(.*?)\x1AI', _decode_inline_codeblock, content)
@@ -177,9 +186,8 @@ def format_content(content: str, users: dict = None, masked_links: bool = False,
                      r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
                      r'(&lt;@&amp;(.{1,100}?)&gt;))', _encode_mentions, content)
 
-    jumbo_pat = fr'&lt;(:.*?:)(\d*)&gt;|&lt;(a:.*?:)(\d*)&gt;'
-    jumbo = (not re.sub(r'(\s)', '', re.sub(jumbo_pat, '', demoji.replace(content)))) and \
-            (len(re.findall(jumbo_pat, content)) < 28)
+    jumbo_pat = fr'&lt;(:.*?:)(\d*)&gt;|&lt;(a:.*?:)(\d*)&gt;|{UNICODE_EMOJI_PAT}'
+    jumbo = (not re.sub(r'(\s)', '', re.sub(jumbo_pat, '', content))) and (len(re.findall(jumbo_pat, content)) < 28)
     emoji_class = 'emoji emoji--large' if jumbo else 'emoji'
 
     # Custom emojis (<:name:id>)
@@ -187,7 +195,7 @@ def format_content(content: str, users: dict = None, masked_links: bool = False,
                      fr'https://cdn.discordapp.com/emojis/\2.png" alt="\1">', content)
 
     # Custom animated emojis (<a:name:id>)
-    content = re.sub(r'&lt;(a:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
+    content = re.sub(r'&lt;a(:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
                      fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
 
     # Process emojis (:text:)
