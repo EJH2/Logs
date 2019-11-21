@@ -5,6 +5,17 @@ import pendulum
 from api import consts
 
 
+def _rough_match(regex, lines, splitter):
+    _matches = list()
+    for text in lines:
+        if re.match(regex, text):
+            _matches.append(text)
+        else:
+            _matches[-1] += f'{splitter}{text}'
+
+    return (re.match(regex, m) for m in _matches)
+
+
 def rowboat(content, progress):
     matches = (re.finditer(consts.rowboat_re, content, re.MULTILINE))
     match_data = list(m.groupdict() for m in matches)
@@ -72,15 +83,7 @@ def rosalina_bottings(content, progress):
 
 def auttaja(content, progress):
     content = content[:-1] if content.endswith('\n') else content
-    lines = content.split('\n\n')
-    _matches = list()
-    for text in lines:
-        if re.match(consts.auttaja_re, text):
-            _matches.append(text)
-        else:
-            _matches[-1] += f'\n\n{text}'
-
-    matches = (re.match(consts.auttaja_re, m) for m in _matches)
+    matches = _rough_match(consts.auttaja_re, content.split('\n\n'), '\n\n')
     match_data = list(m.groupdict() for m in matches)
     message_array = []
 
@@ -144,15 +147,7 @@ def gearbot(content, progress):
 
 
 def vortex(content, progress):
-    lines = content.split('\n\n')[1:]
-    _matches = list()
-    for text in lines:
-        if re.match(consts.vortex_re, text):
-            _matches.append(text)
-        else:
-            _matches[-1] += f'\n\n{text}'
-
-    matches = (re.match(consts.vortex_re, m) for m in _matches)
+    matches = _rough_match(consts.vortex_re, content.split('\n\n')[1:], '\n\n')
     match_data = list(m.groupdict() for m in matches)
     message_array = []
 

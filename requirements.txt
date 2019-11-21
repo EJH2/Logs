@@ -1,3 +1,4 @@
+natural==0.2.0
 celery==4.3.0
 celery-progress==0.0.8
 channels==2.3.0

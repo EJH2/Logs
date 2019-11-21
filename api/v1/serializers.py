@@ -50,9 +50,21 @@ class LogCreateSerializer(serializers.Serializer):
             ret['guild'] = None
         return ret
 
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
 
 class LogErrorSerializer(serializers.Serializer):
     errors = serializers.JSONField(help_text='Request errors.')
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
 
 
 class LogListSerializer(serializers.HyperlinkedModelSerializer):

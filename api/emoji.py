@@ -1,5 +1,6 @@
 """
-using emoji list from https://gist.github.com/Vexs/629488c4bb4126ad2a9909309ed6bd71/da8c23f4a42f3ad7cf829398b89bda5347907fef
+using emoji list from
+https://gist.github.com/Vexs/629488c4bb4126ad2a9909309ed6bd71/da8c23f4a42f3ad7cf829398b89bda5347907fef
 © 2019 Vexs, licensed under "do-whatever-the-fuck-you-want"
 """
 

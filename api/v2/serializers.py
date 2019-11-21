@@ -42,9 +42,21 @@ class LogCreateSerializer(serializers.Serializer):
             ret['guild'] = None
         return ret
 
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
 
 class LogErrorSerializer(serializers.Serializer):
     errors = serializers.JSONField(help_text='Request errors.')
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
 
 
 class LogArchiveCreateSerializer(serializers.Serializer):
@@ -81,9 +93,21 @@ class LogArchiveCreateSerializer(serializers.Serializer):
             ret['guild'] = None
         return ret
 
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
 
 class LogArchiveSerializer(serializers.Serializer):
     url = serializers.URLField(help_text='Archive URL.')
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
 
 
 class LogListSerializer(serializers.HyperlinkedModelSerializer):
