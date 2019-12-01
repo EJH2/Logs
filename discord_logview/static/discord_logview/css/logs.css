@@ -95,8 +95,8 @@ img {
 }
 
 .emoji--large {
-    width: 2rem;
-    height: 2rem;
+    width: 3rem;
+    height: 3rem;
 }
 
 .mention {
@@ -155,6 +155,10 @@ span.mention {
 
 .infinite-scroll-request[style='display: block;'] {
     display: inline !important;
+}
+
+.infinite-scroll-status {
+    text-align: center;
 }
 
 /* === NAV BAR === */
@@ -286,6 +290,11 @@ nav .toolbox-tools {
     }
 }
 
+#copyright {
+    margin: 10px;
+    text-align: center;
+}
+
 /* === NO JS === */
 
 .no-js .users {
@@ -349,6 +358,10 @@ nav .toolbox-tools {
     max-height: 0;
 }
 
+#copyall {
+    list-style: none;
+}
+
 #user-list-toggle, #users {
     -webkit-transition: all .25s ease-in-out;
     -moz-transition: all 0.25s ease-in-out;
@@ -363,6 +376,10 @@ nav .toolbox-tools {
     -ms-transform: rotate(90deg);
     -o-transform: rotate(90deg);
     transform: rotate(90deg);
+}
+
+#user-list-toggle > input {
+    display: none;
 }
 
 .toolbox {
@@ -481,6 +498,10 @@ a.material-icons {
     background: #72767d;
     margin-bottom: -2px;
     animation: placeholder-pulse 3s ease-in-out infinite;
+}
+
+#user-list > .placeholder-text {
+    margin-bottom: -3px;
 }
 
 @keyframes placeholder-pulse {

@@ -76,13 +76,13 @@ modified by https://github.com/EJH2
     <div class="infinite-next">
         <a class="infinite-more-link" href="{{ log.uuid }}?page={{ log.page.next_page_number }}"></a>
     </div>
-    <div class="infinite-scroll-status" style="text-align: center">
+    <div class="infinite-scroll-status">
         <img class="infinite-scroll-request" src="{% static 'discord_logview/icons/loading.gif' %}" alt="Loading...">
     </div>
     {% endif %}
     <div id="lightbox_div"></div>
 {% block extra_js %}{% endblock %}
-<div id="copyright" style="margin: 10px; text-align: center">
+<div id="copyright">
     <div>Made with blood, sweat, and Django by <a href="https://github.com/EJH2">EJH2</a></div>
     <div>Discord Log Viewer is not affiliated with Discord, which is a registered trademark of Discord Inc.</div>
 </div>

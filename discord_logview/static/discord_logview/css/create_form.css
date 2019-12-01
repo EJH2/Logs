@@ -64,6 +64,10 @@ div, span, a, input {
     white-space: normal;
 }
 
+.option-hint > ul > li > b {
+    color: darkgrey;
+}
+
 select, input#url {
     border: 1px solid #b0b0b0;
 }
@@ -107,6 +111,15 @@ input[type='radio']:checked + .r-text { color: #494; }
     color: #888;
     font-size: 0.85em;
     line-height: 1.5em;
+}
+
+.bottom-hint > div {
+    margin-top: 1em;
+    font-size: 1.2em;
+}
+
+.bottom-hint > div > a {
+    text-decoration: underline;
 }
 
 input#url, select#type, select#guild, select#expires {

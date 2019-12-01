@@ -25,6 +25,10 @@
     display: flex;
     -webkit-box-sizing: border-box;
     box-sizing: border-box
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-basis: auto;
+    background-color: #2F3135;
 }
 
 .glitch-wrapper {

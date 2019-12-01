@@ -22,13 +22,13 @@
         {% if log.users %}
             <span>User{% if log.users|length != 1 %}s: {% else %}: {% endif %}</span>
             <label id="user-list-toggle" class="material-icons">
-                <input type="checkbox" style="display: none" onclick="return toggleUsers()">
+                <input type="checkbox" onclick="return toggleUsers()">
                 arrow_right
             </label>
             <ul id="users">
-                <li id="copyall" style="list-style: none">
+                <li id="copyall">
                     <span class="tooltip">
-                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)" style="opacity: 1;">Copy All User IDs</span>
+                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)">Copy All User IDs</span>
                     </span>
                 </li>
                 {% for user in log.users %}
