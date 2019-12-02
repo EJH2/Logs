@@ -21,7 +21,7 @@ if not demoji.last_downloaded_timestamp() or pendulum.now() > \
 demoji.set_emoji_pattern()
 # This is taken from the Demoji module, because they decided to make the emoji pattern private
 esc = (re.escape(c) for c in sorted(dict(demoji.stream_unicodeorg_emojifile(demoji.URL)), key=len, reverse=True))
-UNICODE_EMOJI_PAT = re.compile(r"|".join(esc))
+UNICODE_EMOJI_PAT = re.compile(r"|".join(esc)).pattern
 
 
 def _encode_codeblock(m):
