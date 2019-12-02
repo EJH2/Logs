@@ -3,8 +3,11 @@ import requests
 from allauth.socialaccount.providers.discord.views import DiscordOAuth2Adapter as DiscordAdapter
 from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView, OAuth2LoginView
 
+from discord.provider import DiscordProvider
+
 
 class CustomDiscordOAuth2Adapter(DiscordAdapter):
+    provider_id = DiscordProvider.id
     guilds_url = 'https://discordapp.com/api/users/@me/guilds'
 
     def complete_login(self, request, app, token, **kwargs):
