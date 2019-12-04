@@ -14,13 +14,34 @@ modified by https://github.com/EJH2
     <meta name="viewport" content="width=device-width"/>
     <meta name="og:title" content="Discord Log Viewer">
     <meta name="og:description" content="Beautify your Discord Logs">
-    <meta name="og:image" content="https://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
+    <meta name="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
 
     <link href="{% static "discord_logview/css/logs.css" %}" rel="stylesheet">
-    <link id="theme" href="{% static "discord_logview/css/logs_dark.css" %}" rel="stylesheet">
+    <script>
+      if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
+        document.documentElement.style.display = 'none';
+        document.head.insertAdjacentHTML(
+            'beforeend',
+            '<link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_dark.css" %}" onload="document.documentElement.style.display = \'\'">'
+        );
+      }
+    </script>
+    <link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_dark.css" %}" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: dark)">
+    <link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_light.css" %}" media="(prefers-color-scheme: light)">
+    <script>
+      if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
+        document.documentElement.style.display = 'none';
+        document.head.insertAdjacentHTML(
+            'beforeend',
+            '<link rel="stylesheet" class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css" onload="document.documentElement.style.display = \'\'">'
+        );
+      }
+    </script>
+    <link class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css"
+          rel="stylesheet" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: dark)">
+    <link class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-light.min.css"
+          rel="stylesheet" media="(prefers-color-scheme: light)">
     <link rel="stylesheet" href="{% static 'discord_logview/css/alert.css' %}">
-    <link id="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css"
-          rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
     {% block extra_css %}{% endblock %}

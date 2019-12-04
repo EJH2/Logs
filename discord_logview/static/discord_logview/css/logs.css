@@ -309,6 +309,10 @@ nav .toolbox-tools {
     display: none;
 }
 
+.no-js .spoiler-box.spoiler-hidden .spoiler-text {
+    opacity: 1;
+}
+
 /* === HEADER === */
 
 #header {

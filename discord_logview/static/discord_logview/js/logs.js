@@ -56,6 +56,8 @@ function loadJS() {
 window.addEventListener('DOMContentLoaded', (event) => {
     document.body.classList.remove('no-js');
 
+    initialTheme();
+
     loadJS();
 
     if (typeof InfiniteScroll !== 'undefined') {
@@ -76,21 +78,51 @@ function toggleDrawer(element) {
     element.classList.toggle('rotated');
 }
 
-function toggleTheme() {
-    let theme = document.getElementById('theme');
-    let hlTheme = document.getElementById('hl_theme');
+function initialTheme() {
+    let theme = window.localStorage.getItem('theme') || (
+        window.matchMedia('(prefers-color-scheme: dark)').media === 'not all' ? 'dark' : (
+            window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        )
+    );
+    setTheme(theme)
+}
+
+function setTheme(theme) {
+    let cssThemes = document.getElementsByClassName('theme');
+    let hlThemes = document.getElementsByClassName('hl_theme');
     let guildIcon = document.getElementById('header-icon');
-    if (theme.getAttribute('href').indexOf('dark') > -1) {
-        theme.setAttribute('href', '/static/discord_logview/css/logs_light.css');
-        hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-light.min.css');
+    if (theme === 'light') {
+        for (let cssTheme of cssThemes) {
+            cssTheme.setAttribute('href', '/static/discord_logview/css/logs_light.css');
+        }
+        for (let hlTheme of hlThemes) {
+            hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-light.min.css');
+        }
+        if (guildIcon.src.indexOf('processing') === -1) {
+            guildIcon.src = '/static/discord_logview/icons/black_file.png';
+        }
     } else {
-        theme.setAttribute('href', '/static/discord_logview/css/logs_dark.css');
-        hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css');
+        for (let cssTheme of cssThemes) {
+            cssTheme.setAttribute('href', '/static/discord_logview/css/logs_dark.css');
+        }
+        for (let hlTheme of hlThemes) {
+            hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css');
+        }
+        if (guildIcon.src.indexOf('processing') === -1) {
+            guildIcon.src = '/static/discord_logview/icons/white_file.png';
+        }
     }
-    if (guildIcon.src.indexOf('white_file') > -1) {
-        guildIcon.src = '/static/discord_logview/icons/black_file.png'
-    } else if (guildIcon.src.indexOf('black_file') > -1) {
-        guildIcon.src = '/static/discord_logview/icons/white_file.png'
+}
+
+function toggleTheme() {
+    let theme = window.localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    console.log(theme);
+    if (theme === 'dark') {
+        window.localStorage.setItem('theme', 'light');
+        setTheme('light');
+    } else {
+        window.localStorage.setItem('theme', 'dark');
+        setTheme('dark');
     }
 }
 
