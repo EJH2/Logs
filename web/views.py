@@ -98,7 +98,7 @@ def log_html(request, pk):
     data['total_messages'] = len(msgs)
     page = request.GET.get('page')
     if not request.is_ajax() and page:
-        return redirect('logs-html', pk=pk)
+        return redirect('log-html', pk=pk)
 
     paginator = Paginator(msgs, 100)
     try:
@@ -153,7 +153,7 @@ def log_preview(request, pk):
     data['total_messages'] = len(msgs)
     page = request.GET.get('page')
     if not request.is_ajax() and page:
-        return redirect('logs-preview', pk=pk)
+        return redirect('log-preview', pk=pk)
 
     paginator = Paginator(msgs, 100)
     if paginator.num_pages > 1:
