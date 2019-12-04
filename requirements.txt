@@ -4,7 +4,7 @@ celery-progress==0.0.8
 channels==2.3.0
 channels-redis==2.4.0
 demoji==0.1.5
-Django==2.2.4
+Django==2.2.8
 django-allauth==0.40.0
 djangorestframework==3.10.2
 drf-yasg==1.16.1
