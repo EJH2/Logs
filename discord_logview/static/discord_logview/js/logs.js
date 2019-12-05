@@ -66,7 +66,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             append: '.infinite-item',
             status: '.infinite-scroll-status',
             hideNav: '.infinite-next',
-            history: 'replace',
+            history: false,
         });
         infScroll.on('append', function (response, path, items) {
             loadJS()
