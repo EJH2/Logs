@@ -233,3 +233,9 @@ blockquote {
 .message-reaction-count {
     color: #99AAB5;
 }
+
+/* === LOG CREATION FORM === */
+
+input#url, select#type, select#guild, select#expires {
+    color: initial !important;
+}
