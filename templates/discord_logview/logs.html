@@ -8,7 +8,7 @@
         {% else %}
             src="{% static 'discord_logview/icons/white_file.png' %}"
         {% endif %}
-         onerror="this.src='{% static 'discord_logview/icons/white_file.png' %}'" alt="">
+         onerror="this.src='{% static 'discord_logview/icons/white_file.png' %}'; this.onerror = ''" alt="">
 {% endblock %}
 {% block header-data %}
     <div id="log-type">

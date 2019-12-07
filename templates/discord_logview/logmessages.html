@@ -2,7 +2,7 @@
 {% for group in log.message_groups %}
     <div class="message-group infinite-item">
         <div class="author-avatar-container">
-            <img class="author-avatar" src="{{ group.author.avatar_url }}" onerror="this.src='{{ group.author.default_avatar_url }}'" alt=""/>
+            <img class="author-avatar" src="{{ group.author.avatar_url }}" onerror="this.src='{{ group.author.default_avatar_url }}'; this.onerror = ''" alt=""/>
         </div>
         <div class="messages">
             <div class="author-header">
@@ -29,7 +29,7 @@
                     <div class="message-attachment">
                         {% if attachment.is_image %}
                             <a href="#{{ attachment.filename }}">
-                                <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'"/>
+                                <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''"/>
                             </a>
                         {% else %}
                             <a href="{{ attachment.url }}">
