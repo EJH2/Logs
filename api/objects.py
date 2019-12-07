@@ -65,7 +65,7 @@ class User:
         self.id = data.get('id')
         self.username = data.get('username')
         self.discriminator = data.get('discriminator')
-        self.avatar = data.get('avatar')
+        self.avatar_url = data.get('avatar')
         self.bot = data.get('bot')
         self.color = data.get('color')
 
