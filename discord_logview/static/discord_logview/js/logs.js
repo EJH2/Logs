@@ -51,6 +51,19 @@ function loadJS() {
             s.classList.add('mentioned');
         }
     }
+
+    for (let m of document.querySelectorAll('.message-group')) {
+        let avatarElem = m.getElementsByClassName('author-avatar')[0];
+        if (avatarElem.src.indexOf('.gif') > -1) {
+            avatarElem.src = avatarElem.src.replace('.gif', '.png');
+            m.onmouseenter = function () {
+                avatarElem.src = avatarElem.src.replace('.png', '.gif');
+            };
+            m.onmouseleave = function () {
+                avatarElem.src = avatarElem.src.replace('.gif', '.png');
+            }
+        }
+    }
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
