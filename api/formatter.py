@@ -131,12 +131,12 @@ def _format_content(content: str, users: dict = None, newlines: bool = True):
     # User mentions (<@id> and <@!id>)
     content = re.sub(r'(&lt;@!?(\d+)&gt;)', lambda m: _smart_mention(m, users), content)
 
-    # User mentions (@user#discrim)
-    content = re.sub(r'@(.{2,32}?)#(\d{4})', lambda m: _find_id_by_name(m, users), content)
-
     # User mentions (<@user#discrim (id)>)
     content = re.sub(r'&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;',
                      r'<span class="mention user" title="\3">@\2</span>', content)
+
+    # User mentions (@user#discrim)
+    content = re.sub(r'@(.{2,32}?)#(\d{4})', lambda m: _find_id_by_name(m, users), content)
 
     # Channel mentions (<#id>)
     content = re.sub(r'(&lt;#\d+&gt;)', r'<span class="mention">\1</span>', content)
