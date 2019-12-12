@@ -52,9 +52,10 @@ def _process_emojis(m):
 
 
 def _process_unicode_emojis(m, emoji_class):
-    e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', m.group())
-    title_e = re.sub(r'[\U0001F3FB-\U0001F3FF]$', '', e) or e
-    title = UNICODE_LIST.get(title_e, demoji.findall(title_e)[title_e])
+    e = m.group()
+    title = UNICODE_LIST.get(e, demoji.findall(e)[e])
+    if '\u200d' not in e:  # If there isn't a zero width joiner, strip out variation selectors
+        e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
     codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
     return f'<img class="{emoji_class}" title=":{title}:" ' \
         f'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
