@@ -22,6 +22,7 @@ demoji.set_emoji_pattern()
 # This is taken from the Demoji module, because they decided to make the emoji pattern private
 esc = (re.escape(c) for c in sorted(dict(demoji.stream_unicodeorg_emojifile(demoji.URL)), key=len, reverse=True))
 UNICODE_EMOJI_PAT = re.compile(r"|".join(esc)).pattern
+ESCAPED_EMOJI_PAT = fr'\\({UNICODE_EMOJI_PAT})'
 
 
 def _encode_codeblock(m):
@@ -45,6 +46,10 @@ def _encode_inline_codeblock(m):
 
 def _encode_mentions(m):
     return f'\x1AD{base64.b64encode(m.group(1).encode()).decode()}\x1AD'
+
+
+def _encode_emojis(m):
+    return f'\x1AE{base64.b64encode(m.group(1).encode()).decode()}\x1AE'
 
 
 def _process_emojis(m):
@@ -74,6 +79,10 @@ def _decode_url(m):
 
 
 def _decode_mentions(m):
+    return base64.b64decode(m.group(1).encode()).decode()
+
+
+def _decode_emojis(m):
     return base64.b64decode(m.group(1).encode()).decode()
 
 
@@ -122,6 +131,9 @@ def _format_content(content: str, users: dict = None, newlines: bool = True):
 
     # Decode mentions
     content = re.sub('\x1AD(.*?)\x1AD', _decode_mentions, content)
+
+    # Decode escaped emojis
+    content = re.sub('\x1AE(.*?)\x1AE', _decode_emojis, content)
 
     # Meta mentions (@everyone)
     content = content.replace('@everyone', '<span class="mentioned mention no-select">@everyone</span>')
@@ -186,6 +198,9 @@ def format_content(content: str, users: dict = None, masked_links: bool = False,
     content = re.sub(r'((@everyone)|(@here)|(&lt;@!?(\d+)&gt;)|(&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;)|'
                      r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
                      r'(&lt;@&amp;(.{1,100}?)&gt;))', _encode_mentions, content)
+
+    # Encode escaped emojis
+    content = re.sub(ESCAPED_EMOJI_PAT, _encode_emojis, content)
 
     jumbo_pat = fr'&lt;(:.*?:)(\d*)&gt;|&lt;(a:.*?:)(\d*)&gt;|{UNICODE_EMOJI_PAT}'
     jumbo = (not re.sub(r'(\s)', '', re.sub(jumbo_pat, '', content))) and (len(re.findall(jumbo_pat, content)) < 28)
@@ -254,6 +269,9 @@ def format_content_lite(content: str, users: dict = None, newlines: bool = True)
     content = re.sub(r'((@everyone)|(@here)|(&lt;@!?(\d+)&gt;)|(&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;)|'
                      r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
                      r'(&lt;@&amp;(.{1,100}?)&gt;))', _encode_mentions, content)
+
+    # Encode escaped emojis
+    content = re.sub(ESCAPED_EMOJI_PAT, _encode_emojis, content)
 
     # Process emojis (:text:)
     content = re.sub(EMOJI_REGEX, _process_emojis, content)
