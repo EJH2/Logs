@@ -75,7 +75,7 @@ def _get_privacy(log, request):
     raise Http404('Log not found!')
 
 
-def log_html(request, pk):
+def _get_log(request, pk):
     log = get_object_or_404(Log, pk=pk)
     error = _get_privacy(log, request)
     if error:
@@ -86,6 +86,14 @@ def log_html(request, pk):
             'task_ids': list(enumerate(log.data.get('tasks'))),
             'iso': pendulum.now().isoformat()
         })
+
+    return log
+
+
+def log_html(request, pk):
+    log = _get_log(request, pk)
+    if not isinstance(log, Log):
+        return log
 
     data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
             'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None,
@@ -119,6 +127,21 @@ def log_raw(request, pk):
         return error
 
     return render(request, 'discord_logview/lograw.html', context={'content': log.content, 'log': {'type': log.type}})
+
+
+def log_export(request, pk):
+    log = _get_log(request, pk)
+    if not isinstance(log, Log):
+        return log
+
+    data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
+            'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None}
+
+    log_pages = log.pages.order_by('index')
+    msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
+    data['total_messages'] = len(msgs)
+    data['messages'] = msgs
+    return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data), 'export': True})
 
 
 def log_delete(request, pk):
@@ -196,6 +219,19 @@ def log_preview_raw(request, pk):
     return render(request, 'discord_logview/lograw.html', context={
         'content': data['content'], 'log': {'type': data['type']}
     })
+
+
+def log_preview_export(request, pk):
+    data = request.session.get(pk)
+    if not data:
+        raise Http404('That log could not be found!')
+
+    data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
+            'messages': data['data']['messages'], 'raw_content': data['content'], 'raw_type': data['type'],
+            'type': all_types.get(data['type']), 'user_id': None}
+
+    data['total_messages'] = len(data['messages'])
+    return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data), 'export': True})
 
 
 # ====================================

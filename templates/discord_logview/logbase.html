@@ -52,11 +52,13 @@ modified by https://github.com/EJH2
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
     {% endif %}
     <script>const uid = '{{ log.user_id }}';</script>
+    {% if not export %}
     <script src="{% static 'discord_logview/js/alert.js' %}"></script>
+    {% endif %}
     <script src="{% static 'discord_logview/js/logs.js' %}"></script>
 </head>
-<body class="no-js">
-    {% if log_type == "logger" %} {# Patrons, smh #}
+<body class="no-js"{% if export %} style="margin-top: 20px"{% endif %}>
+    {% if log.type == "logger" %} {# Patrons, smh #}
     <!--
     hahayes
          _
@@ -74,13 +76,14 @@ modified by https://github.com/EJH2
       |    |
     !-->
     {% endif %}
-    {% include 'discord_logview/navbar.html' %}
-    <br>
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
+    {% if not export %}
+        {% include 'discord_logview/navbar.html' %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endif %}
     <div id="header">
         <div id="header-icon-container">
             {% block header-icon %}{% endblock header-icon %}
