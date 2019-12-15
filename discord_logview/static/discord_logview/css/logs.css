@@ -433,7 +433,7 @@ input:checked ~ .toolbox-tools li {
     max-width: fit-content;
 }
 
-.tooltip .permanent {
+.tooltip .tooltiptext.permanent {
     opacity: 1;
     cursor: pointer;
 }
