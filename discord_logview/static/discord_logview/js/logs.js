@@ -111,7 +111,7 @@ function setTheme(theme) {
         for (let hlTheme of hlThemes) {
             hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-light.min.css');
         }
-        if (guildIcon.src.indexOf('processing') === -1) {
+        if (guildIcon.src.indexOf('processing') === -1 && ['black_file', 'white_file'].indexOf(guildIcon.src.slice(-14, -4)) > -1) {
             guildIcon.src = '/static/discord_logview/icons/black_file.png';
         }
     } else {
@@ -121,7 +121,7 @@ function setTheme(theme) {
         for (let hlTheme of hlThemes) {
             hlTheme.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css');
         }
-        if (guildIcon.src.indexOf('processing') === -1) {
+        if (guildIcon.src.indexOf('processing') === -1 && ['black_file', 'white_file'].indexOf(guildIcon.src.slice(-14, -4)) > -1) {
             guildIcon.src = '/static/discord_logview/icons/white_file.png';
         }
     }
