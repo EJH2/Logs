@@ -4,7 +4,7 @@ from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from itsdangerous import BadSignature
 from sentry_sdk import capture_exception
@@ -114,7 +114,11 @@ def log_html(request, pk):
 
 def log_raw(request, pk):
     log = get_object_or_404(Log, pk=pk)
-    return HttpResponse(f"<pre>{log.content}</pre>")
+    error = _get_privacy(log, request)
+    if error:
+        return error
+
+    return render(request, 'discord_logview/lograw.html', context={'content': log.content, 'log': {'type': log.type}})
 
 
 def log_delete(request, pk):
@@ -188,7 +192,10 @@ def log_preview_raw(request, pk):
     data = request.session.get(pk)
     if not data:
         raise Http404('That log could not be found!')
-    return HttpResponse(f"<pre>{data['content']}</pre>")
+
+    return render(request, 'discord_logview/lograw.html', context={
+        'content': data['content'], 'log': {'type': data['type']}
+    })
 
 
 # ====================================

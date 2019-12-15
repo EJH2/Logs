@@ -1,0 +1,41 @@
+<!--
+Discord Log Viewer is not affiliated with Discord, which is a registered trademark of Discord Inc.
+Made by https://github.com/EJH2
+© 2019 EJH2
+!-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Discord Log</title>
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="og:title" content="Discord Log Viewer">
+    <meta name="og:description" content="Beautify your Discord Logs">
+    <meta name="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
+
+    <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
+</head>
+<body>
+    {% if log.type == "Logger" %} {# Patrons, smh #}
+    <!--
+    hahayes
+         _
+       _| |
+     _| | |
+    | | | |
+    | | | | __
+    | | | |/  \
+    |       /\ \
+    |      /  \/
+    |      \  /\
+    |       \/ /
+     \        /
+      |     /
+      |    |
+    !-->
+    {% endif %}
+    <pre>{{ content }}</pre>
+</body>
+</html>
