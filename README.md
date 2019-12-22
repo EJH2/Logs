@@ -1,7 +1,7 @@
 # Discord Logview
 
 ### Overview
-This is the successor to [this project](https://github.com/EJH2/django_logs). The name didn't really fit for what it
+This is the successor to the legacy branch of this project. The name didn't really fit for what it
 was, and the old code was really bad. For now, the old code will be running on my main site 
 [here](https://logs.discord.website), until such time when a merger can be safely made. If you want to see this in
 action before it goes live, feel free to check out [my staging site](https://logstaging.discord.website). If something breaks,
