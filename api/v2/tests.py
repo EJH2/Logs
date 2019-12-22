@@ -8,6 +8,8 @@ from api.consts import all_types
 from api.models import Whitelist
 from api.tests import create_user, default_headers, create_credentials
 
+import responses
+
 
 def create_message(content):
     return [
@@ -60,12 +62,32 @@ class ArchiveTestCase(TestCase):
         self.client = Client()
         self.client.login(**self.credentials)
 
+    @responses.activate
     def test_archive_url(self):
         """Tests to see if the Archive API is functioning."""
         # Test archiving
+        responses.add(responses.GET, 'https://example.com/log',
+                      json=[
+                          {
+                              "id": "658136631949131787",
+                              "author": {
+                                  "id": "319313310514282506",
+                                  "avatar": "e12bbe9ba8a06db42d2e9098caaa34af",
+                                  "bot": False,
+                                  "discriminator": "4379",
+                                  "username": "Big Nibba"
+                              },
+                              "content": "Idk",
+                              "timestamp": "2019-12-22T02:40:01.531Z",
+                              "edited_timestamp": None,
+                              "attachments": [],
+                              "embeds": [],
+                              "mentions": []
+                          }
+                      ])
         payload = {
             'type': random.choice(list(all_types.keys())),
-            'url': 'https://mystb.in/raw/nihubativo',  # This URL is for testing purposes only
+            'url': 'https://example.com/log',  # This URL is for testing purposes only
             'expires': '10min'
         }
         archive_response = self.client.post(reverse('v2:archive'), data=payload)
