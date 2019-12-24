@@ -268,6 +268,10 @@ nav .toolbox-tools {
         top: 120px;
     }
 
+    nav input:checked ~ .toolbox-tools li:nth-child(4) {
+        top: 158px;
+    }
+
     nav input:checked ~ .toolbox-tools li:nth-child(3) .tooltiptext {
         border-bottom-right-radius: 5px;
         border-bottom-left-radius: 5px;
@@ -461,7 +465,6 @@ input:checked ~ .toolbox-tools li {
 }
 
 a.material-icons {
-    color: inherit;
     text-decoration: none;
 }
 
@@ -605,6 +608,10 @@ body {
 
     input:checked ~ .toolbox-tools li:nth-child(3) {
         left: -120px;
+    }
+
+    input:checked ~ .toolbox-tools li:nth-child(4) {
+        left: -160px;
     }
 
     .tooltip .tooltiptext.tool-text {

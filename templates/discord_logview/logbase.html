@@ -9,6 +9,8 @@ modified by https://github.com/EJH2
 <head>
     <title>{% block title %}{% endblock %}</title>
 
+    <base href="{{ request.scheme }}://{{ request.META.HTTP_HOST }}">
+
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width"/>

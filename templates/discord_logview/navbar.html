@@ -33,6 +33,18 @@
                         </div>
                     </li>
                 {% endif %}
+                {% if log.uuid %}
+                <li>
+                    <div class="tooltip">
+                        {% if log.is_preview %}
+                            <a class="material-icons tool" download="Log {{ log.uuid }}.html" href="{% url 'log-preview-export' pk=log.uuid %}" target="_blank">cloud_download</a>
+                        {% else %}
+                            <a class="material-icons tool" download="Log {{ log.uuid }}.html" href="{% url 'log-export' pk=log.uuid %}" target="_blank">cloud_download</a>
+                        {% endif %}
+                        <span class="tooltiptext pre pre--inline tool-text">Export</span>
+                    </div>
+                </li>
+                {% endif %}
                 {% if log.users %}
                     <li>
                         <div class="tooltip">
