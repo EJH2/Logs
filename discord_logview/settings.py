@@ -40,14 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.forms',
 
-    'discord_logview',
-    'api',
-    'web',
-
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'discord',
+
+    'discord_logview',
+    'api',
+    'web',
 
     'celery_progress',
     'celery_progress.websockets',
