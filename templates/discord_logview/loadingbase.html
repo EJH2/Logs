@@ -1,8 +1,6 @@
 {% extends 'discord_logview/logbase.html' %}
 {% load static %}
-{% block header-icon %}
-    <img id="header-icon" class="placeholder" src="{% static 'discord_logview/icons/processing.png' %}" alt="">
-{% endblock %}
+{% block header-icon %}<img id="header-icon" class="placeholder" src="{% static 'discord_logview/icons/processing.png' %}" alt="">{% endblock %}
 {% block header-data %}
     <div id="log-type">
         <div class="placeholder placeholder-title"></div>

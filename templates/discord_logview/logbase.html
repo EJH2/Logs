@@ -8,9 +8,7 @@ modified by https://github.com/EJH2
 <html lang="en">
 <head>
     <title>{% block title %}{% endblock %}</title>
-
     <base href="{{ request.scheme }}://{{ request.META.HTTP_HOST }}">
-
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width"/>
@@ -20,24 +18,24 @@ modified by https://github.com/EJH2
 
     <link href="{% static "discord_logview/css/logs.css" %}" rel="stylesheet">
     <script>
-      if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
-        document.documentElement.style.display = 'none';
-        document.head.insertAdjacentHTML(
-            'beforeend',
-            '<link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_dark.css" %}" onload="document.documentElement.style.display = \'\'">'
-        );
-      }
+        if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
+            document.documentElement.style.display = 'none';
+            document.head.insertAdjacentHTML(
+                'beforeend',
+                '<link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_dark.css" %}" onload="document.documentElement.style.display = \'\'">'
+            );
+        }
     </script>
     <link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_dark.css" %}" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: dark)">
     <link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_light.css" %}" media="(prefers-color-scheme: light)">
     <script>
-      if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
-        document.documentElement.style.display = 'none';
-        document.head.insertAdjacentHTML(
-            'beforeend',
-            '<link rel="stylesheet" class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css" onload="document.documentElement.style.display = \'\'">'
-        );
-      }
+        if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
+            document.documentElement.style.display = 'none';
+            document.head.insertAdjacentHTML(
+                'beforeend',
+                '<link rel="stylesheet" class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css" onload="document.documentElement.style.display = \'\'">'
+            );
+        }
     </script>
     <link class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css"
           rel="stylesheet" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: dark)">
@@ -79,13 +77,13 @@ modified by https://github.com/EJH2
     !-->
     {% endif %}
     {% if not export %}
-        {% include 'discord_logview/navbar.html' %}
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-        {% endif %}
+    {% include 'discord_logview/navbar.html' %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
     <div id="header">
         <div id="header-icon-container">
             {% block header-icon %}{% endblock header-icon %}

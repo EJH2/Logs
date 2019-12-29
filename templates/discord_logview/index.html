@@ -1,9 +1,7 @@
 {% extends 'discord_logview/logbase.html' %}
 {% load static %}
 {% block title %}Discord Log Viewer{% endblock %}
-{% block header-icon %}
-    <img id="header-icon" src="{% static 'discord_logview/icons/white_file.png' %}" alt="">
-{% endblock %}
+{% block header-icon %}<img id="header-icon" src="{% static 'discord_logview/icons/white_file.png' %}" alt="">{% endblock %}
 {% block header-data %}
     <div id="log-type">
         <span>Logs From File</span>

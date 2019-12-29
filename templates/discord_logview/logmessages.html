@@ -9,132 +9,132 @@
                 <span>
                     <span {% if group.author.color %}style="color: {{ group.author.color }}"{% endif %} class="author-name" title="{{ group.author | stringformat:"s" | escape }}">{{ group.author.username|escape }}</span>
                     {% if group.author.bot %}
-                        <span class="bot-tag">BOT</span>
+                    <span class="bot-tag">BOT</span>
                     {% endif %}
                 </span>
                 {% if group.timestamp %}
-                    <time class="message-timestamp" datetime="{{ group.timestamp }}">{{ group.human_timestamp }}</time>
+                <time class="message-timestamp" datetime="{{ group.timestamp }}">{{ group.human_timestamp }}</time>
                 {% endif %}
             </div>
             {% for message in group.messages %}
-                {% if message.content %}
-                    <div class="message-content{% if message.error %} error{% endif %}">
-                        {{ message.content | safe }}
-                        {% if message.edited_timestamp or message.edited %}
-                            <span class="message-edited-timestamp">(edited)</span>
-                        {% endif %}
-                    </div>
+            {% if message.content %}
+            <div class="message-content{% if message.error %} error{% endif %}">
+                {{ message.content | safe }}
+                {% if message.edited_timestamp or message.edited %}
+                <span class="message-edited-timestamp">(edited)</span>
                 {% endif %}
-                {% for attachment in message.attachments %}
-                    <div class="message-attachment">
-                        {% if attachment.is_image %}
-                            <a href="#{{ attachment.filename }}">
-                                <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''"/>
-                            </a>
-                        {% else %}
-                            <a href="{{ attachment.url }}">
-                                <div class="horizontal">
-                                    <img class="icon" src="{% static 'discord_logview/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
-                                    <div class="message-attachment-inner">
-                                        <div class="filename-link">
-                                            <a class="filename-link-inner" href="{{ attachment.url }}">{{ attachment.filename }}</a>
-                                        </div>
-                                        <div class="message-attachment-size">{{ attachment.size }}</div>
-                                    </div>
-                                    <a class="filename-link-inner" href="{{ attachment.url }}">
-                                        <svg class="message-attachment-download" width="24" height="24">
-                                            <g fill="none" fill-rule="evenodd">
-                                                <path d="M0 0h24v24H0z"></path>
-                                                <path class="fill" fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
-                                            </g>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </a>
-                        {% endif %}
+            </div>
+            {% endif %}
+            {% for attachment in message.attachments %}
+            <div class="message-attachment">
+                {% if attachment.is_image %}
+                    <a href="#{{ attachment.filename }}">
+                        <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''"/>
+                    </a>
+                {% else %}
+                <a href="{{ attachment.url }}">
+                    <div class="horizontal">
+                        <img class="icon" src="{% static 'discord_logview/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
+                        <div class="message-attachment-inner">
+                            <div class="filename-link">
+                                <a class="filename-link-inner" href="{{ attachment.url }}">{{ attachment.filename }}</a>
+                            </div>
+                            <div class="message-attachment-size">{{ attachment.size }}</div>
+                        </div>
+                        <a class="filename-link-inner" href="{{ attachment.url }}">
+                            <svg class="message-attachment-download" width="24" height="24">
+                                <g fill="none" fill-rule="evenodd">
+                                    <path d="M0 0h24v24H0z"></path>
+                                    <path class="fill" fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                                </g>
+                            </svg>
+                        </a>
                     </div>
-                {% endfor %}
-                {% for embed in message.embeds %}
-                    <div class="message-embed">
-                        <div class="message-embed-color-pill" style="background-color: {{ embed.color }}"></div>
-                        <div class="message-embed-inner">
-                            <div class="message-embed-content">
-                                <div class="message-embed-content-inner message-content">
-                                    {% if embed.author %}
-                                        <div class="message-embed-author">
-                                            {% if embed.author.icon_url %}
-                                                <img alt class="message-embed-author-icon" src="{{ embed.author.icon_url }}">
-                                            {% endif %}
-                                            {% if embed.author.name %}
-                                                {% if embed.author.url %}
-                                                    <a class="message-embed-author message-embed-author-link message-embed-link" href="{{ embed.author.url }}">{{ embed.author.name }}</a>
-                                                {% else %}
-                                                    <span class="message-embed-author-name">{{ embed.author.name }}</span>
-                                                {% endif %}
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                    {% if embed.title %}
-                                        <div class="message-embed-margin">
-                                            {% if embed.url %}
-                                                <a class="message-embed-title message-embed-link" href="{{ embed.url }}">{{ embed.title | safe }}</a>
-                                            {% else %}
-                                                <span class="message-embed-title">{{ embed.title | safe }}</span>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                    {% if embed.description %}
-                                        <div class="message-embed-description">{{ embed.description | safe }}</div>
-                                    {% endif %}
-                                    {% if embed.fields|length > 0 %}
-                                        <div class="message-embed-fields">
-                                            {% for field in embed.fields %}
-                                                <div class="message-embed-field {% if field.inline %}message-embed-field-inline{% endif %}">
-                                                    <div class="message-embed-field-name">{{ field.name | safe }}</div>
-                                                    <div class="message-embed-field-value">{{ field.value | safe }}</div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                {% if embed.thumbnail %}
-                                    <img src="{{ embed.thumbnail.url }}" alt="{{ embed.thumbnail.url }}" class="message-embed-thumbnail" style="max-width: 80px; max-height: 80px">
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% for embed in message.embeds %}
+            <div class="message-embed">
+                <div class="message-embed-color-pill" style="background-color: {{ embed.color }}"></div>
+                <div class="message-embed-inner">
+                    <div class="message-embed-content">
+                        <div class="message-embed-content-inner message-content">
+                            {% if embed.author %}
+                            <div class="message-embed-author">
+                                {% if embed.author.icon_url %}
+                                <img alt class="message-embed-author-icon" src="{{ embed.author.icon_url }}">
+                                {% endif %}
+                                {% if embed.author.name %}
+                                {% if embed.author.url %}
+                                <a class="message-embed-author message-embed-author-link message-embed-link" href="{{ embed.author.url }}">{{ embed.author.name }}</a>
+                                {% else %}
+                                <span class="message-embed-author-name">{{ embed.author.name }}</span>
+                                {% endif %}
                                 {% endif %}
                             </div>
-                            {% if embed.image %}
-                                <img src="{{ embed.image.url }}" alt="{{ embed.image.url }}" class="message-embed-image message-embed-margin-large">
                             {% endif %}
-                            {% if embed.footer or embed.timestamp %}
-                                {% if embed.footer and not embed.timestamp %}
-                                    <div class="message-embed-footer">
-                                        {% if embed.footer.icon_url %}
-                                            <img class="message-embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="">
-                                        {% endif %}
-                                        <span class="message-embed-footer-text">{{ embed.footer.text }}</span>
-                                    </div>
+                            {% if embed.title %}
+                            <div class="message-embed-margin">
+                                {% if embed.url %}
+                                <a class="message-embed-title message-embed-link" href="{{ embed.url }}">{{ embed.title | safe }}</a>
+                                {% else %}
+                                <span class="message-embed-title">{{ embed.title | safe }}</span>
                                 {% endif %}
-                                {% if embed.timestamp and not embed.footer %}
-                                    <div class="message-embed-footer">
-                                        <time class="message-embed-footer-text" datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
-                                    </div>
-                                {% endif %}
-                                {% if embed.footer and embed.timestamp %}
-                                    <div class="chatlog__embed-footer">
-                                        {% if embed.footer.icon_url %}
-                                            <img class="message-embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="">
-                                        {% endif %}
-                                        <span class="message-embed-footer-text">
-                                            {{ embed.footer.text }}
-                                            <span class="message-embed-footer-separator">•</span>
-                                            <time datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
-                                        </span>
-                                    </div>
-                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% if embed.description %}
+                            <div class="message-embed-description">{{ embed.description | safe }}</div>
+                            {% endif %}
+                            {% if embed.fields|length > 0 %}
+                            <div class="message-embed-fields">
+                                {% for field in embed.fields %}
+                                <div class="message-embed-field {% if field.inline %}message-embed-field-inline{% endif %}">
+                                    <div class="message-embed-field-name">{{ field.name | safe }}</div>
+                                    <div class="message-embed-field-value">{{ field.value | safe }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
+                        {% if embed.thumbnail %}
+                        <img src="{{ embed.thumbnail.url }}" alt="{{ embed.thumbnail.url }}" class="message-embed-thumbnail" style="max-width: 80px; max-height: 80px">
+                        {% endif %}
                     </div>
-                {% endfor %}
+                    {% if embed.image %}
+                    <img src="{{ embed.image.url }}" alt="{{ embed.image.url }}" class="message-embed-image message-embed-margin-large">
+                    {% endif %}
+                    {% if embed.footer or embed.timestamp %}
+                    {% if embed.footer and not embed.timestamp %}
+                    <div class="message-embed-footer">
+                        {% if embed.footer.icon_url %}
+                        <img class="message-embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="">
+                        {% endif %}
+                        <span class="message-embed-footer-text">{{ embed.footer.text }}</span>
+                    </div>
+                    {% endif %}
+                    {% if embed.timestamp and not embed.footer %}
+                    <div class="message-embed-footer">
+                        <time class="message-embed-footer-text" datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
+                    </div>
+                    {% endif %}
+                    {% if embed.footer and embed.timestamp %}
+                    <div class="chatlog__embed-footer">
+                        {% if embed.footer.icon_url %}
+                        <img class="message-embed-footer-icon" src="{{ embed.footer.icon_url }}" alt="">
+                        {% endif %}
+                        <span class="message-embed-footer-text">
+                            {{ embed.footer.text }}
+                            <span class="message-embed-footer-separator">•</span>
+                            <time datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
             {% endfor %}
+        {% endfor %}
         </div>
     </div>
 {% endfor %}

@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{% block head_title %}{% endblock %}</title>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width"/>
-    <meta name="og:title" content="Discord Log Viewer">
-    <meta name="og:description" content="Beautify your Discord Logs">
-    <meta name="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
-    <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'discord_logview/css/social.css' %}">
-    {% block extra_head %}
-    {% endblock %}
-  </head>
-  <body>
-    <span id="body">
-        {% block body %}
-
-        {% if messages %}
-        <div>
-          <strong>Messages:</strong>
-          <ul>
-            {% for message in messages %}
-            <li>{{message}}</li>
-            {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
-        {% block content %}
-        {% endblock %}
-        {% endblock %}
-        {% block extra_body %}
-        {% endblock %}
-    </span>
-  </body>
+    <head>
+        <title>{% block head_title %}{% endblock %}</title>
+        {% load static %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width"/>
+        <meta name="og:title" content="Discord Log Viewer">
+        <meta name="og:description" content="Beautify your Discord Logs">
+        <meta name="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
+        <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
+        <link rel="stylesheet" href="{% static 'discord_logview/css/social.css' %}">
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body>
+        <span id="body">
+            {% block body %}
+            {% if messages %}
+            <div>
+                <strong>Messages:</strong>
+                <ul>
+                    {% for message in messages %}
+                    <li>{{message}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+            {% endblock %}
+            {% block extra_body %}
+            {% endblock %}
+        </span>
+    </body>
 </html>

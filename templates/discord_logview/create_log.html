@@ -1,12 +1,8 @@
 {% extends 'discord_logview/loadingbase.html' %}
 {% load static %}
 {% block title %}Create A Log{% endblock %}
-{% block extra_css %}
-    <link rel='stylesheet' href="{% static 'discord_logview/css/create_form.css' %}">
-{% endblock %}
-{% block extra_js %}
-    <script src="{% static 'discord_logview/js/create_form.js' %}"></script>
-{% endblock %}
+{% block extra_css %}<link rel='stylesheet' href="{% static 'discord_logview/css/create_form.css' %}">{% endblock %}
+{% block extra_js %}<script src="{% static 'discord_logview/js/create_form.js' %}"></script>{% endblock %}
 {% block messages_inner %}
 <form name="logForm" action="{% url 'new' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
