@@ -196,7 +196,7 @@ def modmailbot(content, progress):
             'author': {
                 'id': 0,
                 'username': match['username'],
-                'discriminator': match.get('discriminator', '0000')
+                'discriminator': match.get('discriminator') or '0000'
             },
             'content': match['content'],
             'timestamp': pendulum.from_format(match['timestamp'], 'YYYY-MM-DD HH:mm:ss').isoformat(),
