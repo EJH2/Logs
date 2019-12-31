@@ -9,7 +9,7 @@ function loadJS() {
     for (let attach of document.getElementsByClassName('message-attachment-thumbnail')) {
         let a = attach.parentElement;
         a.onclick = function () {
-            let id = a.getAttribute('href').substring(1);
+            let id = a.getAttribute('href').split("#").slice(1).join("#");
             let lightA = document.createElement('a');
             lightA.setAttribute('id', id);
             lightA.classList.add('lightbox');

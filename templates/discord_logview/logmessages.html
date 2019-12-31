@@ -28,7 +28,7 @@
             {% for attachment in message.attachments %}
             <div class="message-attachment">
                 {% if attachment.is_image %}
-                    <a href="#{{ attachment.filename }}">
+                    <a href="/{{ log.uuid }}#{{ attachment.filename }}">
                         <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''"/>
                     </a>
                 {% else %}
