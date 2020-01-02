@@ -1,28 +1,13 @@
+const baguetteSettings = {animation: 'fadeIn', noScrollbars: true, buttons: false};
+
 function loadJS() {
 
     document.querySelectorAll('.pre--multiline').forEach((block) => {
         hljs.highlightBlock(block);
     });
 
-    const lightDiv = document.getElementById('lightbox_div');
-
-    for (let attach of document.getElementsByClassName('message-attachment-thumbnail')) {
-        let a = attach.parentElement;
-        a.onclick = function () {
-            let id = a.getAttribute('href').split("#").slice(1).join("#");
-            let lightA = document.createElement('a');
-            lightA.setAttribute('id', id);
-            lightA.classList.add('lightbox');
-            let lightImg = document.createElement('img');
-            lightImg.setAttribute('src', attach.getAttribute('src'));
-            lightA.onclick = function () {
-                window.history.back();
-                lightDiv.innerHTML = '';
-            };
-            lightA.appendChild(lightImg);
-            lightDiv.appendChild(lightA);
-        };
-    }
+    baguetteBox.run('.message-attachment', baguetteSettings);
+    baguetteBox.run('.embed-image', baguetteSettings);
 
     for (let t of document.getElementsByTagName('time')) {
         let date = t.getAttribute('datetime');

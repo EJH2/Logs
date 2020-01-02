@@ -43,11 +43,13 @@ modified by https://github.com/EJH2
           rel="stylesheet" media="(prefers-color-scheme: light)">
     <link rel="stylesheet" href="{% static 'discord_logview/css/alert.css' %}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.0/baguetteBox.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
     {% block extra_css %}{% endblock %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.0/baguetteBox.min.js"></script>
     {% if log.chunked %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
     {% endif %}
@@ -104,7 +106,6 @@ modified by https://github.com/EJH2
         <img class="infinite-scroll-request" src="{% static 'discord_logview/icons/loading.gif' %}" alt="Loading...">
     </div>
     {% endif %}
-    <div id="lightbox_div"></div>
 {% block extra_js %}{% endblock %}
 <div id="copyright">
     <div>Made with blood, sweat, and Django by <a href="https://github.com/EJH2">EJH2</a></div>

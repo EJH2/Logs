@@ -28,8 +28,8 @@
             {% for attachment in message.attachments %}
             <div class="message-attachment">
                 {% if attachment.is_image %}
-                    <a href="/{{ log.uuid }}#{{ attachment.filename }}">
-                        <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''"/>
+                    <a href="{{ attachment.url }}" target="_blank">
+                        <img class="message-attachment-thumbnail" src="{{ attachment.url }}" alt="attachment unavailable" onerror="this.src=this.parentElement.href='{% static 'discord_logview/icons/dead_attachment.png' %}'; this.title='attachment unavailable';"/>
                     </a>
                 {% else %}
                 <a href="{{ attachment.url }}">
@@ -98,11 +98,19 @@
                             {% endif %}
                         </div>
                         {% if embed.thumbnail %}
-                        <img src="{{ embed.thumbnail.url }}" alt="{{ embed.thumbnail.url }}" class="message-embed-thumbnail" style="max-width: 80px; max-height: 80px">
+                        <div class="embed-image">
+                            <a href="{{ embed.thumbnail.url }}">
+                                <img src="{{ embed.thumbnail.url }}" alt class="message-embed-thumbnail" style="max-width: 80px; max-height: 80px">
+                            </a>
+                        </div>
                         {% endif %}
                     </div>
                     {% if embed.image %}
-                    <img src="{{ embed.image.url }}" alt="{{ embed.image.url }}" class="message-embed-image message-embed-margin-large">
+                    <div class="embed-image">
+                        <a href="{{ embed.image.url }}">
+                            <img src="{{ embed.image.url }}" alt class="message-embed-image message-embed-margin-large">
+                        </a>
+                    </div>
                     {% endif %}
                     {% if embed.footer or embed.timestamp %}
                     {% if embed.footer and not embed.timestamp %}
