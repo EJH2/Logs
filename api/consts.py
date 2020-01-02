@@ -1,5 +1,14 @@
 import re
 
+from rest_framework.routers import DefaultRouter
+
+
+class OptionalSlashRouter(DefaultRouter):
+    def __init__(self, *args, **kwargs):
+        super(DefaultRouter, self).__init__(*args, **kwargs)
+        self.trailing_slash = '/?'
+
+
 rowboat_re = r'(?P<timestamp>(?:[\d-]+) (?:[\d:.]+)) \((?P<message_id>[\d]{16,18}) \/ (?P<guild_id>[\d]{16,18}) \/ ' \
              r'(?P<user_id>[\d]{16,18})\) (?P<username>.*?)#(?P<discriminator>\d{4}): (?P<content>[\S\s]*?)? \(' \
              r'(?P<attachments>(?:http(?:|s):.*))?\)$'
