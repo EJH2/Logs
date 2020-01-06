@@ -39,6 +39,9 @@
         }).catch((err) => {
             console.error('An error has occurred:', err);
         });
+        if (req.status === 401) {
+            window.location.href = '{% url "account_login" %}?next=' + window.location.pathname
+        }
         e.value = (await req.json()).token
     }
     </script>

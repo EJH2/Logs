@@ -11,7 +11,8 @@ def get_token(request):
     if not request.is_ajax():
         return Response(status=status.HTTP_403_FORBIDDEN)
     if not request.user.is_authenticated:
-        return Response(data={'token': 'You have to log in first to see your token!'})
+        return Response(data={'token': 'You have to log in first to see your token!'},
+                        status=status.HTTP_401_UNAUTHORIZED)
     if request.query_params.get('refresh'):
         Token.objects.filter(user=request.user).delete()
 
