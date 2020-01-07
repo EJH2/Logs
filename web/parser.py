@@ -44,4 +44,4 @@ def save_preview(data, owner) -> Log:
         'tasks': utils.add_task_messages([result.id], messages=['Saving messages... ({percent}%)']), **log_data
     }
 
-    return Log.objects.get_orcreate(uuid=data['uuid'], defaults=data)
+    return Log.objects.get_or_create(uuid=data['uuid'], defaults=data)[0]
