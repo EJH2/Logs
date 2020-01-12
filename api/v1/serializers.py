@@ -9,7 +9,8 @@ from api.utils import validate_expires, get_default_timestamp
 class LogCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     url = serializers.URLField(help_text='URL containing messages.')
-    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp, help_text='Log expiration.')
+    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp,
+                                        help_text='Log expiration in UTC.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
     guild = serializers.IntegerField(allow_null=True, default=None,
                                      help_text='Linked guild of log. Must be set if privacy '

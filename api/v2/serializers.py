@@ -12,7 +12,8 @@ from api.utils import get_default_timestamp
 class LogCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     messages = serializers.JSONField(help_text='Array of Discord message objects.')
-    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp, help_text='Log expiration.')
+    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp,
+                                        help_text='Log expiration in UTC.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
     guild = serializers.IntegerField(allow_null=True, default=None,
                                      help_text='Linked guild of log. Must be set if privacy '
@@ -62,7 +63,8 @@ class LogErrorSerializer(serializers.Serializer):
 class LogArchiveCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     url = serializers.URLField(help_text='URL containing valid JSON array of Discord message objects.')
-    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp, help_text='Log expiration.')
+    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp,
+                                        help_text='Log expiration in UTC.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
     guild = serializers.IntegerField(allow_null=True, default=None,
                                      help_text='Linked guild of log. Must be set if privacy '

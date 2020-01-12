@@ -21,12 +21,14 @@ class LogViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(responses=schemas.list_responses)
     def list(self, request):
+        """List all logs that you can own or manage."""
         queryset = self.get_queryset()
         serializer = LogListSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(manual_parameters=[schemas.url_parameter], responses=schemas.read_responses)
     def retrieve(self, request, pk=None):
+        """Retrieve a log that you own."""
         queryset = self.get_queryset()
         log = get_object_or_404(queryset, pk=pk)
         serializer = LogListSerializer(log, context={'request': request})
@@ -34,6 +36,7 @@ class LogViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(query_serializer=LogCreateSerializer, responses=schemas.create_responses)
     def create(self, request):
+        """Create a log."""
         serializer = LogCreateSerializer(data=request.data, context={'user': request.user})
         if not serializer.is_valid():
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -49,6 +52,7 @@ class LogViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(manual_parameters=[schemas.url_parameter])
     def destroy(self, request, pk=None):
+        """Delete a log that you own."""
         queryset = self.get_queryset()
         log = get_object_or_404(queryset, pk=pk)
         log.delete()

@@ -43,7 +43,10 @@ def validate_expires(user, value):
     if user.has_perm('log.no_expiry'):
         exp = None
     if exp and value > pendulum.now().add(**exp):
-        raise serializers.ValidationError(f'Expiry time must not exceed {", ".join([f"{exp[k]} {k}" for k in exp])}!')
+        raise serializers.ValidationError(
+            f'Expiry time must be an iso-8601 timestamp of a date less than '
+            f'{", ".join(["{} {}".format(exp[k], k[:-1 if k.endswith("s") else k]) for k in exp])} from now!'
+        )
     return value
 
 
