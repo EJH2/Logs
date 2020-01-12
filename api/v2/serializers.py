@@ -37,6 +37,12 @@ class LogCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(f'Privacy value must be one of {", ".join(privacy_types)}!')
         return value
 
+    def validate_guild(self, value):
+        """Check to see if there is a guild if the privacy type requires one"""
+        if self.initial_data.get('privacy', 'public') in ['guild', 'mods'] and not value:
+            raise serializers.ValidationError('A guild must be set if the privacy type is set to guild, mods!')
+        return value
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret['privacy'] in ['public', 'invite']:
@@ -88,6 +94,12 @@ class LogArchiveCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(f'Privacy value must be one of {", ".join(privacy_types)}!')
         return value
 
+    def validate_guild(self, value):
+        """Check to see if there is a guild if the privacy type requires one"""
+        if self.initial_data.get('privacy', 'public') in ['guild', 'mods'] and not value:
+            raise serializers.ValidationError('A guild must be set if the privacy type is set to guild, mods!')
+        return value
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret['privacy'] in ['public', 'invite']:
@@ -117,4 +129,4 @@ class LogListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Log
-        fields = ('owner', 'uuid', 'url', 'type', 'created', 'expires')
+        fields = ('owner', 'uuid', 'url', 'type', 'created', 'expires', 'privacy', 'guild')

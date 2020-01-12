@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from api.models import Log, Whitelist
-from api.permissions import HasAPIAccess
+from api.permissions import HasAPIAccess, filter_queryset
 from api.utils import signer
 from api.v2 import schemas
 from api.v2.parser import create_log
@@ -35,7 +35,6 @@ def archive(request):
 
 
 @swagger_auto_schema(method='GET', auto_schema=None)
-@permission_classes([HasAPIAccess])
 @api_view(['GET'])
 def un_archive(request, signed_data: str):
     try:
@@ -52,10 +51,7 @@ class LogViewSet(viewsets.ViewSet):
     permission_classes = (HasAPIAccess,)
 
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Log.objects.none()
-        queryset = Log.objects.filter(owner=self.request.user)
-        return queryset
+        return filter_queryset(self.request, Log.objects.all())
 
     @swagger_auto_schema(responses=schemas.list_responses)
     def list(self, request):

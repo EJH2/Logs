@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from api.models import Log, Whitelist
-from api.permissions import HasAPIAccess
+from api.permissions import HasAPIAccess, filter_queryset
 from api.v1 import schemas
 from api.v1.parser import create_log
 from api.v1.serializers import LogListSerializer, LogCreateSerializer
@@ -14,10 +14,7 @@ class LogViewSet(viewsets.ViewSet):
     permission_classes = (HasAPIAccess,)
 
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Log.objects.none()
-        queryset = Log.objects.filter(owner=self.request.user)
-        return queryset
+        return filter_queryset(self.request, Log.objects.all())
 
     @swagger_auto_schema(responses=schemas.list_responses)
     def list(self, request):
