@@ -120,4 +120,35 @@ read_responses = {
     status.HTTP_404_NOT_FOUND: openapi.Response('Not Found')
 }
 
+partial_update_responses = {
+    status.HTTP_200_OK: openapi.Response('Patch Log', serializers.LogListSerializer, examples={
+        'application/json': {
+            'owner': 'ipsum',
+            'uuid': 'DHYCLTzjqREHg2ttnWvbYk',
+            'url': 'https://logs.discord.website/DHYCLTzjqREHg2ttnWvbYk',
+            'type': 'rawgoat',
+            'created': '1970-01-01T00:00:00.000000',
+            'expires': now,
+            'privacy': 'public',
+            'guild': None
+        },
+    }),
+    status.HTTP_400_BAD_REQUEST: openapi.Response('Bad Request', serializers.LogErrorSerializer, examples={
+        'application/json': {
+            'errors': {
+                'expires': [
+                    'Expiry time must be an iso-8601 timestamp of a date less than 1 week from now!'
+                ],
+                'privacy': [
+                    'Privacy value must be one of public, guild, mods, invite!'
+                ],
+                'guild': [
+                    'A guild must be set if the privacy type is set to guild, mods!'
+                ]
+            }
+        }
+    }),
+    status.HTTP_404_NOT_FOUND: openapi.Response('Not Found')
+}
+
 url_parameter = openapi.Parameter('uuid', openapi.IN_PATH, description='Log\'s UUID', type=openapi.TYPE_STRING)

@@ -56,6 +56,37 @@ class LogCreateSerializer(serializers.Serializer):
         pass
 
 
+class LogPatchSerializer(serializers.Serializer):
+    expires = serializers.DateTimeField(required=False, help_text='Log expiration in UTC.')
+    privacy = serializers.CharField(required=False, help_text='Log privacy.')
+    guild = serializers.IntegerField(allow_null=True, required=False,
+                                     help_text='Linked guild of log. Must be set if privacy '
+                                               'setting is either guild or mods.')
+
+    def validate_expires(self, value):
+        """Check if expiry time is within parameters"""
+        return utils.validate_expires(self.context['user'], value)
+
+    @staticmethod
+    def validate_privacy(value):
+        """Check if privacy value is within parameters"""
+        if value not in privacy_types:
+            raise serializers.ValidationError(f'Privacy value must be one of {", ".join(privacy_types)}!')
+        return value
+
+    def validate_guild(self, value):
+        """Check to see if there is still a guild if the privacy type requires one"""
+        if self.initial_data.get('privacy', 'public') in ['guild', 'mods'] and not value:
+            raise serializers.ValidationError('A guild must be set if the privacy type is set to guild, mods!')
+        return value
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
 class LogErrorSerializer(serializers.Serializer):
     errors = serializers.JSONField(help_text='Request errors.')
 

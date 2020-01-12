@@ -14,7 +14,7 @@ from api.permissions import HasAPIAccess, filter_queryset
 from api.utils import signer
 from api.v2 import schemas
 from api.v2.parser import create_log
-from api.v2.serializers import LogListSerializer, LogCreateSerializer, LogArchiveCreateSerializer
+from api.v2.serializers import LogListSerializer, LogCreateSerializer, LogArchiveCreateSerializer, LogPatchSerializer
 
 
 @swagger_auto_schema(method='POST', query_serializer=LogArchiveCreateSerializer, responses=schemas.archive_responses)
@@ -66,6 +66,21 @@ class LogViewSet(viewsets.ViewSet):
         queryset = self.get_queryset()
         log = get_object_or_404(queryset, pk=pk)
         serializer = LogListSerializer(log, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(query_serializer=LogPatchSerializer, manual_parameters=[schemas.url_parameter],
+                         responses=schemas.partial_update_responses)
+    def partial_update(self, request, pk=None):
+        """Update an existing log. None of these query parameters are required!"""
+        serializer = LogPatchSerializer(data=request.data, context={'user': request.user})
+        if not serializer.is_valid():
+            return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        data = serializer.data
+        queryset = self.get_queryset().filter(pk=pk)
+        if not len(queryset) > 0:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        queryset.update(**data)
+        serializer = LogListSerializer(queryset[0], context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(query_serializer=LogCreateSerializer, responses=schemas.create_responses)
