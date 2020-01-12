@@ -712,7 +712,7 @@ body {
 }
 
 .message-content {
-    font-size: .9375rem;
+    font-size: 1rem;
     word-wrap: break-word;
     max-width: 95%;
 }
