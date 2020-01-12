@@ -14,11 +14,10 @@ def create_preview(content, log_type, expires, **kwargs) -> dict:
     :param log_type: Type of log, can be none if :param content is a list.
     :type log_type: Union[str, None]
     :param expires: Expiration time of log.
-    :type expires: Union[int, None]
+    :type expires: Union[str, None]
     :param kwargs: Extraneous data.
     """
-    data = {'type': log_type, 'content': content, 'uuid': Log.generate_uuid(content),
-            'expires': pendulum.now().add(seconds=int(expires)).isoformat() if expires else None}
+    data = {'type': log_type, 'content': content, 'uuid': Log.generate_uuid(content), 'expires': expires}
 
     result = celery.chain(v1_tasks.parse_text.s(log_type, content), tasks.parse_json.s())()
     data['data'] = {**result.get(), **kwargs}

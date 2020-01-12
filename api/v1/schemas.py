@@ -24,7 +24,7 @@ create_responses = {
                     'URL Content-Type must be text/plain!'
                 ],
                 'expires': [
-                    'Expiry time must be one of 10min, 30min, 1hour, 1day, 1week!'
+                    'Expiry time must be an iso-8601 timestamp of a date less than 1 week from now!'
                 ],
                 'privacy': [
                     'Privacy value must be one of public, guild, mods, invite!'

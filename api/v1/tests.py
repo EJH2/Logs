@@ -1,3 +1,4 @@
+import pendulum
 from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework import status
@@ -41,7 +42,7 @@ class LogTestCase(TestCase):
         payload = {
             'type': 'rowboat',
             'url': 'https://mystb.in/raw/haseqocezu',
-            'expires': '10min'
+            'expires': pendulum.now().add(minutes=10)
         }
         resp = self.client.post(reverse('v1:logs-list'), data=payload, **self.token_headers)
         return resp
@@ -85,7 +86,7 @@ class WhitelistTestCase(TestCase):
         payload = {
             'type': 'rowboat',
             'url': 'https://mystb.in/raw/haseqocezu',
-            'expires': '10min'
+            'expires': pendulum.now().add(minutes=10)
         }
         resp = self.client.post(reverse('v1:logs-list'), data=payload, **self.token_headers)
         return resp

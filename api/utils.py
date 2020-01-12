@@ -1,3 +1,4 @@
+import pendulum
 from django.conf import settings
 from itsdangerous import URLSafeSerializer
 from rest_framework import serializers
@@ -35,12 +36,17 @@ def get_chain_tasks(node) -> list:
 
 
 def validate_expires(user, value):
-    exp = list(expiry_times.keys())[:5]
+    value = pendulum.instance(value)
+    exp = {'weeks': 1}
     if user.has_perm('log.extended_expiry'):
-        exp = list(expiry_times.keys())[:7]
+        exp = {'months': 1}
     if user.has_perm('log.no_expiry'):
-        exp = expiry_times
-    if value.lower() not in exp:
-        raise serializers.ValidationError(f'Expiry time must be one of {", ".join(exp)}!')
+        exp = None
+    if exp and value > pendulum.now().add(**exp):
+        raise serializers.ValidationError(f'Expiry time must not exceed {", ".join([f"{exp[k]} {k}" for k in exp])}!')
     return value
+
+
+def get_default_timestamp():
+    return pendulum.now().add(minutes=30)
 

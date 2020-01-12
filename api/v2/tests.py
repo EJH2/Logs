@@ -1,5 +1,6 @@
 import random
 
+import pendulum
 from django.test import Client, TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -88,7 +89,7 @@ class ArchiveTestCase(TestCase):
         payload = {
             'type': random.choice(list(all_types.keys())),
             'url': 'https://example.com/log',  # This URL is for testing purposes only
-            'expires': '10min'
+            'expires': pendulum.now().add(minutes=10).isoformat()
         }
         archive_response = self.client.post(reverse('v2:archive'), data=payload)
         self.assertEqual(archive_response.status_code, status.HTTP_201_CREATED)
@@ -114,7 +115,7 @@ class LogTestCase(TestCase):
         payload = {
             'type': random.choice(list(all_types.keys())),
             'messages': messages,
-            'expires': '10min'
+            'expires': pendulum.now().add(minutes=10).isoformat()
         }
         resp = self.client.post(reverse('v2:logs-list'), data=payload, **self.token_headers)
         return resp
@@ -160,7 +161,7 @@ class WhitelistTestCase(TestCase):
         payload = {
             'type': self.log_type,
             'messages': messages,
-            'expires': '10min'
+            'expires': pendulum.now().add(minutes=10).isoformat()
         }
         resp = self.client.post(reverse('v2:logs-list'), data=payload, **self.token_headers)
         return resp

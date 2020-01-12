@@ -1,15 +1,15 @@
 import requests
 from rest_framework import serializers
 
-from api.consts import expiry_times, form_types, privacy_types
+from api.consts import form_types, privacy_types
 from api.models import Log
-from api.utils import validate_expires
+from api.utils import validate_expires, get_default_timestamp
 
 
 class LogCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     url = serializers.URLField(help_text='URL containing messages.')
-    expires = serializers.CharField(allow_null=True, default='30min', help_text='Log expiration.')
+    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp, help_text='Log expiration.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
     guild = serializers.IntegerField(allow_null=True, default=None,
                                      help_text='Linked guild of log. Must be set if privacy '
@@ -44,7 +44,6 @@ class LogCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['expires'] = expiry_times[ret['expires']]
         ret['messages'] = requests.get(ret.pop('url')).text
         if ret['privacy'] in ['public', 'invite']:
             ret['guild'] = None

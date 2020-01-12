@@ -4,14 +4,15 @@ import requests
 from rest_framework import serializers
 
 from api import utils
-from api.consts import expiry_times, privacy_types
+from api.consts import privacy_types
 from api.models import Log
+from api.utils import get_default_timestamp
 
 
 class LogCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     messages = serializers.JSONField(help_text='Array of Discord message objects.')
-    expires = serializers.CharField(allow_null=True, default='30min', help_text='Log expiration.')
+    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp, help_text='Log expiration.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
     guild = serializers.IntegerField(allow_null=True, default=None,
                                      help_text='Linked guild of log. Must be set if privacy '
@@ -37,7 +38,6 @@ class LogCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['expires'] = expiry_times[ret['expires']]
         if ret['privacy'] in ['public', 'invite']:
             ret['guild'] = None
         return ret
@@ -62,7 +62,7 @@ class LogErrorSerializer(serializers.Serializer):
 class LogArchiveCreateSerializer(serializers.Serializer):
     type = serializers.CharField(help_text='Log type.')
     url = serializers.URLField(help_text='URL containing valid JSON array of Discord message objects.')
-    expires = serializers.CharField(allow_null=True, default='30min', help_text='Log expiration.')
+    expires = serializers.DateTimeField(allow_null=True, default=get_default_timestamp, help_text='Log expiration.')
     privacy = serializers.CharField(default='public', help_text='Log privacy.')
     guild = serializers.IntegerField(allow_null=True, default=None,
                                      help_text='Linked guild of log. Must be set if privacy '
@@ -88,7 +88,6 @@ class LogArchiveCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['expires'] = expiry_times[ret['expires']]
         if ret['privacy'] in ['public', 'invite']:
             ret['guild'] = None
         return ret

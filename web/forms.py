@@ -1,3 +1,4 @@
+import pendulum
 import requests
 from allauth.socialaccount.models import SocialAccount
 from django import forms
@@ -76,7 +77,7 @@ class LogCreateForm(forms.Form):
         if not cleaned_data.get('url') and not cleaned_data.get('file'):
             self.add_error('url', 'You must specify either a URL or file to parse!')
         if cleaned_data.get('expires'):
-            cleaned_data['expires'] = expiry_times[cleaned_data['expires']]
+            cleaned_data['expires'] = pendulum.now().add(seconds=expiry_times[cleaned_data['expires']]).isoformat()
         if cleaned_data['privacy'] not in ['public', 'invite'] and not cleaned_data.get('guild'):
             self.add_error('guild', 'You must specify a guild to link to!')
         else:

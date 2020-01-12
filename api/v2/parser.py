@@ -16,7 +16,7 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
     :type log_type: Union[str, None]
     :param owner: Log owner.
     :param expires: Expiration time of log.
-    :type expires: Union[int, None]
+    :type expires: Union[str, None]
     :param privacy: Log privacy setting.
     :type privacy: str
     :param guild: Linked guild of log. Must be set if privacy setting is either guild or mods.
@@ -29,7 +29,7 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
     if Log.objects.filter(uuid=uuid).exists():
         return Log.objects.get(uuid=uuid)
 
-    data['expires'] = pendulum.now().add(seconds=int(expires)) if expires else None
+    data['expires'] = pendulum.parse(expires) if expires else None
 
     messages = ['{current}/{total} messages formatted... ({percent}%)', 'Saving messages... ({percent}%)']
     result = celery.chain(tasks.parse_json.s(content) | tasks.create_pages.s(uuid))()
