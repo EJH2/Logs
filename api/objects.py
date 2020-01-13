@@ -24,6 +24,10 @@ class LogRenderer:
         return duration(self.created, now=pendulum.now()) if self.created else None
 
     @property
+    def export_created(self):
+        return self.created.strftime('%Y-%m-%d %H:%M:%S')
+
+    @property
     def message_groups(self):
         groups = []
 
