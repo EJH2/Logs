@@ -12,6 +12,8 @@ class HasAPIAccess(permissions.BasePermission):
 
 
 def filter_queryset(request, queryset):
+    if not request.user.is_authenticated:
+        return queryset.none()
     try:
         discord_user = SocialAccount.objects.get(user=request.user)
         guilds = discord_user.extra_data.get('guilds', [])
