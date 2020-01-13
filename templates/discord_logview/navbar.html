@@ -34,9 +34,9 @@
                 <li>
                     <div class="tooltip">
                         {% if log.is_preview %}
-                        <a class="material-icons tool" download="Log {{ log.uuid }}.html" href="{% url 'log-preview-export' pk=log.uuid %}" target="_blank">cloud_download</a>
+                        <a class="material-icons tool" download="Log {{ log.created.isoformat }} - {{ log.total_messages }} Messages.html" href="{% url 'log-preview-export' pk=log.uuid %}" target="_blank">cloud_download</a>
                         {% else %}
-                        <a class="material-icons tool" download="Log {{ log.uuid }}.html" href="{% url 'log-export' pk=log.uuid %}" target="_blank">cloud_download</a>
+                        <a class="material-icons tool" download="Log {{ log.created.isoformat }} - {{ log.total_messages }} Messages.html" href="{% url 'log-export' pk=log.uuid %}" target="_blank">cloud_download</a>
                         {% endif %}
                         <span class="tooltiptext pre pre--inline tool-text">Export</span>
                     </div>
