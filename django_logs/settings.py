@@ -81,6 +81,8 @@ EMAIL_PORT = config('EMAIL_PORT')
 
 ROOT_URLCONF = 'django_logs.urls'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

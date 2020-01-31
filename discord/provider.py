@@ -1,26 +1,19 @@
-from allauth.socialaccount.providers.base import ProviderAccount
-from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
+from allauth.socialaccount.providers.discord import provider
 
 
-class DiscordAccount(ProviderAccount):
+class DiscordAccount(provider.DiscordAccount):
 
     def get_avatar_url(self):
         user_id = self.account.extra_data.get('id')
         avatar_hash = self.account.extra_data.get('avatar')
-        return f'https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.webp'
+        if not avatar_hash:
+            return f'https://cdn.discordapp.com/embed/avatars/{int(self.account.extra_data["discriminator"]) % 5}.png'
+        ending = 'gif' if avatar_hash.startswith('a_') else 'png'
+        return f'https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.{ending}'
 
-    def to_str(self):
-        default = super(DiscordAccount, self).to_str()
-        return self.account.extra_data.get('username', default)
 
-
-class DiscordProvider(OAuth2Provider):
-    id = 'discord'
-    name = 'Discord'
+class DiscordProvider(provider.DiscordProvider):
     account_class = DiscordAccount
-
-    def extract_uid(self, data):
-        return str(data['id'])
 
     def extract_common_fields(self, data):
         return dict(
@@ -29,9 +22,6 @@ class DiscordProvider(OAuth2Provider):
             first_name=data.get('username'),
             last_name=data.get('discriminator'),
         )
-
-    def get_default_scope(self):
-        return ['email', 'identify']
 
 
 provider_classes = [DiscordProvider]
