@@ -152,7 +152,7 @@ def parse_json(self, json_data: dict):
     progress = ProgressRecorder(self)
 
     for count, msg in enumerate(json_data):
-        author = msg['author']
+        author = msg.get('author', {'id': 0, 'username': 'Unknown User', 'discriminator': '0000'})
 
         if not author.get('avatar'):
             author['avatar'] = f'https://cdn.discordapp.com/embed/avatars/{int(author["discriminator"]) % 5}.png'
@@ -170,7 +170,7 @@ def parse_json(self, json_data: dict):
         if msg.get('attachments'):
             for a in msg['attachments']:
                 a['is_image'] = False
-                if any([a['height'], a['width'],
+                if any([a.get('height'), a.get('width'),
                         a['filename'].rsplit('.', 1)[-1] in ['png', 'jpg', 'jpeg', 'gif', 'webm', 'webp', 'mp4']]):
                     a['is_image'] = True
                     continue
