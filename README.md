@@ -1,4 +1,4 @@
-# Discord Logview
+# Logs
 
 ### Overview
 This is the successor to the legacy branch of this project. The name didn't really fit for what it
