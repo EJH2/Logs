@@ -161,6 +161,7 @@ def parse_json(self, json_data: dict):
             author['avatar'] = f'https://cdn.discordapp.com/avatars/{author["id"]}/{author["avatar"]}.{ending}'
         if author not in users:
             users.append(author)
+        msg['author'] = author
 
         if msg.get('mentions'):
             for m in msg['mentions']:
