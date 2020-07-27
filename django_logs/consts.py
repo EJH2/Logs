@@ -40,9 +40,9 @@ capnbot_re = r'(?P<time>[\d\-\: \.]{19,26}) \((?P<mid>[\d]{16,18}) \/ (?P<gid>[\
              r',4}(?:\?[\w=]+)?))\) (?P<uname>.*?)#(?P<disc>\d{4}): (?P<content>[\S\s]*?)? \| (?P<attach>(?:http(?' \
              r':|s):.*))? \| (?P<embeds>(?:{\"embeds\": \[).*?)?$'
 
-modmailbot_re = r'\[(?P<time>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\] (?:\(Anonymous\) )?\(.*?\))? (?P<uname>' \
-                r'.*?)(?:#(?P<disc>\d{4}))?: (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* .*? \(.*\)\n(?P<attach' \
-                r'>(?:http(?:|s):.*)))?$| (?P<bcontent>[^\n]+))'
+modmailbot_re = r'\[(?P<time>[\d :-]{19})\](?:(?: \[(?:(?:(?:FROM|TO) USER)|CHAT|COMMAND)\]) \[(?P<uname>.*?)' \
+                r'(?:#(?P<disc>\d{4}))?\] (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* (?P<attach>' \
+                r'(?:http(?:|s):.*)))?$| (?P<bcontent>[^\n]+))'
 
 invite_deleter_re = r'\[(?P<gid>[\d]{16,18})-(?P<cid>[\d]{16,18})-(?P<uid>[\d]{16,18})\] (?P<uname>.*?)#' \
                     r'(?P<disc>\d{4}): (?P<content>[\S\s]*?)?$'
