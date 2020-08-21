@@ -25,9 +25,9 @@ gearbot_re = r'(?P<timestamp>[\w\-. :]{26}) (?P<guild_id>\d{16,18}) - (?P<channe
              r'>\d{16,18}) \| (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,18})\) \| (?P<content>' \
              r'[\S\s]*?)? \|(?: ?(?P<attachments>(?:http(?:|s):.*))?)?$'
 
-modmailbot_re = r'\[(?P<timestamp>[\d :-]{19})\](?:(?: \[FROM USER\]| \[TO USER\] (?:\(Anonymous\) )?\(.*?\))? ' \
-                r'(?P<username>.*?)(?:#(?P<discriminator>\d{4}))?: (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* ' \
-                r'(?P<attachments>(?:http(?:|s):.*)))?$| (?P<bot_content>[^\n]+))'
+modmailbot_re = r'\[(?P<timestamp>[\d :-]{19})\](?:(?: \[(?:(?:(?:FROM|TO) USER)|CHAT|COMMAND)\]) \[(?P<username>.*?)' \
+                r'(?:#(?P<discriminator>\d{4}))?\] (?P<content>[\S\s]*?)(?:\n{2}\*\*Attachment:\*\* (?P<attachments>' \
+                r'(?:http(?:|s):.*)))?$| (?P<bot_content>[^\n]+))'
 
 vortex_re = r'\[(?P<timestamp>[\w, :]{28,29})\] (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,18})' \
             r'\) : (?P<content>[\S\s]*?)(?P<attachments>(?:\n(?:http(?:|s):.*)|)*?)$'
