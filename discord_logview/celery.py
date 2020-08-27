@@ -1,5 +1,7 @@
 import json
 import os
+import subprocess
+
 import pendulum
 
 import redis
@@ -15,7 +17,8 @@ if config('SENTRY_DSN'):
     init_kwargs = {
         'dsn': config('SENTRY_DSN'),
         'integrations': [DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
-        'send_default_pii': True
+        'send_default_pii': True,
+        'release': subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode()
     }
     sentry_sdk.init(**init_kwargs)
 
@@ -41,11 +44,6 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
-
-
-@app.task
-def debug_task(self):
-    print('Request: {0!r}'.format(self.request))
 
 
 @app.on_after_configure.connect
