@@ -100,15 +100,15 @@ def log_html(request, pk):
             'delete_token': signer.dumps(f'log.{pk}') if log.owner == request.user else None}
 
     log_pages = log.pages.order_by('index')
-    if log_pages.count() > 1:
-        data['chunked'] = True
     msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
     data['total_messages'] = len(msgs)
     page = request.GET.get('page')
     if not request.is_ajax() and page:
         return redirect('log-html', pk=pk)
 
-    paginator = Paginator(msgs, 100)
+    paginator = Paginator(msgs, 50)
+    if paginator.num_pages > 1:
+        data['chunked'] = True
     try:
         msg_page = paginator.page(page)
     except PageNotAnInteger:
@@ -182,7 +182,7 @@ def log_preview(request, pk):
     if not request.is_ajax() and page:
         return redirect('log-preview', pk=pk)
 
-    paginator = Paginator(msgs, 100)
+    paginator = Paginator(msgs, 50)
     if paginator.num_pages > 1:
         data['chunked'] = True
     try:
