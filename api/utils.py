@@ -3,8 +3,6 @@ from django.conf import settings
 from itsdangerous import URLSafeSerializer
 from rest_framework import serializers
 
-from api.consts import expiry_times
-
 signer = URLSafeSerializer(settings.SECRET_KEY)
 
 
