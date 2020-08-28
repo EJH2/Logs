@@ -11,12 +11,9 @@
           <div>
               <div class="flex flex-horizontal flex-justify-center flex-align-center flex-wrap page-wrap">
                   <div class="text-section">
-                      <div class="glitch-wrapper">
-                          <div class="glitch" data-text="{% block data-text %}{% endblock %}">
-                              {% block glitch-content %}{% endblock %}
-                          </div>
+                      <div class="error">
+                          {% block error-code %}{% endblock %}
                       </div>
-                      <h4 class="margin-top-8 margin-bottom-8 header weight-bold">{% block header-content %}{% endblock %}</h4>
                       <div class="suggestion-text weight-light">{% block suggestion-text %}{% endblock %}</div>
                       <ul class="links-section">
                           {% block links %}

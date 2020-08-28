@@ -1,4 +1,3 @@
 {% extends 'errorbase.html' %}
-{% block title %}{% block data-text %}{% block glitch-content %}404{% endblock %}{% endblock %}{% endblock %}
-{% block header-content %}What was that?{% endblock %}
-{% block suggestion-text %}Looks like you've got some bad data here. For your safety and ours, we're gonna stop it here. If you are the owner of this data, and know it isn't bad, come have a chat <a href="https://discord.gg/3X8WwbU">here</a>.{% endblock %}
+{% block title %}{% block error-code %}400{% endblock %}{% endblock %}
+{% block suggestion-text %}It looks like you've got some bad data. For your safety and ours, we're gonna stop it here. If you are the owner of this data, and know it isn't bad, come have a <a href="https://discord.gg/3X8WwbU">chat</a>.{% endblock %}
