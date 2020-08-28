@@ -90,6 +90,21 @@ def _get_log(request, pk):
     return log
 
 
+def _paginate_logs(msgs, data):
+    paginator = Paginator(msgs, 50)
+    if paginator.num_pages > 1:
+        data['chunked'] = True
+    try:
+        msg_page = paginator.page(data.pop('page'))
+    except PageNotAnInteger:
+        msg_page = paginator.page(1)
+    except EmptyPage:
+        msg_page = paginator.page(paginator.num_pages)
+    data['page'] = msg_page
+    data['messages'] = msg_page.object_list
+    return data
+
+
 def log_html(request, pk):
     log = _get_log(request, pk)
     if not isinstance(log, Log):
@@ -102,21 +117,11 @@ def log_html(request, pk):
     log_pages = log.pages.order_by('index')
     msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
     data['total_messages'] = len(msgs)
-    page = request.GET.get('page')
+    page = data['page'] = request.GET.get('page')
     if not request.is_ajax() and page:
         return redirect('log-html', pk=pk)
 
-    paginator = Paginator(msgs, 50)
-    if paginator.num_pages > 1:
-        data['chunked'] = True
-    try:
-        msg_page = paginator.page(page)
-    except PageNotAnInteger:
-        msg_page = paginator.page(1)
-    except EmptyPage:
-        msg_page = paginator.page(paginator.num_pages)
-    data['page'] = msg_page
-    data['messages'] = msg_page.object_list
+    data = _paginate_logs(msgs, data)
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
 
@@ -178,21 +183,11 @@ def log_preview(request, pk):
 
     msgs = data['messages']
     data['total_messages'] = len(msgs)
-    page = request.GET.get('page')
+    page = data['page'] = request.GET.get('page')
     if not request.is_ajax() and page:
         return redirect('log-preview', pk=pk)
 
-    paginator = Paginator(msgs, 50)
-    if paginator.num_pages > 1:
-        data['chunked'] = True
-    try:
-        msg_page = paginator.page(page)
-    except PageNotAnInteger:
-        msg_page = paginator.page(1)
-    except EmptyPage:
-        msg_page = paginator.page(paginator.num_pages)
-    data['page'] = msg_page
-    data['messages'] = msg_page.object_list
+    data = _paginate_logs(msgs, data)
     messages.add_message(request, messages.INFO, 'This is a preview of what your log would look like. This URL cannot '
                                                  'be shared. If you like what you see, simply click the save icon. '
                                                  'If not, click the trash icon.')
