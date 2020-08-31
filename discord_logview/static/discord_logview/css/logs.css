@@ -588,7 +588,7 @@ body {
     }
 }
 
-@media (min-width: 500px) and (hover: hover) {
+@media (min-width: 500px) and (any-pointer: coarse) {
     body {
         padding-left: 15%;
         padding-right: 15%
