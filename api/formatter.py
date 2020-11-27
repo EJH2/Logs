@@ -1,295 +1,246 @@
-"""
-using code from <https://github.com/kyb3r/modmail-api/blob/8759fa08c6ffb838fa2405b5addb676b9c640b2c/core/formatter.py>
-© 2018 Kyber, licensed under MIT
-modified by https://github.com/EJH2
-© 2019 EJH2
-"""
-
-import base64
-import html
 import re
 
 import demoji
+import dispy_markdown as md
 import pendulum
 
-from api.emoji import EMOJI_LIST, EMOJI_REGEX, UNICODE_LIST
+from api.emoji import EMOJI_LIST, UNICODE_LIST
 
 if not demoji.last_downloaded_timestamp() or pendulum.now() > \
         (pendulum.instance(demoji.last_downloaded_timestamp()).add(days=7)):
     demoji.download_codes()
 
 demoji.set_emoji_pattern()
-# This is taken from the Demoji module, because they decided to make the emoji pattern private
-esc = (re.escape(c) for c in sorted(dict(demoji.stream_unicodeorg_emojifile(demoji.URL)), key=len, reverse=True))
-UNICODE_EMOJI_PAT = re.compile(r"|".join(esc)).pattern
-ESCAPED_EMOJI_PAT = fr'\\({UNICODE_EMOJI_PAT})'
+UNICODE_EMOJI_PAT = demoji._EMOJI_PAT.pattern
+jumbo_pat = re.compile(fr'<a?:.*?:\d*>|:[\wñ+-]+:|{UNICODE_EMOJI_PAT}')
 
 
-def _encode_codeblock(m):
-    return f'\x1AM{base64.b64encode(m.group(1).encode()).decode()}\x1AM'
+class BlockQuote(md.classes['block_quote']):
 
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag(
+            'div', md.html_tag(
+                'div', '', {'class': 'blockquoteDivider-2hH8H6'}, state
+            ) + md.html_tag(
+                'blockquote', output(node['content'], state)
+            ), {'class': 'blockquoteContainer-U5TVEi'}, state
+        )
 
-def _encode_link(m):
-    encoded_1 = base64.b64encode(m.group(1).encode()).decode()
-    encoded_2 = base64.b64encode(m.group(2).encode()).decode()
-    encoded_3 = f'|{base64.b64encode(m.group(5).encode()).decode()}' if m.group(3) else ''
-    return f'\x1AL{encoded_1}|{encoded_2}{encoded_3}\x1AL'
 
+class CodeBlock(md.classes['code_block']):
 
-def _encode_url(m):
-    return f'\x1AU{base64.b64encode(m.group(1).encode()).decode()}\x1AU'
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag('pre', md.html_tag(
+            'code', md.markdown.sanitize_text(node['content']), {
+                'class': node['lang'] or 'plaintext'
+            }, state
+        ), None, state)
 
 
-def _encode_inline_codeblock(m):
-    return f'\x1AI{base64.b64encode(m.group(2).encode()).decode()}\x1AI'
+class InlineCode(md.classes['inline_code']):
 
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag(
+            'code', md.markdown.sanitize_text(node['content'].strip()), {'class': 'inline'}, state
+        )
 
-def _encode_mentions(m):
-    return f'\x1AD{base64.b64encode(m.group(1).encode()).decode()}\x1AD'
 
+class Spoiler(md.classes['spoiler']):
 
-def _encode_emojis(m):
-    return f'\x1AE{base64.b64encode(m.group(1).encode()).decode()}\x1AE'
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag(
+            'span', md.html_tag(
+                'span', output(node['content'], state), {'class': 'inlineContent-3ZjPuv'}, state
+            ), {'class': 'spoilerText-3p6IlD'}, state
+        )
 
 
-def _process_emojis(m):
-    return EMOJI_LIST[m.group(2)] if m.group(2) in EMOJI_LIST.keys() else m.group(1)
+class DiscordUser(md.classes['discord_user']):
 
+    @staticmethod
+    def html(node, output, state):
+        user = next((item for item in state['users'] if str(item['id']) == node['id']), None)
+        mention = f'@{user["username"]}' if user else f'<@!{node["id"]}>'
+        return md.html_tag('span', mention, {'class': 'mention wrapper-3WhCwL mention'}, state)
 
-def _process_unicode_emojis(m, emoji_class):
-    e = m.group()
-    title = UNICODE_LIST.get(e, demoji.findall(e)[e])
-    if '\u200d' not in e:  # If there isn't a zero width joiner, strip out variation selectors
-        e = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', e)
-    codepoint = "-".join(['%04x' % ord(_c) for _c in e]).lstrip('0')
-    return f'<img class="{emoji_class}" title=":{title}:" ' \
-        f'src="https://twemoji.maxcdn.com/2/svg/{codepoint}.svg" alt="{e}">'
 
+class DiscordChannel(md.classes['discord_channel']):
 
-def _decode_link(m):
-    encoded_1 = base64.b64decode(m.group(1).encode()).decode()
-    encoded_2 = base64.b64decode(m.group(2).encode()).decode()
-    encoded_3 = f' title="{base64.b64decode(m.group(4).encode()).decode()}"' if m.group(3) else ''
-    return f'<a href="{encoded_2}"{encoded_3}>{encoded_1}</a>'
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag('span', f'<#{node["id"]}>', {'class': 'mention wrapper-3WhCwL mention'}, state)
 
 
-def _decode_url(m):
-    decoded = base64.b64decode(m.group(1).encode()).decode()
-    return f'<a href="{decoded}">{decoded}</a>'
+class DiscordRole(md.classes['discord_role']):
 
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag('span', f'<@&{node["id"]}>', {'class': 'mention wrapper-3WhCwL mention'}, state)
 
-def _decode_mentions(m):
-    return base64.b64decode(m.group(1).encode()).decode()
 
+class DiscordEmoji(md.classes['discord_emoji']):
 
-def _decode_emojis(m):
-    return base64.b64decode(m.group(1).encode()).decode()
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag(
+            'img', '', {
+                'class': f'{state["emoji_class"]}{" animated" if node["animated"] else ""}',
+                'src': f'https://cdn.discordapp.com/emojis/{node["id"]}.{"gif" if node["animated"] else "png"}',
+                'alt': f':{node["name"]}:'
+            }
+        )
 
 
-def _smart_mention(m, users):
-    uid = m.group(2)
-    user = next((item for item in users if str(item['id']) == uid), None)
-    if user:
-        return f'<span class="mention user" title="{uid}">@{user["username"]}</span>'
-    return f'<span class="mention user" title="{uid}">{m.group(1)}</span>'
+class DiscordEveryone(md.classes['discord_everyone']):
+
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag(
+            'span', '@everyone', {'class': 'mention wrapper-3WhCwL mention'}, state
+        )
 
 
-def _find_id_by_name(m, users):
-    name, disc = m.groups()
-    user = next((item for item in users if item['username'] == name and item['discriminator'] == disc), None)
-    if user:
-        return f'<span class="mention user" title="{user["id"]}">@{name}</span>'
-    return f'<span class="mention" title="{name}#{disc}">@{name}</span>'
+class DiscordHere(md.classes['discord_here']):
 
+    @staticmethod
+    def html(node, output, state):
+        return md.html_tag(
+            'span', '@here', {'class': 'mention wrapper-3WhCwL mention'}, state
+        )
+
 
-def _decode_inline_codeblock(m):
-    return f'<span class="pre pre--inline">{base64.b64decode(m.group(1).encode()).decode()}</span>'
-
-
-def _decode_codeblock(m):
-    decoded = base64.b64decode(m.group(1).encode()).decode()
-    match = re.match(r'([^`]*?\n)?([\s\S]+)', decoded)
-    lang = (match.group(1) or '').strip(' \n\r') or 'plaintext'
-    result = html.escape(match.group(2))
-    return (f'<div class="pre pre--multiline {lang}">{result}'
-            '</div>'.replace('\x00', ''))
-
-
-def _format_content(content: str, users: dict = None, newlines: bool = True):
-    # Decode and process URLs
-    content = re.sub('\x1AU(.*?)\x1AU', _decode_url, content)
-
-    if newlines:
-        # Process new lines
-        content = content.replace('\n', '<br>')
-
-    # Nobody said this was gonna be pretty
-    spoiler_html = r'<span class="spoiler-box"><span class="spoiler-text">\2</span></span>'
-
-    # Process spoiler (||text||)
-    content = re.sub(r'(\|\|)(?=\S)([\S\s]+?)(?<=\S)\1', spoiler_html, content)
-
-    # Decode mentions
-    content = re.sub('\x1AD(.*?)\x1AD', _decode_mentions, content)
-
-    # Decode escaped emojis
-    content = re.sub('\x1AE(.*?)\x1AE', _decode_emojis, content)
-
-    # Meta mentions (@everyone)
-    content = content.replace('@everyone', '<span class="mentioned mention no-select">@everyone</span>')
-
-    # Meta mentions (@here)
-    content = content.replace('@here', '<span class="mentioned mention no-select">@here</span>')
-
-    # User mentions (<@id> and <@!id>)
-    content = re.sub(r'(&lt;@!?(\d+)&gt;)', lambda m: _smart_mention(m, users), content)
-
-    # User mentions (<@user#discrim (id)>)
-    content = re.sub(r'&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;',
-                     r'<span class="mention user" title="\3">@\2</span>', content)
-
-    # User mentions (@user#discrim)
-    content = re.sub(r'@(.{2,32}?)#(\d{4})', lambda m: _find_id_by_name(m, users), content)
-
-    # Channel mentions (<#id>)
-    content = re.sub(r'(&lt;#\d+&gt;)', r'<span class="mention">\1</span>', content)
-
-    # Channel mentions (<#name>)
-    content = re.sub(r'(&lt;#(.{1,100}?)&gt;)', r'<span class="mention">#\2</span>', content)
-
-    # Role mentions (<@&id>)
-    content = re.sub(r'(&lt;@&amp;(\d+)&gt;)', r'<span class="mention">\1</span>', content)
-
-    # Role mentions (<@&name>)
-    content = re.sub(r'(&lt;@&amp;(.{1,100}?)&gt;)', r'<span class="mention" title="Role: \2">@\2</span>', content)
-
-    # Decode and process inline codeblocks
-    content = re.sub('\x1AI(.*?)\x1AI', _decode_inline_codeblock, content)
-
-    # Decode and process multiline codeblocks
-    content = re.sub('\x1AM(.*?)\x1AM', _decode_codeblock, content)
-
-    return content
-
-
-def format_content(content: str, users: dict = None, masked_links: bool = False, newlines: bool = True) -> str:
-    """Format raw text content to recognizable HTML"""
-
-    # Encode multiline codeblocks (```text```)
-    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+', _encode_codeblock, content)
-
-    # Encode links
-    if masked_links:
-        content = re.sub(r'\[(.*?)\]\((.*?)( (&quot;)(.*?)\4|)\)', _encode_link, content)
-
-    # Encode URLs
-    content = re.sub(r'(?:<)?(\b(?:(?:https?|ftp|file)://|www\.|ftp\.)(?:\([-a-zA-Z0'
-                     r'-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,.'
-                     r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-z'
-                     r'A-Z0-9+&@#/%=~_|$]))(?:>)?', _encode_url, content)
-
-    # HTML-encode content
-    content = html.escape(content)
-
-    # Encode inline codeblocks (`text` or ``text``)
-    content = re.sub(r'(``?)([^`]+)\1', _encode_inline_codeblock, content)
-
-    # Encode mentions
-    content = re.sub(r'((@everyone)|(@here)|(&lt;@!?(\d+)&gt;)|(&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;)|'
-                     r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
-                     r'(&lt;@&amp;(.{1,100}?)&gt;))', _encode_mentions, content)
-
-    # Encode escaped emojis
-    content = re.sub(ESCAPED_EMOJI_PAT, _encode_emojis, content)
-
-    jumbo_pat = fr'&lt;(:.*?:)(\d*)&gt;|&lt;(a:.*?:)(\d*)&gt;|{UNICODE_EMOJI_PAT}'
-    jumbo = (not re.sub(r'(\s)', '', re.sub(jumbo_pat, '', content))) and (len(re.findall(jumbo_pat, content)) < 28)
-    emoji_class = 'emoji emoji--large' if jumbo else 'emoji'
-
-    # Custom emojis (<:name:id>)
-    content = re.sub(r'&lt;(:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
-                     fr'https://cdn.discordapp.com/emojis/\2.png" alt="\1">', content)
-
-    # Custom animated emojis (<a:name:id>)
-    content = re.sub(r'&lt;a(:.*?:)(\d*)&gt;', fr'<img class="{emoji_class}" title="\1" src="'
-                     fr'https://cdn.discordapp.com/emojis/\2.gif" alt="\1">', content)
-
-    # Process emojis (:text:)
-    content = re.sub(EMOJI_REGEX, _process_emojis, content)
-
-    # Process unicode emojis
-    content = demoji.replace(content, lambda m: _process_unicode_emojis(m, emoji_class))
-
-    # Process block quotes (> text or >>> te\ntx)
-    content = re.sub(r'^&gt; (.+)$|^(?:&gt;){3} ([\S\s]+)$', r'<blockquote>\1\2</blockquote>', content)
-
-    # Process bold (**text**)
-    content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
-
-    # Process underline (__text__)
-    content = re.sub(r'__((?:\\[\s\S]|[^\\])+?)__(?!_)', r'<u>\1</u>', content)
-
-    # Process italic (*text* or _text_)
-    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s*\\]|\*\*)|'
-                     r'[^\s*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
-
-    # Process strike through (~~text~~)
-    content = re.sub(r'~~(?=\S)((?:\\[\s\S]|~(?!~)|[^\s\\~]|\s+(?!~~))+?)~~', r'<s>\1</s>', content)
-
-    # Decode and process links
-    if masked_links:
-        # Potential bug, may need to change to: '\x1AL(.*?)\|(.*?)\x1AL'
-        content = re.sub('\x1AL(.*?)\\|(.*?)(\\|(.*?)|)\x1AL', _decode_link, content)
-
-    return _format_content(content, users, newlines)
-
-
-def format_content_lite(content: str, users: dict = None, newlines: bool = True) -> str:
-    """Format raw text content to recognizable HTML
-
-    This is designated the lite function because some parts of Discord require special parsing rules.
-    """
-
-    # Encode multiline codeblocks (```text```)
-    content = re.sub(r'```+((?:[^`]*?\n)?(?:[\s\S]+))\n?```+', _encode_codeblock, content)
-
-    # Encode URLs
-    content = re.sub(r'(\b(?:(?:https?|ftp|file)://|www\.|ftp\.)(?:\([-a-zA-Z0'
-                     r'-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-zA-Z0-9+&@#/%?=~_|!:,.'
-                     r'\[\];])*(?:\([-a-zA-Z0-9+&@#/%?=~_|!:,.\[\];]*\)|[-a-z'
-                     r'A-Z0-9+&@#/%=~_|$]))', _encode_url, content)
-
-    # HTML-encode content
-    content = html.escape(content)
-
-    # Encode inline codeblocks (`text` or ``text``)
-    content = re.sub(r'(``?)([^`]+)\1', _encode_inline_codeblock, content)
-
-    # Encode mentions
-    content = re.sub(r'((@everyone)|(@here)|(&lt;@!?(\d+)&gt;)|(&lt;@((.{2,32}?)#\d{4}) \((\d+)\)&gt;)|'
-                     r'(@((.{2,32}?)#\d{4}))|(&lt;#\d+&gt;)|(&lt;#(.{1,100}?)&gt;)|(&lt;@&amp;(\d+)&gt;)|'
-                     r'(&lt;@&amp;(.{1,100}?)&gt;))', _encode_mentions, content)
-
-    # Encode escaped emojis
-    content = re.sub(ESCAPED_EMOJI_PAT, _encode_emojis, content)
-
-    # Process emojis (:text:)
-    content = re.sub(EMOJI_REGEX, _process_emojis, content)
-
-    # Process unicode emojis
-    content = demoji.replace(content, lambda m: _process_unicode_emojis(m, 'emoji'))
-
-    # Process bold (**text**)
-    content = re.sub(r'\*\*((?:\\[\s\S]|[^\\])+?)\*\*(?!\*)', r'<b>\1</b>', content)
-
-    # Process underline (__text__)
-    content = re.sub(r'__((?:\\[\s\S]|[^\\])+?)__(?!_)', r'<u>\1</u>', content)
-
-    # Process italic (*text* or _text_)
-    content = re.sub(r'\b_((?:__|\\[\s\S]|[^\\_])+?)_\b|\*(?=\S)((?:\*\*|\\[\s\S]|\s+(?:\\[\s\S]|[^\s*\\]|\*\*)|'
-                     r'[^\s*\\])+?)\*(?!\*)', r'<i>\1\2</i>', content)
-
-    # Process strike through (~~text~~)
-    content = re.sub(r'~~(?=\S)((?:\\[\s\S]|~(?!~)|[^\s\\~]|\s+(?!~~))+?)~~', r'<s>\1</s>', content)
-
-    return _format_content(content, users, newlines)
+def _parse_emoji(emoji: str):
+    title = UNICODE_LIST.get(emoji, demoji.findall(emoji)[emoji])
+    if '\u200d' not in emoji:  # If there isn't a zero width joiner, strip out variation selectors
+        emoji = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', emoji)
+    return {
+        'type': 'unicode_emoji',
+        'title': title,
+        'emoji': emoji
+    }
+
+
+class DiscordTextEmoji(md.markdown.Rule):
+
+    @staticmethod
+    def match(*args, **kwargs):
+        return md.markdown.any_scope_regex(r'^:([\wñ+-]+):')(*args, **kwargs)
+
+    @staticmethod
+    def parse(capture, parse, state):
+        if not capture[1] in EMOJI_LIST:
+            return {
+                'type': 'text',
+                'content': capture[0]
+            }
+        return _parse_emoji(EMOJI_LIST[capture[1]])
+
+
+class UnicodeEmoji(md.markdown.Rule):
+
+    @staticmethod
+    def match(*args, **kwargs):
+        return md.markdown.any_scope_regex(f'^(?:{UNICODE_EMOJI_PAT})')(*args, **kwargs)
+
+    @staticmethod
+    def parse(capture, parse, state):
+        return _parse_emoji(capture[0])
+
+    @staticmethod
+    def html(node, output, state):
+        if node['title'] in ['registered', 'copyright', 'tm']:
+            return node['emoji']
+        codepoint = "-".join(['%04x' % ord(_c) for _c in node["emoji"]]).lstrip('0')
+        return md.html_tag(
+            'img', '', {
+                'class': state['emoji_class'],
+                'title': f':{node["title"]}:',
+                'src': f'https://twemoji.maxcdn.com/2/svg/{codepoint}.svg',
+                'alt': node['emoji']
+            }, state
+        )
+
+
+rules_discord_only = {
+    **md.rules_discord_only,
+    'discord_user': DiscordUser(md.rules['discord_user'].order),
+    'discord_channel': DiscordChannel(md.rules['discord_channel'].order),
+    'discord_role': DiscordRole(md.rules['discord_role'].order),
+    'discord_emoji': DiscordEmoji(md.rules['discord_emoji'].order),
+    'discord_everyone': DiscordEveryone(md.rules['discord_everyone'].order),
+    'discord_here': DiscordHere(md.rules['discord_here'].order),
+    'discord_text_emoji': DiscordTextEmoji(md.rules['discord_emoji'].order),
+    'unicode_emoji': UnicodeEmoji(md.rules['discord_emoji'].order)
+}
+
+rules = {
+    **md.rules,
+    'block_quote': BlockQuote(md.rules['block_quote'].order),
+    'code_block': CodeBlock(md.rules['code_block'].order),
+    'inline_code': InlineCode(md.rules['inline_code'].order),
+    'spoiler': Spoiler(md.rules['spoiler'].order),
+    **rules_discord_only
+}
+
+rules_embed = {**md.rules_embed, **rules}
+rules_embed_lite = rules_embed.copy()
+del rules_embed_lite['code_block']
+
+parser = md.markdown.parser_for(rules)
+html_output = md.markdown.output_for(rules, 'html')
+parser_discord = md.markdown.parser_for(rules_discord_only)
+html_output_discord = md.markdown.output_for(rules_discord_only, 'html')
+parser_embed = md.markdown.parser_for(rules_embed)
+html_output_embed = md.markdown.output_for(rules_embed, 'html')
+parser_embed_lite = md.markdown.parser_for(rules_embed_lite)
+html_output_embed_lite = md.markdown.output_for(rules_embed_lite, 'html')
+
+
+def to_html(source: str, options: dict = None, custom_parser=None, custom_html_output=None):
+    if (custom_parser or custom_html_output) and (not custom_parser or not custom_html_output):
+        raise Exception('You must pass both a custom parser and custom htmlOutput function, not just one!')
+
+    options = {
+        'embed': False,
+        'escape_html': True,
+        'discord_only': False,
+        'discord_callback': {},
+        'users': {},
+        **(options if options else {})
+    }
+
+    _parser = parser
+    _html_output = html_output
+    if custom_parser:
+        _parser = custom_parser
+        _html_output = custom_html_output
+    elif options['discord_only']:
+        _parser = parser_discord
+        _html_output = html_output_discord
+    elif options['embed']:
+        _parser = parser_embed
+        _html_output = html_output_embed
+        if options['embed'] == 'lite':
+            _parser = parser_embed_lite
+            _html_output = html_output_embed_lite
+
+    state = {
+        'inline': True,
+        'in_quote': False,
+        'in_emphasis': False,
+        'escape_html': options['escape_html'],
+        'emoji_class': 'emoji',
+        'users': options['users'],
+        'css_module_names': options.get('css_module_names'),
+        'discord_callback': {**md.core.discord_callback_defaults, **options['discord_callback']}
+    }
+
+    if not options['embed']:
+        jumbo = (not re.sub(r'(\s)', '', jumbo_pat.sub('', source))) and (len(jumbo_pat.findall(source)) < 28)
+        state['emoji_class'] = 'emoji jumboable' if jumbo else 'emoji'
+
+    return _html_output(_parser(source, state), state)
