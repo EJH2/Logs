@@ -4682,5 +4682,3 @@ _EMOJI_LIST = {
 EMOJI_LIST = json.loads(json.dumps(_EMOJI_LIST))
 
 UNICODE_LIST = {EMOJI_LIST[k]: k for k in EMOJI_LIST}
-
-EMOJI_REGEX = f'(:({"|".join(EMOJI_LIST.keys())}):)'.replace('+', '\\+')
