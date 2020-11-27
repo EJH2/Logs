@@ -106,6 +106,21 @@ class EmbedAuthorSerializer(serializers.Serializer):
         pass
 
 
+class EmbedProviderSerializer(serializers.Serializer):
+    name = serializers.CharField(default=None, allow_null=True)
+    url = serializers.URLField(default=None, allow_null=True)
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        return sort_null(ret)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+
 class EmbedFieldSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=256)
     value = serializers.CharField(max_length=2048)
@@ -149,7 +164,9 @@ class EmbedSerializer(serializers.Serializer):
     color = serializers.IntegerField(default=5198940)
     image = ImageSerializer(default=None, allow_null=True)
     thumbnail = ImageSerializer(default=None, allow_null=True)
+    video = ImageSerializer(default=None, allow_null=True)
     author = EmbedAuthorSerializer(default=None, allow_null=True)
+    provider = EmbedProviderSerializer(default=None, allow_null=True)
     fields = EmbedFieldSerializer(many=True, default=[], allow_null=True)
     footer = EmbedFooterSerializer(required=False, default={}, allow_null=True)
 
