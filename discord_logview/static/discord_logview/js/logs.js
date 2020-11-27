@@ -1,44 +1,72 @@
 const baguetteSettings = {animation: 'fadeIn', noScrollbars: true, buttons: false};
 
-function loadJS() {
+let lastDate = moment(0);
 
-    document.querySelectorAll('.pre--multiline').forEach((block) => {
+function insertDivider(message) {
+    let dividerSpan = document.createElement('span');
+    dividerSpan.classList.add('content-1o0f9g');
+    let msgTime = message.querySelectorAll('.timestamp-3ZCmNB time, .timestamp-3ZCmNB span')[0];
+    let date = msgTime.getAttribute('datetime');
+    dividerSpan.innerText = moment(date).format('MMMM D, YYYY');
+    let dividerDiv = document.createElement('div');
+    dividerDiv.classList.add('divider-3_HH5L', 'hasContent-1_DUdQ', 'divider-JfaTT5', 'hasContent-1cNJDh');
+    dividerDiv.appendChild(dividerSpan);
+    message.parentElement.insertBefore(dividerDiv, message);
+}
+
+function loadJS(page) {
+
+    for (let t of page.querySelectorAll('.timestamp-3ZCmNB time, .timestamp-3ZCmNB span')) {
+        let currentDate = moment(t.getAttribute('datetime'));
+        if (currentDate.date() !== lastDate.date() && lastDate._i !== 0) {
+            insertDivider(t.closest('div.message-group'))
+        }
+        if (currentDate > lastDate) {
+            lastDate = currentDate;
+        }
+    }
+
+    page.querySelectorAll('pre code').forEach((block) => {
         hljs.highlightBlock(block);
     });
 
-    baguetteBox.run('.message-attachment', baguetteSettings);
-    baguetteBox.run('.embed-image', baguetteSettings);
+    baguetteBox.run('.imageZoom-1n-ADA', baguetteSettings);
 
-    for (let t of document.getElementsByTagName('time')) {
+    for (let t of page.getElementsByTagName('time')) {
         let date = t.getAttribute('datetime');
         t.textContent = moment(date).calendar();
     }
 
-    for (let s of document.getElementsByClassName('spoiler-box')) {
-        s.onclick = function () {
-            s.classList.toggle('spoiler-hidden');
-        };
-        s.classList.add('spoiler-hidden');
+    for (let h of page.querySelectorAll('.timestampVisibleOnHover-2bQeI4 span')) {
+        let date = h.getAttribute('datetime');
+        h.textContent = moment(date).format('LT')
     }
 
-    for (let s of document.getElementsByClassName('mention user')) {
+    for (let s of page.getElementsByClassName('spoilerText-3p6IlD')) {
+        s.onclick = function () {
+            s.classList.toggle('hidden-HHr2R9');
+        };
+        s.classList.add('hidden-HHr2R9');
+    }
+
+    for (let s of page.getElementsByClassName('mention user')) {
         s.onclick = function () {
             return copyIDMention(s);
         }
     }
 
-    for (let s of document.querySelectorAll('span.mentioned')) {
+    for (let s of page.querySelectorAll('span.mentioned')) {
         s.parentElement.classList.add('mentioned')
     }
 
-    for (let s of document.querySelectorAll('span.mention')) {
+    for (let s of page.querySelectorAll('span.mention')) {
         if (s.title === uid) {
             s.classList.add('mentioned');
         }
     }
 
-    for (let m of document.querySelectorAll('.message-group')) {
-        let avatarElem = m.getElementsByClassName('author-avatar')[0];
+    for (let m of page.querySelectorAll('.message-group')) {
+        let avatarElem = m.getElementsByClassName('avatar-1BDn8e')[0];
         if (avatarElem.src.indexOf('.gif') > -1) {
             avatarElem.src = avatarElem.src.replace('.gif', '.png');
             m.onmouseenter = function () {
@@ -56,7 +84,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     initialTheme();
 
-    loadJS();
+    loadJS(document.getElementById('message-page-1') || document.getElementById('message-container'));
 
     if (typeof InfiniteScroll !== 'undefined') {
         let infScroll = new InfiniteScroll('.infinite-container', {
@@ -67,7 +95,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             history: false,
         });
         infScroll.on('append', function (response, path, items) {
-            loadJS()
+            loadJS(items[0]);
         });
     }
 });
@@ -89,7 +117,9 @@ function setTheme(theme) {
     let cssThemes = document.getElementsByClassName('theme');
     let hlThemes = document.getElementsByClassName('hl_theme');
     let guildIcon = document.getElementById('header-icon');
+    let html = document.querySelectorAll('html')[0];
     if (theme === 'light') {
+        html.classList.replace('theme-dark', 'theme-light');
         for (let cssTheme of cssThemes) {
             cssTheme.setAttribute('href', '/static/discord_logview/css/logs_light.css');
         }
@@ -100,6 +130,7 @@ function setTheme(theme) {
             guildIcon.src = '/static/discord_logview/icons/black_file.png';
         }
     } else {
+        html.classList.replace('theme-light', 'theme-dark');
         for (let cssTheme of cssThemes) {
             cssTheme.setAttribute('href', '/static/discord_logview/css/logs_dark.css');
         }

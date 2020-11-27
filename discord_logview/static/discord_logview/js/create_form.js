@@ -13,7 +13,7 @@ function clear_url() {
 }
 
 const privacyRadios = document.logForm.privacy;
-const guildDiv = document.getElementById('guildDiv');
+const guildDiv = document.getElementById('guild-div');
 const guildOption = document.getElementById('guild');
 function guildVisibility(value) {
     if (!(['guild', 'mods'].includes(value))) {
