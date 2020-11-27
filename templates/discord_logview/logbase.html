@@ -1,11 +1,5 @@
-<!--
-using code derived from <https://github.com/Tyrrrz/DiscordChatExporter/blob/1356d4483afbb0942c67cc459c6ee5ccaedeb6f6/DiscordChatExporter.Core/Resources/ExportTemplates/Html/Core.html>
-© 2017-2018 Alexey Golub, licensed under MIT
-modified by https://github.com/EJH2
-© 2019 EJH2
-!-->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="mouse-mode full-motion app-focused theme-dark">
 <head>
     <title>{% block title %}{% endblock %}</title>
     <base href="{{ request.scheme }}://{{ request.META.HTTP_HOST }}">
@@ -28,6 +22,9 @@ modified by https://github.com/EJH2
     </script>
     <link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_dark.css" %}" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: dark)">
     <link rel="stylesheet" class="theme" href="{% static "discord_logview/css/logs_light.css" %}" media="(prefers-color-scheme: light)">
+    <link href="{% static "discord_logview/css/logs.css" %}" rel="stylesheet">
+
+    <!-- Discord Code Block Styling !-->
     <script>
         if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
             document.documentElement.style.display = 'none';
@@ -41,7 +38,8 @@ modified by https://github.com/EJH2
           rel="stylesheet" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: dark)">
     <link class="hl_theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/solarized-light.min.css"
           rel="stylesheet" media="(prefers-color-scheme: light)">
-    <link rel="stylesheet" href="{% static 'discord_logview/css/alert.css' %}">
+
+    <!-- Extraneous Styling !-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.0/baguetteBox.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
@@ -51,11 +49,11 @@ modified by https://github.com/EJH2
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.0/baguetteBox.min.js"></script>
     {% if log.chunked %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
     {% endif %}
-    <script>const uid = '{{ log.user_id }}';</script>
+        <script>const uid = '{{ log.user_id }}';</script>
     {% if not export %}
-    <script src="{% static 'discord_logview/js/alert.js' %}"></script>
+        <script src="{% static 'discord_logview/js/alert.js' %}"></script>
     {% endif %}
     <script src="{% static 'discord_logview/js/logs.js' %}"></script>
 </head>
@@ -79,12 +77,12 @@ modified by https://github.com/EJH2
     !-->
     {% endif %}
     {% if not export %}
-    {% include 'discord_logview/navbar.html' %}
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
+        {% include 'discord_logview/navbar.html' %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
     {% endif %}
     <div id="header">
         <div id="header-icon-container">
@@ -99,17 +97,17 @@ modified by https://github.com/EJH2
         {% block messages %}{% endblock messages %}
     </div>
     {% if log.page and log.page.has_next %}
-    <div class="infinite-next">
-        <a class="infinite-more-link" href="{{ log.uuid }}?page={{ log.page.next_page_number }}"></a>
-    </div>
-    <div class="infinite-scroll-status">
-        <img class="infinite-scroll-request" src="{% static 'discord_logview/icons/loading.gif' %}" alt="Loading...">
-    </div>
+        <div class="infinite-next">
+            <a class="infinite-more-link" href="{{ log.uuid }}?page={{ log.page.next_page_number }}"></a>
+        </div>
+        <div class="infinite-scroll-status">
+            <img class="infinite-scroll-request" src="{% static 'discord_logview/icons/loading.gif' %}" alt="Loading...">
+        </div>
     {% endif %}
-{% block extra_js %}{% endblock %}
-<div id="copyright">
-    <div>Made with blood, sweat, and Django by <a href="https://github.com/EJH2">EJH2</a></div>
-    <div>Discord Log Viewer is not affiliated with Discord, which is a registered trademark of Discord Inc.</div>
-</div>
+    {% block extra_js %}{% endblock %}
+    <div id="copyright">
+        <div>Made with blood, sweat, and Django by <a href="https://github.com/EJH2">EJH2</a></div>
+        <div>Discord Log Viewer is not affiliated with Discord, which is a registered trademark of Discord Inc.</div>
+    </div>
 </body>
 </html>
