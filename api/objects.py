@@ -93,10 +93,12 @@ class Embed:
         self.url = data.get('url')
         self.type = data.get('type', 'rich')
         self.author = data.get('author')
+        self.provider = data.get('provider')
         self.timestamp_ = pendulum.parse(data['timestamp']) if data.get('timestamp') else None
         self.color = data.get('color')
         self.image = data.get('image')
         self.thumbnail = data.get('thumbnail')
+        self.video = data.get('video')
         self.fields = data.get('fields')
         self.footer = data.get('footer')
 
