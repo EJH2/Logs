@@ -2,6 +2,8 @@ import pendulum
 
 from natural.date import duration
 
+embed_grid_values = [['1 / 13'], ['1 / 7', '7 / 13'], ['1 / 5', '5 / 9', '9 / 13']]
+
 
 class LogRenderer:
     def __init__(self, data):
@@ -101,6 +103,35 @@ class Embed:
         self.video = data.get('video')
         self.fields = data.get('fields')
         self.footer = data.get('footer')
+
+        if self.fields:
+            rows = []
+            row = []
+            for index, field in enumerate(self.fields):
+                if not index:
+                    row.append(field)
+                    continue
+                if not field['inline']:
+                    if row:
+                        rows.append(row)
+                    row = [field]
+                    rows.append(row)
+                    row = []
+                else:
+                    if len(row) == 3:
+                        rows.append(row)
+                        row = []
+                    row.append(field)
+            if row:
+                rows.append(row)
+
+            for row in rows:
+                grid = embed_grid_values[len(row) - 1]
+                for index, value in enumerate(grid):
+                    row[index]['grid_column'] = value
+
+            for index, value in enumerate([field_ for row_ in rows for field_ in row_]):
+                self.fields[index].update(value)
 
     @property
     def timestamp(self):
