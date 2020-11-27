@@ -1,0 +1,154 @@
+{% load static %}
+{% for embed in embeds %}
+    {% if embed.type == 'image' %}
+        <div aria-hidden="false" class="embed-IeVjo6 embedWrapper-lXpS3L"><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L embedMedia-1guQoW embedImage-2W1cML" href="{{ embed.url }}" rel="noreferrer noopener" target="_blank" style="height: {{ embed.thumbnail.height }}px; width: {{ embed.thumbnail.width }}px;"><img alt="" src="{{ embed.thumbnail.url }}" style="height: {{ embed.thumbnail.height }}px; width: {{ embed.thumbnail.width }}px;"></a></div>
+    {% elif embed.type == 'video' %}
+        {% if embed.provider %}
+            <div class="embedWrapper-lXpS3L embedFull-2tM8-- embed-IeVjo6 markup-2BOw-j" style="border-color: {{ embed.color }}; max-width: 432px;">
+                <div class="grid-1nZz7S">
+                    {% if embed.provider.url %}
+                        <div class="embedProvider-3k5pfl embedMargin-UO5XwE"><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedLink-1G1K1D" href="{{ embed.provider.url }}" rel="noreferrer noopener" target="_blank">{{ embed.provider.name }}</a></div>
+                    {% else %}
+                        <div class="embedProvider-3k5pfl embedMargin-UO5XwE">
+                            <span>{{ embed.provider.name }}</span>
+                        </div>
+                    {% endif %}
+                    {% if embed.author %}
+                        <div class="embedAuthor-3l5luH embedMargin-UO5XwE">
+                            {% if embed.author.name %}
+                                {% if embed.author.url %}
+                                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedAuthorNameLink-1gVryT embedLink-1G1K1D embedAuthorName-3mnTWj" href="{{ embed.author.url }}" rel="noreferrer noopener" target="_blank">{{ embed.author.name }}</a>
+                                {% else %}
+                                    <span class="embedAuthorName-3mnTWj">{{ embed.author.name }}</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% if embed.title %}
+                        <div class="embedTitle-3OXDkz embedMargin-UO5XwE">{% if embed.url %}<a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedTitleLink-1Zla9e embedLink-1G1K1D embedTitle-3OXDkz" href="{{ embed.url }}" rel="noreferrer noopener" target="_blank">{{ embed.title|safe }}</a>{% else %}{{ embed.title|safe }}{% endif %}</div>
+                    {% endif %}
+                    <div class="embedVideo-3nf0O9 embedMedia-1guQoW" style="width: {{ embed.video.width }}px; height: {{ embed.video.height }}px;">
+                        <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedVideoImageComponent-34z3di" rel="noreferrer noopener" target="_blank" role="button" style="width: {{ embed.video.width }}px; height: {{ embed.video.height }}px;"><img class="embedVideoImageComponentInner-2Ujh_1" alt="" src="{{ embed.thumbnail.proxy_url }}" style="width: {{ embed.thumbnail.width }}px; height: {{ embed.thumbnail.height }}px;"></a>
+                        <div class="embedVideoActions-O6vR7W">
+                            <div class="centerContent-1dpMl0">
+                                <div class="wrapper-129saQ">
+                                    <div class="iconWrapperActive-12kkfE iconWrapper-21idzA" role="button" tabindex="0">
+                                        <svg class="iconPlay-2kgvwV icon-3ZFEtL" aria-hidden="false" width="16" height="16" viewBox="0 0 24 24"><polygon fill="currentColor" points="0 0 0 14 11 7" transform="translate(7 5)"></polygon></svg>
+                                    </div>
+                                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB iconWrapperActive-12kkfE iconWrapper-21idzA" href="{{ embed.video.url }}" rel="noreferrer noopener" target="_blank" role="button" tabindex="0"><svg class="iconExternalMargins-2v2mzg icon-3ZFEtL" aria-hidden="false" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" transform="translate(3.000000, 4.000000)" d="M16 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4v-2H2V4h14v10h-4v2h4c1.1 0 2-.9 2-2V2a2 2 0 0 0-2-2zM9 6l-4 4h3v6h2v-6h3L9 6z"></path></svg></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if embed.footer %}
+                        <div class="embedFooter-3yVop- embedMargin-UO5XwE">
+                            {% if embed.footer.icon_url %}
+                                <img alt="" class="embedFooterIcon-239O1f" src="{{ embed.footer.icon_url }}">
+                            {% endif %}
+                            <span class="embedFooterText-28V_Wb">{{ embed.footer.text }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div aria-hidden="false" class="embed-IeVjo6 embedWrapper-lXpS3L">
+                <div class="embedVideo-3nf0O9 embedMedia-1guQoW">
+                    <div class="imageWrapper-2p5ogY" style="width: {% firstof embed.thumbnail.width embed.video.width %}px; height: {% firstof embed.thumbnail.height embed.video.height %}px;">
+                        <div class="wrapperPaused-19pWuK wrapper-2TxpI8" data-fullscreen="false" style="width: {% firstof embed.thumbnail.width embed.video.width %}px; height: {% firstof embed.thumbnail.height embed.video.height %}px;">
+                            <video class="video-8eMOth" playsinline="" muted height="{{ embed.video.height }}" poster="{% firstof embed.thumbnail.proxy_url embed.video.proxy_url %}?format=jpeg" preload="metadata" width="{{ embed.video.width }}" src="{{ embed.video.url }}"></video>
+                            <div class="playCenter-Fe8u3X flexCenter-3_1bcw flex-1O1GKY justifyCenter-3D2jYp alignCenter-1dQNNs">
+                                <div class="wrapper-129saQ">
+                                    <div class="iconWrapperActive-12kkfE iconWrapper-21idzA">
+                                        <svg class="iconPlay-2kgvwV icon-3ZFEtL" aria-hidden="false" width="16" height="16" viewBox="0 0 24 24"><polygon fill="currentColor" points="0 0 0 14 11 7" transform="translate(7 5)"></polygon></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="playPausePop-RnpJoM" style="opacity: 0;"><svg class="playPausePopIcon-p-D8VH" aria-hidden="false" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M0,14 L4,14 L4,0 L0,0 L0,14 L0,14 Z M8,0 L8,14 L12,14 L12,0 L8,0 L8,0 Z" transform="translate(6 5)"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% elif embed.type == 'gifv' %}
+        <div aria-hidden="false" class="embed-IeVjo6 embedWrapper-lXpS3L">
+            <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedVideo-3nf0O9 embedMedia-1guQoW" href="{{ embed.video.url }}" rel="noreferrer noopener" target="_blank" role="button" style="height: {{ embed.video.height }}px; width: {{ embed.video.width }}px;"><div class="imageAccessory-3uSIjZ"><div class="gifTag-31zFY8"></div></div><video class="embedVideo-3nf0O9 embedMedia-1guQoW" poster="{{ embed.thumbnail.proxy_url }}?width={{ embed.thumbnail.width }}&height={{ embed.thumbnail.height }}" src="{% firstof embed.video.proxy_url embed.video.url %}" width="{{ embed.video.width }}" height="{{ embed.video.height }}" loop="" preload="none" playsinline muted autoplay></video></a>
+        </div>
+    {% elif embed.type == 'article' %}
+        <div class="embedWrapper-lXpS3L embedFull-2tM8-- embed-IeVjo6 markup-2BOw-j" aria-hidden="false" style="max-width: 432px;">
+            <div class="grid-1nZz7S">
+                {% if embed.provider %}
+                    {% if embed.provider.url %}
+                        <div class="embedProvider-3k5pfl embedMargin-UO5XwE"><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedLink-1G1K1D" href="{{ embed.provider.url }}" rel="noreferrer noopener" target="_blank">{{ embed.provider.name }}</a></div>
+                    {% else %}
+                        <div class="embedProvider-3k5pfl embedMargin-UO5XwE"><span>{{ embed.provider.name }}</span></div>
+                    {% endif %}
+                {% endif %}
+                {% if embed.title %}
+                    <div class="embedTitle-3OXDkz embedMargin-UO5XwE">{% if embed.url %}<a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedTitleLink-1Zla9e embedLink-1G1K1D embedTitle-3OXDkz" href="{{ embed.url }}" rel="noreferrer noopener" target="_blank">{{ embed.title|safe }}</a>{% else %}{{ embed.title|safe }}{% endif %}</div>
+                {% endif %}
+                {% if embed.description %}
+                    <div class="embedDescription-1Cuq9a embedMargin-UO5XwE">{{ embed.description|safe }}</div>
+                {% endif %}
+                {% if embed.thumbnail %}
+                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L embedMedia-1guQoW embedImage-2W1cML" href="{{ embed.thumbnail.url }}" rel="noreferrer noopener" target="_blank" style="height: {{ embed.thumbnail.height }}px; width: {{ embed.thumbnail.width }}px;"><img alt="" src="{{ embed.thumbnail.url }}" style="height: {{ embed.thumbnail.height }}px; width: {{ embed.thumbnail.width }}px;"></a>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="embedWrapper-lXpS3L embedFull-2tM8-- embed-IeVjo6 markup-2BOw-j"{% if embed.color %} style="border-color: {{ embed.color }};"{% endif %}>
+            <div class="grid-1nZz7S{% if embed.thumbnail %} hasThumbnail-3FJf1w{% endif %}">
+                {% if embed.author %}
+                    <div class="embedAuthor-3l5luH embedMargin-UO5XwE">
+                        {% if embed.author.icon_url %}
+                            <img alt="" class="embedAuthorIcon--1zR3L" src="{{ embed.author.icon_url }}">
+                        {% endif %}
+                        {% if embed.author.name %}
+                            {% if embed.author.url %}
+                                <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedAuthorNameLink-1gVryT embedLink-1G1K1D embedAuthorName-3mnTWj" href="{{ embed.author.url }}" rel="noreferrer noopener" target="_blank">{{ embed.author.name }}</a>
+                            {% else %}
+                                <span class="embedAuthorName-3mnTWj">{{ embed.author.name }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if embed.title %}
+                    <div class="embedTitle-3OXDkz embedMargin-UO5XwE">{% if embed.url %}<a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedTitleLink-1Zla9e embedLink-1G1K1D embedTitle-3OXDkz" href="{{ embed.url }}" rel="noreferrer noopener" target="_blank">{{ embed.title|safe }}</a>{% else %}{{ embed.title|safe }}{% endif %}</div>
+                {% endif %}
+                {% if embed.description %}
+                    <div class="embedDescription-1Cuq9a embedMargin-UO5XwE">{{ embed.description|safe }}</div>
+                {% endif %}
+                {% if embed.fields|length > 0 %}
+                    <div class="embedFields-2IPs5Z">
+                        {% for field in embed.fields %}
+                            <div class="embedField-1v-Pnh" style="grid-column: {{ field.grid_column }};"><div class="embedFieldName-NFrena">{{ field.name|safe }}</div><div class="embedFieldValue-nELq2s">{{ field.value|safe }}</div></div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if embed.image %}
+                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L embedMedia-1guQoW embedImage-2W1cML" href="{{ embed.image.url }}" rel="noreferrer noopener" target="_blank" style="height: {{ embed.image.height }}px; width: {{ embed.image.width }}px;"><img alt="" src="{{ embed.image.url }}" style="height: {{ embed.image.height }}px; width: {{ embed.image.width }}px;"></a>
+                {% endif %}
+                {% if embed.thumbnail %}
+                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedThumbnail-2Y84-K" href="{{ embed.thumbnail.url }}" rel="noreferrer noopener" target="_blank" style="height: {{ embed.thumbnail.height }}px; width: {{ embed.thumbnail.width }}px;"><img alt="" src="{{ embed.thumbnail.url }}" style="height: {{ embed.thumbnail.height }}px; width: {{ embed.thumbnail.width }}px;"></a>
+                {% endif %}
+                {% if embed.footer or embed.timestamp %}
+                    <div class="embedFooter-3yVop- embedMargin-UO5XwE">
+                        {% if embed.footer and not embed.timestamp %}
+                            {% if embed.footer.icon_url %}
+                                <img alt="" class="embedFooterIcon-239O1f" src="{{ embed.footer.icon_url }}">
+                            {% endif %}
+                            <span class="embedFooterText-28V_Wb">{{ embed.footer.text }}</span>
+                        {% elif embed.timestamp and not embed.footer %}
+                            <time class="embedFooterText-28V_Wb" datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time>
+                        {% else %}
+                            {% if embed.footer.icon_url %}
+                                <img alt="" class="embedFooterIcon-239O1f" src="{{ embed.footer.icon_url }}">
+                            {% endif %}
+                            <span class="embedFooterText-28V_Wb">{{ embed.footer.text }}<span class="embedFooterSeparator-3klTIQ">•</span><time datetime="{{ embed.timestamp }}">{{ embed.human_timestamp }}</time></span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

@@ -1,0 +1,38 @@
+{% load static %}
+{% for attachment in attachments %}
+    {% if attachment.type == 'image' %}
+        <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L" href="#{{ attachment.filename }}" style="height: {{ attachment.height }}px; width: {{ attachment.width }}px;"><img src="{{ attachment.url }}" alt="" data-id="{{ attachment.filename }}" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''"  style="height: {{ attachment.height }}px; width: {{ attachment.width }}px;"/></a>
+    {% elif attachment.type == 'gif' %}
+        <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L" href="{{ attachment.url }}" rel="noreferrer noopener" target="_blank" style="height: {{ attachment.height }}px; width: {{ attachment.width }}px;"><div class="imageAccessory-3uSIjZ"><div class="gifTag-31zFY8"></div></div><img alt="" src="{{ attachment.proxy_url }}?format=png" style="height: {{ attachment.height }}px; width: {{ attachment.width }}px;"></a>
+    {% elif attachment.type == 'video' %}
+        <div class="imageWrapper-2p5ogY embedWrapper-lXpS3L" style="height: {{ attachment.height }}px; width: {{ attachment.width }}px;">
+            <div class="wrapperPaused-19pWuK wrapper-2TxpI8" data-fullscreen="false" tabindex="0" style="height: {{ attachment.height }}px; width: {{ attachment.width }}px;">
+                <div class="metadata-13NcHb">
+                    <div class="metadataContent-3c_ZXw">
+                        <div class="metadataName-14STf-">{{ attachment.filename }}</div>
+                        <div class="metadataSize-2UOOLK">{{ attachment.size }}</div>
+                    </div>
+                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB metadataDownload-1fk90V" href="{{ attachment.url }}" rel="noreferrer noopener" target="_blank"><svg class="metadataIcon-2FyCKU" aria-hidden="false" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M16.293 9.293L17.707 10.707L12 16.414L6.29297 10.707L7.70697 9.293L11 12.586V2H13V12.586L16.293 9.293ZM18 20V18H20V20C20 21.102 19.104 22 18 22H6C4.896 22 4 21.102 4 20V18H6V20H18Z"></path></svg></a>
+                </div>
+                <video class="video-8eMOth" playsinline="" muted height="{{ attachment.height }}" poster="{{ attachment.proxy_url }}?format=jpeg&width={{ attachment.width }}&height={{ attachment.height }}" preload="metadata" width="{{ attachment.width }}" src="{{ attachment.url }}"></video>
+                <div class="playCenter-Fe8u3X flexCenter-3_1bcw flex-1O1GKY justifyCenter-3D2jYp alignCenter-1dQNNs">
+                    <div class="wrapper-129saQ">
+                        <div class="iconWrapperActive-12kkfE iconWrapper-21idzA" role="button" tabindex="0"><svg class="iconPlay-2kgvwV icon-3ZFEtL" aria-hidden="false" width="16" height="16" viewBox="0 0 24 24"><polygon fill="currentColor" points="0 0 0 14 11 7" transform="translate(7 5)"></polygon></svg></div>
+                    </div>
+                </div>
+                <div class="playPausePop-RnpJoM" style="opacity: 0;"><svg class="playPausePopIcon-p-D8VH" aria-hidden="false" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M0,14 L4,14 L4,0 L0,0 L0,14 L0,14 Z M8,0 L8,14 L12,14 L12,0 L8,0 L8,0 Z" transform="translate(6 5)"></path></svg></div>
+            </div>
+        </div>
+    {% else %}
+        <div class="attachment-33OFj0 horizontal-2EEEnY flex-1O1GKY directionRow-3v3tfG alignCenter-1dQNNs embedWrapper-lXpS3L">
+            <img class="icon-1kp3fr" src="{% static 'discord_logview/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown">
+            <div class="attachmentInner-3vEpKt">
+                <div class="filenameLinkWrapper-1-14c5">
+                    <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB fileNameLink-9GuxCo" href="{{ attachment.url }}" rel="noreferrer noopener" target="_blank">{{ attachment.filename }}</a>
+                </div>
+                <div class="metadata-3WGS0M size12-3R0845 height16-2Lv3qA">{{ attachment.size }}</div>
+            </div>
+            <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB downloadWrapper-vhAtLx" href="{{ attachment.url }}" rel="noreferrer noopener" target="_blank"><svg class="downloadButton-23tKQp" aria-hidden="false" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M16.293 9.293L17.707 10.707L12 16.414L6.29297 10.707L7.70697 9.293L11 12.586V2H13V12.586L16.293 9.293ZM18 20V18H20V20C20 21.102 19.104 22 18 22H6C4.896 22 4 21.102 4 20V18H6V20H18Z"></path></svg></a>
+        </div>
+    {% endif %}
+{% endfor %}
