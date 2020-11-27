@@ -1,10 +1,3 @@
-/*
-using styles adopted from <https://github.com/Tyrrrz/DiscordChatExporter/blob/1356d4483afbb0942c67cc459c6ee5ccaedeb6f6/DiscordChatExporter.Core/Resources/ExportTemplates/Html/LightTheme.css>
-© 2017-2018 Alexey Golub, licensed under MIT
-modified by https://github.com/EJH2
-© 2019 EJH2
-*/
-
 /* === GENERAL === */
 
 body {
@@ -16,45 +9,11 @@ body {
     color: #000000;
 }
 
-a, a.message-embed-title {
-    color: #00B0F4;
-}
-
-.hljs.pre--multiline {
-    background-color: #F9F9F9;
-}
-
-.pre {
-    background-color: #F9F9F9;
-}
-
-.pre--multiline {
-    border-color: #F3F3F3;
-    color: #657B83;
-}
-
-.mention {
-    background-color: #F1F3FB;
-    color: #7289DA;
-}
-
-.mention:hover:not(.mentioned) {
-    background-color: #7289DA;
-    color: #FFF;
-}
-
-.mentioned {
-    background: rgba(250,166,26,.2);
-}
-
-/* === Navbar === */
+/* === NAV BAR === */
 
 nav {
     background-color: #FFF;
     color: #4F5660;
-    -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, .1),
-        0 1.5px 0 rgba(0, 0, 0, .025),
-        0 2px 0 rgba(0, 0, 0, .025);
     box-shadow: 0 1px 0 rgba(0, 0, 0, .1),
         0 1.5px 0 rgba(0, 0, 0, .025),
         0 2px 0 rgba(0, 0, 0, .025);
@@ -72,8 +31,7 @@ nav span>div {
     }
 }
 
-
-/* === INFO === */
+/* === HEADER === */
 
 .tooltip .tooltiptext {
     background-color: #858585;
@@ -151,87 +109,6 @@ nav span>div {
 
 #message-container {
     background-color: #FFF;
-}
-
-.message-group {
-    border-color: #ECEEEF;
-}
-
-.author-name {
-    color: #2F3136;
-}
-
-.message-timestamp {
-    color: #99AAB5;
-}
-
-.message-edited-timestamp {
-    color: #99AAB5;
-}
-
-.message-attachment .horizontal {
-    border-color: #F6F6F7;
-}
-
-.message-embed-inner {
-    background: hsla(0, 0%, 97.6%, .3);
-    border: 1px solid hsla(0, 0%, 80.4%, .3);
-}
-
-.message-embed-author-name {
-    color: #4F545C;
-}
-
-.message-embed-author-name-link {
-    color: #4F545C;
-}
-
-.message-embed-title {
-    color: #4F545C;
-}
-
-.message-embed-description {
-    color: #737F8D;
-}
-
-.message-embed-field-name {
-    color: #36393E;
-}
-
-.message-embed-field-value {
-    color: #737F8D;
-}
-
-.message-embed-footer {
-    color: rgba(79, 83, 91, 0.4);
-}
-
-.message-embed-footer-separator {
-    color: #CACBCE;
-}
-
-blockquote {
-    border-color: #c7ccd1;
-}
-
-.spoiler-box.spoiler-hidden {
-    background-color: #B9BBBE;
-}
-
-.spoiler-box.spoiler-hidden:hover {
-    background-color: #C7C8CB;
-}
-
-.spoiler-box {
-    background-color: #E5E5E5;
-}
-
-.message-reaction {
-    background-color: rgba(79, 84, 92, 0.06);
-}
-
-.message-reaction-count {
-    color: #99AAB5;
 }
 
 /* === LOG CREATION FORM === */
