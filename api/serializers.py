@@ -177,7 +177,7 @@ class EmbedSerializer(serializers.Serializer):
     url = serializers.URLField(default=None, allow_null=True)
     type = serializers.CharField(max_length=20, default='rich')
     timestamp = serializers.DateTimeField(default=None, allow_null=True)
-    color = serializers.IntegerField(default=5198940)
+    color = serializers.IntegerField(default=None, allow_null=True)
     image = ImageSerializer(default=None, allow_null=True)
     thumbnail = ImageSerializer(default=None, allow_null=True)
     video = ImageSerializer(default=None, allow_null=True)
