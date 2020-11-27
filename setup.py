@@ -44,7 +44,8 @@ setup(
         "redis",
         "requests",
         "sentry-sdk",
-        "shortuuid"
+        "shortuuid",
+        "dispy_markdown @ git+https://github.com/EJH2/dispy-markdown.git"
     ],
     extras_require={
         'win': ["gevent"],
