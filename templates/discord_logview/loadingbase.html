@@ -14,19 +14,4 @@
         <div class="placeholder placeholder-text"></div>
     </div>
 {% endblock %}
-{% block messages %}
-    <div class="message-group">
-        <div class="author-avatar-container">
-            <img class="author-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="">
-        </div>
-        <div class="messages">
-            <div class="author-header">
-                <span>
-                    <span class="author-name" title="Discord Log Viewer#0000">Discord Log Viewer</span>
-                </span>
-                    <time class="message-timestamp" datetime="{{ iso }}"></time>
-            </div>
-            {% block messages_inner %}{% endblock %}
-        </div>
-    </div>
-{% endblock %}
+{% block messages %}{% endblock %}

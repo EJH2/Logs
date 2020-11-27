@@ -1,15 +1,48 @@
 {% extends 'discord_logview/loadingbase.html' %}
 {% load static %}
 {% block title %}Loading...{% endblock %}
-{% block messages_inner %}
+{% block messages %}
+    <div class="message-group">
     {% for enum in task_ids %}
-    <div class="message-content">
-        <div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div>
-    </div>
-    <div class="message-content">
-        <div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div>
-    </div>
+        {% if forloop.first %}
+            <div class="message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                <div class="contents-2mQqc9">
+                    <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="threads-avatar-hack avatar-1BDn8e clickable-1bVtEA" alt=" ">
+                    <h2 class="header-23xsNx threads-header-hack"><span
+                            class="username-1A8OIy clickable-1bVtEA focusable-1YV_-H"
+                            title="Discord Log Viewer#0000">Discord Log Viewer</span><span class="timestamp-3ZCmNB"><time
+                            datetime="{{ iso }}">Today</time></span></h2>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div></div>
+                </div>
+            </div>
+            <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                <div class="contents-2mQqc9">
+                    <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                            class="separator-2nZzUB" aria-hidden="true">[</i><span
+                            datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div></div>
+                </div>
+            </div>
+        {% else %}
+            <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                <div class="contents-2mQqc9">
+                    <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                            class="separator-2nZzUB" aria-hidden="true">[</i><span
+                            datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div></div>
+                </div>
+            </div>
+            <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                <div class="contents-2mQqc9">
+                    <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                            class="separator-2nZzUB" aria-hidden="true">[</i><span
+                            datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div></div>
+                </div>
+            </div>
+        {% endif %}
     {% endfor %}
+    </div>
 {% endblock %}
 {% block extra_js %}
     <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
@@ -46,25 +79,39 @@
             };
 
             function somethingBroke() {
-                let node = document.createElement('div');
-                node.classList.add('message-content');
-                node.innerHTML = 'We broke something! Please send this to EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a> so he can try and find the issue!<br>';
-                let block = document.createElement('div');
-                block.classList.add('pre', 'pre--multiline', 'hljs');
-                block.innerHTML = 'Tasks:<br>{% for enum in task_ids %}{{ enum|last|first }}<br>{% endfor %}';
-                node.appendChild(block);
-                node.innerHTML += "Once you\'re ready to go, click <a href={% url 'index' %}>here</a>.";
-                const msgDiv = document.getElementsByClassName("messages");
-                msgDiv[0].appendChild(node);
+                let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+    <div class="contents-2mQqc9">
+        <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                class="separator-2nZzUB" aria-hidden="true">[</i><span
+                aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+        <div class="markup-2BOw-j messageContent-2qWWxC">We broke something! Please send this to EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a> so he can try and find the issue!</div>
+    </div>
+</div>`;
+                const msgDiv = document.getElementsByClassName("messages-3amgkR");
+                msgDiv[0].innerHTML = msgDiv[0].innerHTML + msgHtml;
+                let pre = document.createElement('pre');
+                let code =  document.createElement('code');
+                code.classList.add('hljs');
+                code.innerHTML = 'Tasks:<br>{% for enum in task_ids %}{{ enum|last|first }}<br>{% endfor %}';
+                pre.appendChild(code);
+                let msgs = document.getElementsByClassName('markup-2BOw-j messageContent-2qWWxC');
+                let lastMsg = msgs[msgs.length-1];
+                lastMsg.appendChild(pre);
+                lastMsg.innerHTML += "Once you\'re ready to go, click <a href={% url 'index' %}>here</a>.";
             }
 
             function finishedProcessing() {
                 return new Promise(resolve => {
-                let node = document.createElement('div');
-                node.classList.add('message-content');
-                node.innerText = 'Finished processing. Reloading...';
-                const msgDiv = document.getElementsByClassName("messages");
-                msgDiv[0].appendChild(node);
+                let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+    <div class="contents-2mQqc9">
+        <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                class="separator-2nZzUB" aria-hidden="true">[</i><span
+                aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+        <div class="markup-2BOw-j messageContent-2qWWxC">Finished processing. Reloading...</div>
+    </div>
+</div>`;
+                const msgDiv = document.getElementsByClassName("messages-3amgkR");
+                msgDiv[0].innerHTML = msgDiv[0].innerHTML + msgHtml;
                 setTimeout(function () {location.reload()}, 3000)
             })}
 
