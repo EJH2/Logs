@@ -1,9 +1,7 @@
-import re
-
 from natural.size import filesize
 from rest_framework import serializers
 
-from api.formatter import format_content, format_content_lite
+from api.formatter import to_html
 
 
 def sort_null(_ret):
@@ -128,8 +126,8 @@ class EmbedFieldSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['name'] = format_content_lite(ret['name'], users=self.context['users'])
-        ret['value'] = format_content(ret['value'], masked_links=True, users=self.context['users'])
+        ret['name'] = to_html(ret['name'], options={'embed': 'lite', 'users': self.context['users']})
+        ret['value'] = to_html(ret['value'], options={'embed': True, 'users': self.context['users']})
         return ret
 
     def update(self, instance, validated_data):
@@ -173,7 +171,7 @@ class EmbedSerializer(serializers.Serializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret.get('title'):
-            ret['title'] = format_content_lite(ret['title'], users=self.context['users'])
+            ret['title'] = to_html(ret['title'], options={'embed': 'lite', 'users': self.context['users']})
         if ret.get('description'):
             ret['description'] = format_content(ret['description'], masked_links=True, newlines=False,
                                                 users=self.context['users'])
@@ -202,10 +200,7 @@ class MessageSerializer(serializers.Serializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['_content'] = ret['content']
-        if ret['mentions']:
-            ret['content'] = re.sub(f'<@!?({"|".join([str(i["id"]) for i in ret["mentions"]])})>',
-                                    lambda m: mention_sub(m, ret['mentions']), ret['content'])
-        ret['content'] = format_content(ret['content'], users=self.context['users'])
+        ret['content'] = to_html(ret['content'], options={'users': self.context['users']})
         return ret
 
     def update(self, instance, validated_data):
