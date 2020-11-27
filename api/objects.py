@@ -116,6 +116,7 @@ class Message:
         self.guild_id = kwargs.get('guild_id')
         self.author = User(kwargs.get('author'))
         self.timestamp_ = pendulum.parse(kwargs['timestamp']) if kwargs.get('timestamp') else None
+        self.edited_timestamp_ = pendulum.parse(kwargs['edited_timestamp']) if kwargs.get('edited_timestamp') else None
         self.raw_content = kwargs.get('_content')
         self.content = kwargs.get('content')
         self.attachments = kwargs.get('attachments')
@@ -129,6 +130,10 @@ class Message:
     @property
     def timestamp(self):
         return self.timestamp_.isoformat() if self.timestamp_ else None
+
+    @property
+    def edited_timestamp(self):
+        return self.edited_timestamp_.isoformat() if self.edited_timestamp_ else None
 
     @property
     def human_timestamp(self):
