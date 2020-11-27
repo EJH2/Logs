@@ -10,7 +10,8 @@
     <meta name="og:description" content="Beautify your Discord Logs">
     <meta name="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
 
-    <link href="{% static "discord_logview/css/logs.css" %}" rel="stylesheet">
+    <!-- General Discord Styling !-->
+    <link rel="stylesheet" href="https://canary.discordapp.com/assets/0.ac72fa632985bb1ede44.css">
     <script>
         if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
             document.documentElement.style.display = 'none';
@@ -45,7 +46,7 @@
     <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
     {% block extra_css %}{% endblock %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.0/baguetteBox.min.js"></script>
     {% if log.chunked %}
@@ -93,8 +94,10 @@
         </div>
         {% block far-buttons %}{% endblock %}
     </div>
-    <div id="message-container" class="infinite-container">
-        {% block messages %}{% endblock messages %}
+    <div id="message-container" class="messagesWrapper-3lZDfY group-spacing-0">
+        <div class="messages-3amgkR infinite-container">
+            {% block messages %}{% endblock messages %}
+        </div>
     </div>
     {% if log.page and log.page.has_next %}
         <div class="infinite-next">
