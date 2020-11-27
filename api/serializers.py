@@ -17,6 +17,17 @@ def mention_sub(match, mentions):
     return f'<@{m["username"]}#{m["discriminator"]} ({m["id"]})>'
 
 
+def scale_image(height, width, max_height, max_width):
+    old_width = width
+    width = old_width if old_width < max_width else max_width
+    height = height / (old_width / width)
+    if height > max_height:
+        old_height = height
+        height = max_height
+        width = width / (old_height / max_height)
+    return int(height), int(width)
+
+
 class AuthorSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField(min_length=2, max_length=32)
@@ -78,6 +89,9 @@ class ImageSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
+        if ret.get('width'):
+            ret['height'], ret['width'] = scale_image(ret['height'], ret['width'], 300, 400)
+
         return sort_null(ret)
 
     def update(self, instance, validated_data):
