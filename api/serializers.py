@@ -58,19 +58,23 @@ class AttachmentSerializer(serializers.Serializer):
     id = serializers.IntegerField(default=None)
     filename = serializers.CharField()
     url = serializers.CharField()
+    proxy_url = serializers.CharField(default=None, allow_null=True)
     size = serializers.IntegerField(default=0)
     width = serializers.IntegerField(default=None, allow_null=True)
     height = serializers.IntegerField(default=None, allow_null=True)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if any([ret['height'],
-                ret['width'],
-                ret['filename'].rsplit('.', 1)[-1] in ['png', 'jpg', 'jpeg', 'gif', 'webm', 'webp', 'mp4'],
-                re.match(r'data:(?:image/(?P<mimetype>\w+))?(?:;(?P<b64>base64))?,(?P<data>(?:[A-Za-z0-9+/]{4})'
-                         r'``*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)', ret['url'])
-                ]):
-            ret['is_image'] = True
+        ret['type'] = 'file'
+        if ret.get('height') or ret.get('width'):
+            ext = ret.get('filename').rsplit('.', 1)[-1]
+            if ext in ['png', 'jpg', 'jpeg']:
+                ret['type'] = 'image'
+            elif ext in 'gifv':
+                ret['type'] = 'gif'
+            else:
+                ret['type'] = 'video'
+            ret['height'], ret['width'] = scale_image(ret['height'], ret['width'], 300, 400)
         ret['size'] = filesize(ret['size'])
         return ret
 
@@ -187,9 +191,19 @@ class EmbedSerializer(serializers.Serializer):
         if ret.get('title'):
             ret['title'] = to_html(ret['title'], options={'embed': 'lite', 'users': self.context['users']})
         if ret.get('description'):
-            ret['description'] = format_content(ret['description'], masked_links=True, newlines=False,
-                                                users=self.context['users'])
-        ret['color'] = f'#{ret["color"]:06X}'
+            ret['description'] = to_html(ret['description'], options={'embed': True, 'users': self.context['users']})
+        ret['color'] = f'#{ret["color"]:06X}' if ret.get('color') else None
+
+        if ret['type'] == 'article' and not (ret.get('title') or ret.get('description')):
+            ret['type'] = 'image'
+
+        ret['thumbnail'] = ret.get('thumbnail') or {}
+        if (ret.get('thumbnail') or {}).get('width') and ret['type'] in ['link', 'rich'] or ret['image']:
+            img = 'thumbnail' if ret.get('thumbnail') else 'image'
+            ret['thumbnail']['height'], ret['thumbnail']['width'] = scale_image(
+                ret[img]['height'], ret[img]['width'], 80, 80
+            )
+
         return ret
 
     def update(self, instance, validated_data):
