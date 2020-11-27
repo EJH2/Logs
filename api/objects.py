@@ -142,7 +142,8 @@ class Message:
     def is_different_from(self, other):
         if self.timestamp_ is not None:
             return (
-                    (other.timestamp_ - self.timestamp_).total_seconds() > 60
+                    (other.timestamp_ - self.timestamp_).total_seconds() > 420
+                    or other.timestamp_.day != self.timestamp_.day
                     or other.author != self.author
             )
         return other.author != self.author
