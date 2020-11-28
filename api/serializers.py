@@ -7,7 +7,7 @@ from api.formatter import to_html
 def sort_null(_ret):
     ret = _ret.copy()
     for key in _ret:
-        if not _ret[key]:
+        if _ret[key] is None:
             del ret[key]
     return ret
 
