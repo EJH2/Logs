@@ -83,7 +83,7 @@ def _get_log(request, pk):
 
     if log.data.get('tasks') and not log.pages.count() > 0:
         return render(request, 'discord_logview/loading.html', context={
-            'task_ids': list(enumerate(log.data.get('tasks'))),
+            'task_ids': log.data.get('tasks'),
             'iso': pendulum.now().isoformat()
         })
 

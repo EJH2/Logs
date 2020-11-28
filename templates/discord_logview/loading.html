@@ -3,7 +3,7 @@
 {% block title %}Loading...{% endblock %}
 {% block messages %}
     <div class="message-group">
-    {% for enum in task_ids %}
+    {% for task_id in task_ids %}
         {% if forloop.first %}
             <div class="message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
                 <div class="contents-2mQqc9">
@@ -12,7 +12,7 @@
                             class="username-1A8OIy clickable-1bVtEA focusable-1YV_-H"
                             title="Discord Log Viewer#0000">Discord Log Viewer</span><span class="timestamp-3ZCmNB"><time
                             datetime="{{ iso }}">Today</time></span></h2>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div></div>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar'>&nbsp;</div></div>
                 </div>
             </div>
             <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
@@ -20,7 +20,7 @@
                     <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
                             class="separator-2nZzUB" aria-hidden="true">[</i><span
                             datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div></div>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div></div>
                 </div>
             </div>
         {% else %}
@@ -29,7 +29,7 @@
                     <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
                             class="separator-2nZzUB" aria-hidden="true">[</i><span
                             datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ enum|first }}' class='progress-bar'>&nbsp;</div></div>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar'>&nbsp;</div></div>
                 </div>
             </div>
             <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
@@ -37,7 +37,7 @@
                     <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
                             class="separator-2nZzUB" aria-hidden="true">[</i><span
                             datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ enum|first }}">Waiting for progress to start...</div></div>
+                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div></div>
                 </div>
             </div>
         {% endif %}
@@ -48,27 +48,27 @@
     <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
     <script src="{% static 'celery_progress/websockets.js' %}"></script>
     <script>
-        {% for enum in task_ids %}const progressUrl{{ enum|first }} = "/ws/progress/{{ enum|last|first }}/";
-        {% endfor %}
         document.addEventListener("DOMContentLoaded", function () {
-            const bars = [
-                {% for enum in task_ids %}{bar: CeleryWebSocketProgressBar, progressUrl: progressUrl{{enum|first}}, message: `{{ enum|last|last }}`, id: {{ enum|first }}},
-                {% endfor %}];
+            const task_urls = [
+                {% for task_id in task_ids %}["/ws/progress/{{ task_id|first }}/", "{{ task_id|last }}"],
+            {% endfor %}];
 
-            let initProgressBar = function (bar, progressUrl, id, message, callback) {
-                bar.initProgressBar(progressUrl, {
-                    progressBarId: `progress-bar-${id}`,
-                    progressBarMessageId: `progress-bar-message-${id}`,
+            for (let i = 0; i < task_urls.length; i++) {
+                CeleryWebSocketProgressBar.initProgressBar(task_urls[i][0], {
+                    progressBarId: "progress-bar-" + i,
+                    progressBarMessageId: "progress-bar-message-" + i,
                     onProgress: function (progressBarElement, progressBarMessageElement, progress) {
                         progressBarElement.style.backgroundColor = '#68a9ef';
                         progressBarElement.style.width = progress.percent + "%";
-                        const progressMessage = message.replace('{current}', progress.current).replace('{percent}', progress.percent).replace('{total}', progress.total);
+                        const progressMessage = task_urls[i][1].replace('{current}', progress.current).replace('{percent}', progress.percent).replace('{total}', progress.total);
                         progressBarMessageElement.innerHTML = progressMessage || `${progress.current} of ${progress.total} processed.`;
                     },
                     onSuccess: function (progressBarElement, progressBarMessageElement) {
                         progressBarElement.style.backgroundColor = '#76ce60';
                         progressBarMessageElement.innerHTML = "Success!";
-                        callback();
+                        if (i === task_urls.length - 1) {
+                            finishedProcessing();
+                        }
                     },
                     onError: function (progressBarElement, progressBarMessageElement) {
                         progressBarElement.style.backgroundColor = '#dc4f63';
@@ -76,23 +76,16 @@
                         somethingBroke();
                     }
                 });
-            };
+            }
 
             function somethingBroke() {
-                let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-    <div class="contents-2mQqc9">
-        <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
-                class="separator-2nZzUB" aria-hidden="true">[</i><span
-                aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-        <div class="markup-2BOw-j messageContent-2qWWxC">We broke something! Please send this to EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a> so he can try and find the issue!</div>
-    </div>
-</div>`;
+                let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica"><div class="contents-2mQqc9"><span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i class="separator-2nZzUB" aria-hidden="true">[</i><span aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span><div class="markup-2BOw-j messageContent-2qWWxC">We broke something! Please send this to EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a> so he can try and find the issue!</div></div></div>`;
                 const msgDiv = document.getElementsByClassName("messages-3amgkR");
                 msgDiv[0].innerHTML = msgDiv[0].innerHTML + msgHtml;
                 let pre = document.createElement('pre');
                 let code =  document.createElement('code');
                 code.classList.add('hljs');
-                code.innerHTML = 'Tasks:<br>{% for enum in task_ids %}{{ enum|last|first }}<br>{% endfor %}';
+                code.innerHTML = 'Tasks:<br>{% for task_id in task_ids %}{{ task_id|first }}<br>{% endfor %}';
                 pre.appendChild(code);
                 let msgs = document.getElementsByClassName('markup-2BOw-j messageContent-2qWWxC');
                 let lastMsg = msgs[msgs.length-1];
@@ -102,34 +95,11 @@
 
             function finishedProcessing() {
                 return new Promise(resolve => {
-                let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-    <div class="contents-2mQqc9">
-        <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
-                class="separator-2nZzUB" aria-hidden="true">[</i><span
-                aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-        <div class="markup-2BOw-j messageContent-2qWWxC">Finished processing. Reloading...</div>
-    </div>
-</div>`;
+                let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica"><div class="contents-2mQqc9"><span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i class="separator-2nZzUB" aria-hidden="true">[</i><span aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span><div class="markup-2BOw-j messageContent-2qWWxC">Finished processing. Reloading...</div></div></div>`;
                 const msgDiv = document.getElementsByClassName("messages-3amgkR");
                 msgDiv[0].innerHTML = msgDiv[0].innerHTML + msgHtml;
                 setTimeout(function () {location.reload()}, 3000)
             })}
-
-            function startProgressBars(bars) {
-                return new Promise(resolve => {
-                    if (bars.length === 1) {
-                        initProgressBar(bars[0].bar, bars[0].progressUrl, bars[0].id, bars[0].message, () => {
-                            finishedProcessing().then(resolve)})
-                    } else {
-                    const bar = bars.shift();
-                    initProgressBar(bar.bar, bar.progressUrl, bar.id, bar.message, () => {
-                        startProgressBars(bars).then(resolve)
-                  })
-                }
-              })
-            }
-
-            startProgressBars(bars);
         });
     </script>
 {% endblock %}
