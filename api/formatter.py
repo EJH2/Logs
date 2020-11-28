@@ -199,8 +199,6 @@ del rules_embed_lite['discord_role']
 
 parser = md.markdown.parser_for(rules)
 html_output = md.markdown.output_for(rules, 'html')
-parser_discord = md.markdown.parser_for(rules_discord_only)
-html_output_discord = md.markdown.output_for(rules_discord_only, 'html')
 parser_embed = md.markdown.parser_for(rules_embed)
 html_output_embed = md.markdown.output_for(rules_embed, 'html')
 parser_embed_lite = md.markdown.parser_for(rules_embed_lite)
