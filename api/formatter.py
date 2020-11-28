@@ -192,6 +192,10 @@ rules_embed = {**md.rules_embed, **rules}
 # Used for embed title and field names
 rules_embed_lite = rules_embed.copy()
 del rules_embed_lite['code_block']
+del rules_embed_lite['br']
+del rules_embed_lite['discord_user']
+del rules_embed_lite['discord_channel']
+del rules_embed_lite['discord_role']
 
 parser = md.markdown.parser_for(rules)
 html_output = md.markdown.output_for(rules, 'html')
