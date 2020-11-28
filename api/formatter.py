@@ -200,10 +200,7 @@ parser_embed_lite = md.markdown.parser_for(rules_embed_lite)
 html_output_embed_lite = md.markdown.output_for(rules_embed_lite, 'html')
 
 
-def to_html(source: str, options: dict = None, custom_parser=None, custom_html_output=None):
-    if (custom_parser or custom_html_output) and (not custom_parser or not custom_html_output):
-        raise Exception('You must pass both a custom parser and custom htmlOutput function, not just one!')
-
+def to_html(source: str, options: dict = None):
     options = {
         'embed': False,
         'escape_html': True,
