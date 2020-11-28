@@ -11,7 +11,7 @@ from sentry_sdk import capture_exception
 
 from api.consts import all_types
 from api.models import Log
-from api.objects import LogRenderer
+from api.objects import LogRenderer, LiteLogRenderer
 from api.utils import signer
 from api.v1.parser import create_log
 from web.forms import LogCreateForm
@@ -117,8 +117,9 @@ def log_html(request, pk):
         return redirect('log-html', pk=pk)
 
     data = _paginate_logs(msgs, data)
-    template = 'logs.html' if not page else 'messages.html'
-    return render(request, f'discord_logview/{template}', context={'log': LogRenderer(data)})
+    if page:
+        return render(request, 'discord_logview/messages.html', context={'log': LiteLogRenderer(data)})
+    return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
 
 def log_raw(request, pk):

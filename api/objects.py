@@ -5,29 +5,11 @@ from natural.date import duration
 embed_grid_values = [['1 / 13'], ['1 / 7', '7 / 13'], ['1 / 5', '5 / 9', '9 / 13']]
 
 
-class LogRenderer:
+class LiteLogRenderer:
     def __init__(self, data):
         self.uuid = data['uuid']
-        self.created = data.get('created')
-        self.total_messages = data['total_messages']
-        self.messages = [Message(**m) for m in data['messages']]
-        self.users = data['users']
-        self.user_id = data['user_id']
-        self.raw_content = data['raw_content']
-        self.raw_type = data['raw_type']
-        self.type = data['type']
         self.page = data.get('page')
-        self.chunked = data.get('chunked')
-        self.is_preview = data.get('is_preview')
-        self.delete_token = data.get('delete_token')
-
-    @property
-    def human_created(self):
-        return duration(self.created, now=pendulum.now()) if self.created else None
-
-    @property
-    def export_created(self):
-        return self.created.strftime('%Y-%m-%d %H:%M:%S')
+        self.messages = [Message(**m) for m in data['messages']]
 
     @property
     def message_groups(self):
@@ -50,6 +32,29 @@ class LogRenderer:
 
         groups.append(curr)
         return groups
+
+
+class LogRenderer(LiteLogRenderer):
+    def __init__(self, data):
+        super().__init__(data)
+        self.created = data.get('created')
+        self.total_messages = data['total_messages']
+        self.users = data['users']
+        self.user_id = data['user_id']
+        self.raw_content = data['raw_content']
+        self.raw_type = data['raw_type']
+        self.type = data['type']
+        self.chunked = data.get('chunked')
+        self.is_preview = data.get('is_preview')
+        self.delete_token = data.get('delete_token')
+
+    @property
+    def human_created(self):
+        return duration(self.created, now=pendulum.now()) if self.created else None
+
+    @property
+    def export_created(self):
+        return self.created.strftime('%Y-%m-%d %H:%M:%S')
 
 
 class MessageGroup:
