@@ -18,6 +18,8 @@ def mention_sub(match, mentions):
 
 
 def scale_image(height, width, max_height, max_width):
+    if min(height,  width) == 0:
+        return min(height, max_height), min(width, max_width)
     old_width = width
     width = old_width if old_width < max_width else max_width
     height = height / (old_width / width)
@@ -66,7 +68,7 @@ class AttachmentSerializer(serializers.Serializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['type'] = 'file'
-        if ret.get('height') or ret.get('width'):
+        if ret.get('height') is not None or ret.get('width') is not None:
             ext = ret.get('filename').rsplit('.', 1)[-1]
             if ext in ['png', 'jpg', 'jpeg']:
                 ret['type'] = 'image'
@@ -93,7 +95,7 @@ class ImageSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret.get('width'):
+        if ret.get('width') is not None:
             ret['height'], ret['width'] = scale_image(ret['height'], ret['width'], 300, 400)
 
         return sort_null(ret)
