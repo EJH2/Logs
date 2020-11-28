@@ -49,7 +49,7 @@ def new(request):
             return redirect('log-preview', pk=data['uuid'])
     else:
         form = LogCreateForm(user=request.user)
-    return render(request, 'discord_logview/create_log.html', context={
+    return render(request, 'discord_logview/create-log.html', context={
         'form': form,
         'iso': pendulum.now().isoformat()
     })
