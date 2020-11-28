@@ -54,6 +54,15 @@ img {
     text-align: center;
 }
 
+.pre--inline {
+    font-family: Menlo, Consolas, Monaco, monospace;
+    font-size: 85%;
+    line-height: 16px;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+
 /* === NAV BAR === */
 
 nav,
@@ -352,7 +361,8 @@ input:checked ~ .toolbox-tools li {
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
+.material-icons.tool:hover + .tooltiptext,
+.info__user-name:hover + .tooltiptext {
     opacity: 1;
     display: inline-block;
 }

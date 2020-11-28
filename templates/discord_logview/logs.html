@@ -28,7 +28,7 @@
             <ul id="users">
                 <li id="copyall">
                     <span class="tooltip">
-                        <span class="tooltiptext pre pre--inline copy permanent" onclick="return copyAll(this)">Copy All User IDs</span>
+                        <span class="tooltiptext pre--inline copy permanent" onclick="return copyAll(this)">Copy All User IDs</span>
                     </span>
                 </li>
                 {% for user in log.users %}
@@ -39,7 +39,7 @@
                                 <span class="botTagCozy-1fFsZk botTag-1un5a6 botTagRegular-2HEhHi botTag-2WPJ74 rem-2m9HGf"><span class="botText-1526X_">BOT</span></span>
                             {% endif %}
                         </span>
-                        <span class='tooltiptext pre pre--inline id'>{{ user.id }}</span>
+                        <span class='tooltiptext pre--inline id'>{{ user.id }}</span>
                     </li>
                 {% endfor %}
             </ul>
