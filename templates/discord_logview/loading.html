@@ -49,26 +49,24 @@
     <script src="{% static 'celery_progress/websockets.js' %}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const task_urls = [
-                {% for task_id in task_ids %}["/ws/progress/{{ task_id|first }}/", "{{ task_id|last }}"],
-            {% endfor %}];
+            const bars = [
+                {% for task in task_ids %}{index: {{ forloop.counter0 }}, url: `/ws/progress/{{ task|first }}/`, message: `{{ task|last }}`},
+                {% endfor %}];
 
-            for (let i = 0; i < task_urls.length; i++) {
-                CeleryWebSocketProgressBar.initProgressBar(task_urls[i][0], {
-                    progressBarId: "progress-bar-" + i,
-                    progressBarMessageId: "progress-bar-message-" + i,
+            function initProgressBar(index, url, message, callback) {
+                CeleryWebSocketProgressBar.initProgressBar(url, {
+                    progressBarId: "progress-bar-" + index,
+                    progressBarMessageId: "progress-bar-message-" + index,
                     onProgress: function (progressBarElement, progressBarMessageElement, progress) {
                         progressBarElement.style.backgroundColor = '#68a9ef';
                         progressBarElement.style.width = progress.percent + "%";
-                        const progressMessage = task_urls[i][1].replace('{current}', progress.current).replace('{percent}', progress.percent).replace('{total}', progress.total);
+                        const progressMessage = message.replace('{current}', progress.current).replace('{percent}', progress.percent).replace('{total}', progress.total);
                         progressBarMessageElement.innerHTML = progressMessage || `${progress.current} of ${progress.total} processed.`;
                     },
                     onSuccess: function (progressBarElement, progressBarMessageElement) {
                         progressBarElement.style.backgroundColor = '#76ce60';
                         progressBarMessageElement.innerHTML = "Success!";
-                        if (i === task_urls.length - 1) {
-                            finishedProcessing();
-                        }
+                        callback();
                     },
                     onError: function (progressBarElement, progressBarMessageElement) {
                         progressBarElement.style.backgroundColor = '#dc4f63';
@@ -100,6 +98,23 @@
                 msgDiv[0].innerHTML = msgDiv[0].innerHTML + msgHtml;
                 setTimeout(function () {location.reload()}, 3000)
             })}
+
+            function startProgressBars(bars) {
+                return new Promise(resolve => {
+                    if (bars.length === 1) {
+                        initProgressBar(bars[0].index, bars[0].url, bars[0].message, () => {
+                            finishedProcessing().then(resolve)
+                        })
+                    } else {
+                        const bar = bars.shift();
+                        initProgressBar(bar.index, bar.url, bar.message, () => {
+                            startProgressBars(bars).then(resolve)
+                        })
+                    }
+              })
+            }
+
+            startProgressBars(bars);
         });
     </script>
 {% endblock %}
