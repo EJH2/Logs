@@ -24,6 +24,8 @@ class LogCreateSerializer(serializers.Serializer):
         """Check if messages are a list"""
         if not isinstance(value, list):
             raise serializers.ValidationError('Messages must be a valid JSON array of Discord message objects!')
+        if not len(value):
+            raise serializers.ValidationError('You must include at least one message to parse!')
         return value
 
     def validate_expires(self, value):
