@@ -26,8 +26,7 @@ def index(request):
 @login_required
 def new(request):
     if request.method == 'POST':
-        form = LogCreateForm(request.POST, request.FILES, user=request.user)
-        if form.is_valid():
+        if (form := LogCreateForm(request.POST, request.FILES, user=request.user)).is_valid():
             if form.cleaned_data.get('file'):
                 content = form.cleaned_data['file'].read()
                 if isinstance(content, bytes):
@@ -76,8 +75,7 @@ def _get_privacy(log, request):
 
 def _get_log(request, pk):
     log = get_object_or_404(Log, pk=pk)
-    error = _get_privacy(log, request)
-    if error:
+    if error := _get_privacy(log, request):
         return error
 
     if log.data.get('tasks') and not log.pages.count() > 0:
@@ -90,8 +88,7 @@ def _get_log(request, pk):
 
 
 def _paginate_logs(msgs, data):
-    paginator = Paginator(msgs, 50)
-    if paginator.num_pages > 1:
+    if (paginator := Paginator(msgs, 50)).num_pages > 1:
         data['chunked'] = True
     try:
         msg_page = paginator.page(data.pop('page'))
@@ -113,8 +110,7 @@ def log_html(request, pk):
             'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None,
             'delete_token': signer.dumps(f'log.{pk}') if log.owner == request.user else None}
 
-    log_pages = log.pages.order_by('index')
-    msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
+    msgs = [msg for msgs in [p.messages for p in log.pages.order_by('index')] for msg in msgs]
     data['total_messages'] = len(msgs)
     page = data['page'] = request.GET.get('page')
     if not request.is_ajax() and page:
@@ -127,8 +123,7 @@ def log_html(request, pk):
 
 def log_raw(request, pk):
     log = get_object_or_404(Log, pk=pk)
-    error = _get_privacy(log, request)
-    if error:
+    if error := _get_privacy(log, request):
         return error
 
     return render(request, 'discord_logview/lograw.html', context={'content': log.content, 'log': {'type': log.type}})
@@ -142,8 +137,7 @@ def log_export(request, pk):
     data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
             'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None}
 
-    log_pages = log.pages.order_by('index')
-    msgs = [msg for msgs in [p.messages for p in log_pages] for msg in msgs]
+    msgs = [msg for msgs in [p.messages for p in log.pages.order_by('index')] for msg in msgs]
     data['total_messages'] = len(msgs)
     data['messages'] = msgs
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data), 'export': True})
@@ -164,16 +158,14 @@ def log_delete(request, pk):
         else:
             raise Http404('Log cannot be found!')
     else:
-        log = get_object_or_404(Log, pk=pk)
-        if log.owner == request.user:
+        if (log := get_object_or_404(Log, pk=pk)).owner == request.user:
             log.delete()
         messages.add_message(request, messages.SUCCESS, 'Log has been successfully deleted!')
         return redirect('index')
 
 
 def log_preview(request, pk):
-    data = request.session.get(pk)
-    if not data:
+    if not (data := request.session.get(pk)):
         raise Http404('That log could not be found!')
 
     data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
@@ -195,8 +187,7 @@ def log_preview(request, pk):
 
 
 def log_preview_save(request, pk):
-    data = request.session.get(pk)
-    if not data:
+    if not (data := request.session.get(pk)):
         raise Http404('That log could not be found!')
     if Log.objects.filter(pk=pk).exists():
         log = Log.objects.get(pk=pk)
@@ -207,8 +198,7 @@ def log_preview_save(request, pk):
 
 
 def log_preview_raw(request, pk):
-    data = request.session.get(pk)
-    if not data:
+    if not (data := request.session.get(pk)):
         raise Http404('That log could not be found!')
 
     return render(request, 'discord_logview/lograw.html', context={
@@ -217,8 +207,7 @@ def log_preview_raw(request, pk):
 
 
 def log_preview_export(request, pk):
-    data = request.session.get(pk)
-    if not data:
+    if not (data := request.session.get(pk)):
         raise Http404('That log could not be found!')
 
     data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
