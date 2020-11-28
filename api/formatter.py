@@ -177,6 +177,7 @@ rules_discord_only = {
     'unicode_emoji': UnicodeEmoji(md.rules['discord_emoji'].order)
 }
 
+# Used for message content
 rules = {
     **md.rules,
     'block_quote': BlockQuote(md.rules['block_quote'].order),
@@ -186,7 +187,9 @@ rules = {
     **rules_discord_only
 }
 
+# Used for webhook messages, embed description, embed field values
 rules_embed = {**md.rules_embed, **rules}
+# Used for embed title and field names
 rules_embed_lite = rules_embed.copy()
 del rules_embed_lite['code_block']
 
