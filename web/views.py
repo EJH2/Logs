@@ -58,18 +58,17 @@ def new(request):
 def _get_privacy(log, request):
     if log.owner == request.user or request.user.is_staff:
         return
-    privacy = log.data.get('privacy')
-    if not privacy or privacy[0] in ['public', 'invite']:
+    if (privacy := log.privacy) in ['public', 'invite']:
         # TODO: Add invite setting logic
         return
     if not request.user.is_authenticated:
         return redirect('/accounts/login/?next=%s' % request.path)
-    social_user = SocialAccount.objects.filter(user=request.user).first()
-    if social_user and social_user.extra_data.get('guilds'):
-        if privacy[1] in [g['id'] for g in social_user.extra_data.get('guilds')]:
-            if not privacy[0] == 'mods':
+    if (social_user := SocialAccount.objects.filter(user=request.user).first()) and \
+            social_user.extra_data.get('guilds'):
+        if (guild := log.guild) in [g['id'] for g in social_user.extra_data.get('guilds')]:
+            if not privacy == 'mods':
                 return
-            if [g for g in social_user.extra_data.get('guilds') if g['id'] == privacy[1] and
+            if [g for g in social_user.extra_data.get('guilds') if g['id'] == guild and
                     bool((g['permissions'] >> 13) & 1)]:
                 return
     raise Http404('Log not found!')
