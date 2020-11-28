@@ -211,21 +211,13 @@ def to_html(source: str, options: dict = None):
     options = {
         'embed': False,
         'escape_html': True,
-        'discord_only': False,
-        'discord_callback': {},
         'users': {},
         **(options if options else {})
     }
 
     _parser = parser
     _html_output = html_output
-    if custom_parser:
-        _parser = custom_parser
-        _html_output = custom_html_output
-    elif options['discord_only']:
-        _parser = parser_discord
-        _html_output = html_output_discord
-    elif options['embed']:
+    if options['embed']:
         _parser = parser_embed
         _html_output = html_output_embed
         if options['embed'] == 'lite':
@@ -239,8 +231,7 @@ def to_html(source: str, options: dict = None):
         'escape_html': options['escape_html'],
         'emoji_class': 'emoji',
         'users': options['users'],
-        'css_module_names': options.get('css_module_names'),
-        'discord_callback': {**md.core.discord_callback_defaults, **options['discord_callback']}
+        'css_module_names': options.get('css_module_names')
     }
 
     if not options['embed']:
