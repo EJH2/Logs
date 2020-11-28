@@ -122,7 +122,8 @@ def log_html(request, pk):
         return redirect('log-html', pk=pk)
 
     data = _paginate_logs(msgs, data)
-    return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
+    template = 'logs.html' if not page else 'messages.html'
+    return render(request, f'discord_logview/{template}', context={'log': LogRenderer(data)})
 
 
 def log_raw(request, pk):

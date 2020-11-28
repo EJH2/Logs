@@ -94,19 +94,7 @@
         </div>
         {% block far-buttons %}{% endblock %}
     </div>
-    <div id="message-container" class="messagesWrapper-3lZDfY group-spacing-0">
-        <div class="messages-3amgkR infinite-container">
-            {% block messages %}{% endblock messages %}
-        </div>
-    </div>
-    {% if log.page and log.page.has_next %}
-        <div class="infinite-next">
-            <a class="infinite-more-link" href="{{ log.uuid }}?page={{ log.page.next_page_number }}"></a>
-        </div>
-        <div class="infinite-scroll-status">
-            <img class="infinite-scroll-request" src="{% static 'discord_logview/icons/loading.gif' %}" alt="Loading...">
-        </div>
-    {% endif %}
+    {% block messages %}{% endblock messages %}
     {% block extra_js %}{% endblock %}
     <div id="copyright">
         <div>Made with blood, sweat, and Django by <a href="https://github.com/EJH2">EJH2</a></div>

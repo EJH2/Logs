@@ -2,46 +2,50 @@
 {% load static %}
 {% block title %}Loading...{% endblock %}
 {% block messages %}
-    <div class="message-group">
-    {% for task_id in task_ids %}
-        {% if forloop.first %}
-            <div class="message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-                <div class="contents-2mQqc9">
-                    <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="threads-avatar-hack avatar-1BDn8e clickable-1bVtEA" alt=" ">
-                    <h2 class="header-23xsNx threads-header-hack"><span
-                            class="username-1A8OIy clickable-1bVtEA focusable-1YV_-H"
-                            title="Discord Log Viewer#0000">Discord Log Viewer</span><span class="timestamp-3ZCmNB"><time
-                            datetime="{{ iso }}">Today</time></span></h2>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar'>&nbsp;</div></div>
-                </div>
+    <div id="message-container" class="messagesWrapper-3lZDfY group-spacing-0">
+        <div class="messages-3amgkR infinite-container">
+            <div class="message-group">
+            {% for task_id in task_ids %}
+                {% if forloop.first %}
+                    <div class="message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                        <div class="contents-2mQqc9">
+                            <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="threads-avatar-hack avatar-1BDn8e clickable-1bVtEA" alt=" ">
+                            <h2 class="header-23xsNx threads-header-hack"><span
+                                    class="username-1A8OIy clickable-1bVtEA focusable-1YV_-H"
+                                    title="Discord Log Viewer#0000">Discord Log Viewer</span><span class="timestamp-3ZCmNB"><time
+                                    datetime="{{ iso }}">Today</time></span></h2>
+                            <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar'>&nbsp;</div></div>
+                        </div>
+                    </div>
+                    <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                        <div class="contents-2mQqc9">
+                            <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                                    class="separator-2nZzUB" aria-hidden="true">[</i><span
+                                    datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                            <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div></div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                        <div class="contents-2mQqc9">
+                            <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                                    class="separator-2nZzUB" aria-hidden="true">[</i><span
+                                    datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                            <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar'>&nbsp;</div></div>
+                        </div>
+                    </div>
+                    <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                        <div class="contents-2mQqc9">
+                            <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
+                                    class="separator-2nZzUB" aria-hidden="true">[</i><span
+                                    datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                            <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div></div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
             </div>
-            <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-                <div class="contents-2mQqc9">
-                    <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
-                            class="separator-2nZzUB" aria-hidden="true">[</i><span
-                            datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div></div>
-                </div>
-            </div>
-        {% else %}
-            <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-                <div class="contents-2mQqc9">
-                    <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
-                            class="separator-2nZzUB" aria-hidden="true">[</i><span
-                            datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar'>&nbsp;</div></div>
-                </div>
-            </div>
-            <div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-                <div class="contents-2mQqc9">
-                    <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i
-                            class="separator-2nZzUB" aria-hidden="true">[</i><span
-                            datetime="{{ iso }}">Today</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-                    <div class="markup-2BOw-j messageContent-2qWWxC"><div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div></div>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
+        </div>
     </div>
 {% endblock %}
 {% block extra_js %}

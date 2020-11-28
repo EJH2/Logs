@@ -1,27 +1,39 @@
 {% load static %}
-<div id="message-page-{{ log.page.number }}" class="infinite-item">
-{% for group in log.message_groups %}
-    <div class="message-group">
-    {% for message in group.messages %}
-    <div class="message-2qnXI6 cozyMessage-3V1Y8y{% if forloop.first %} groupStart-23k01U{% endif %} wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
-        <div class="contents-2mQqc9">
-            {% if forloop.first %}
-            <img src="{{ group.author.avatar_url }}" onerror="this.src='{{ group.author.default_avatar_url }}'; this.onerror = ''" class="threads-avatar-hack avatar-1BDn8e clickable-1bVtEA" alt=" "><h2 class="header-23xsNx threads-header-hack"><span class="username-1A8OIy clickable-1bVtEA focusable-1YV_-H" style="color: {{ group.author.color }};" title="{{ group.author | stringformat:"s" | escape }}">{{ group.author.username|escape }}</span>{% if group.author.bot %}<span class="botTagCozy-1fFsZk botTag-1un5a6 botTagRegular-2HEhHi botTag-2WPJ74 rem-2m9HGf"><span class="botText-1526X_">BOT</span></span>{% endif %}{% if group.timestamp %}<span class="timestamp-3ZCmNB"><time datetime="{{ group.timestamp }}">{{ group.human_timestamp }}</time></span>{% endif %}</h2>
-            {% else %}
-            <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i class="separator-2nZzUB" aria-hidden="true">[</i><span datetime="{{ message.timestamp }}">{{ message.timestamp_|time:"H:i A" }}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
-            {% endif %}
-            {% if message.content %}
-                <div class="markup-2BOw-j messageContent-2qWWxC{% if message.error %} error{% endif %}">{{ message.content|safe }}{% if message.edited_timestamp %}<span class="edited-3sfAzf" aria-label="{{ message.edited_timestamp }}">(edited)</span>{% endif %}</div>
-            {% endif %}
+<div id="message-container" class="messagesWrapper-3lZDfY group-spacing-0">
+    <div class="messages-3amgkR infinite-container">
+        <div id="message-page-{{ log.page.number }}" class="infinite-item">
+            {% for group in log.message_groups %}
+                <div class="message-group">
+                {% for message in group.messages %}
+                    <div class="message-2qnXI6 cozyMessage-3V1Y8y{% if forloop.first %} groupStart-23k01U{% endif %} wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica">
+                        <div class="contents-2mQqc9">
+                            {% if forloop.first %}
+                                <img src="{{ group.author.avatar_url }}" onerror="this.src='{{ group.author.default_avatar_url }}'; this.onerror = ''" class="threads-avatar-hack avatar-1BDn8e clickable-1bVtEA" alt=" "><h2 class="header-23xsNx threads-header-hack"><span class="username-1A8OIy clickable-1bVtEA focusable-1YV_-H" style="color: {{ group.author.color }};" title="{{ group.author | stringformat:"s" | escape }}">{{ group.author.username|escape }}</span>{% if group.author.bot %}<span class="botTagCozy-1fFsZk botTag-1un5a6 botTagRegular-2HEhHi botTag-2WPJ74 rem-2m9HGf"><span class="botText-1526X_">BOT</span></span>{% endif %}{% if group.timestamp %}<span class="timestamp-3ZCmNB"><time datetime="{{ group.timestamp }}">{{ group.human_timestamp }}</time></span>{% endif %}</h2>
+                            {% else %}
+                                <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i class="separator-2nZzUB" aria-hidden="true">[</i><span datetime="{{ message.timestamp }}">{{ message.timestamp_|time:"H:i A" }}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
+                            {% endif %}
+                            {% if message.content %}
+                                <div class="markup-2BOw-j messageContent-2qWWxC{% if message.error %} error{% endif %}">{{ message.content|safe }}{% if message.edited_timestamp %}<span class="edited-3sfAzf" aria-label="{{ message.edited_timestamp }}">(edited)</span>{% endif %}</div>
+                            {% endif %}
+                        </div>
+                        {% if message.attachments or message.embeds %}
+                            <div class="container-1ov-mD">
+                                {% include 'discord_logview/message-attachments.html' with attachments=message.attachments %}
+                                {% include 'discord_logview/message-embeds.html' with embeds=message.embeds %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
         </div>
-        {% if message.attachments or message.embeds %}
-        <div class="container-1ov-mD">
-            {% include 'discord_logview/message-attachments.html' with attachments=message.attachments %}
-            {% include 'discord_logview/message-embeds.html' with embeds=message.embeds %}
-        </div>
-        {% endif %}
     </div>
-    {% endfor %}
-    </div>
-{% endfor %}
 </div>
+{% if log.page and log.page.has_next %}
+    <div class="infinite-next">
+        <a class="infinite-more-link" href="{{ log.uuid }}?page={{ log.page.next_page_number }}"></a>
+    </div>
+    <div class="infinite-scroll-status">
+        <img class="infinite-scroll-request" src="{% static 'discord_logview/icons/loading.gif' %}" alt="Loading...">
+    </div>
+{% endif %}
