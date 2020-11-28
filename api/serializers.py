@@ -230,7 +230,8 @@ class MessageSerializer(serializers.Serializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['_content'] = ret['content']
-        ret['content'] = to_html(ret['content'], options={'users': self.context['users']})
+        webhook_mode = True if ret['author'].get('bot') and ret['author'].get('discriminator') == '0000' else False
+        ret['content'] = to_html(ret['content'], options={'embed': webhook_mode, 'users': self.context['users']})
         return ret
 
     def update(self, instance, validated_data):
