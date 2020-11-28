@@ -181,7 +181,7 @@ class EmbedSerializer(serializers.Serializer):
     timestamp = serializers.DateTimeField(default=None, allow_null=True)
     color = serializers.IntegerField(default=None, allow_null=True)
     image = ImageSerializer(default=None, allow_null=True)
-    thumbnail = ImageSerializer(default={}, allow_null=True)
+    thumbnail = ImageSerializer(default=None, allow_null=True)
     video = ImageSerializer(default=None, allow_null=True)
     author = EmbedAuthorSerializer(default=None, allow_null=True)
     provider = EmbedProviderSerializer(default=None, allow_null=True)
@@ -199,6 +199,7 @@ class EmbedSerializer(serializers.Serializer):
         if ret['type'] == 'article' and not (ret.get('title') or ret.get('description')):
             ret['type'] = 'image'
 
+        ret['thumbnail'] = ret.get('thumbnail') or {}
         if ret['thumbnail'].get('width') and ret['type'] in ['link', 'rich'] or ret['image']:
             img = 'thumbnail' if ret['thumbnail'] else 'image'
             ret['thumbnail']['height'], ret['thumbnail']['width'] = scale_image(
