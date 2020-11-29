@@ -15,9 +15,9 @@ def parse_json(self, json_data: dict):
     :param json_data: Raw JSON.
     :return: Parsed data.
     """
-    messages = list()
-    bad_messages = list()
-    data = dict()
+    messages = []
+    bad_messages = []
+    data = {}
 
     users = [dict(t) for t in {tuple(d['author'].items()) for d in json_data}]
 
@@ -33,17 +33,11 @@ def parse_json(self, json_data: dict):
 
         progress.set_progress(count, total)
 
-    def sort_chronological(value):
-        return int(value.get('id') or 0) or value.get('timestamp')
-
     if any([messages[0].get('timestamp'), messages[0].get('id')]):
-        messages.sort(key=sort_chronological)
+        messages.sort(key=lambda value: int(value.get('id') or 0) or value.get('timestamp'))
     data['messages'] = messages
 
-    def sort_alphabetical(value):
-        return value['username']
-
-    users.sort(key=sort_alphabetical)
+    users.sort(key=lambda value: value['username'])
     data['users'] = users
 
     progress.set_progress(total, total)
@@ -64,7 +58,7 @@ def create_pages(self, data: dict, uuid: str):
 
     messages = data.pop('messages')
 
-    batch_list = list()
+    batch_list = []
     batches = range(0, len(messages), 1000)
     total = len(batches)
     for count, batch in enumerate(batches):
