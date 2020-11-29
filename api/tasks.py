@@ -19,13 +19,13 @@ def parse_json(self, json_data: dict):
     bad_messages = []
     data = {}
 
-    users = [dict(t) for t in {tuple(d['author'].items()) for d in json_data}]
+    _users = {a['id'] or f'{a["username"]}#{a["discriminator"]}': a for a in [msg['author'] for msg in json_data]}
 
     total = len(json_data)
     progress = WebSocketProgressRecorder(self)
 
     for count, msg in enumerate(json_data):
-        msg = MessageSerializer(data=msg, context={'users': users})
+        msg = MessageSerializer(data=msg, context={'users': _users})
         if msg.is_valid():
             messages.append(msg.data)
         else:
@@ -37,6 +37,7 @@ def parse_json(self, json_data: dict):
         messages.sort(key=lambda value: int(value.get('id') or 0) or value.get('timestamp'))
     data['messages'] = messages
 
+    users = list(_users.values())
     users.sort(key=lambda value: value['username'])
     data['users'] = users
 

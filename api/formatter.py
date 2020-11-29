@@ -63,8 +63,7 @@ class DiscordUser(md.classes['discord_user']):
 
     @staticmethod
     def html(node, output, state):
-        user = next((item for item in state['users'] if str(item['id']) == node['id']), None)
-        mention = f'@{user["username"]}' if user else f'<@!{node["id"]}>'
+        mention = f'@{user["username"]}' if (user := state['users'].get(node['id'])) else f'<@!{node["id"]}>'
         return md.html_tag('span', mention, {'class': 'mention wrapper-3WhCwL mention'}, state)
 
 
