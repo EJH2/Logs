@@ -106,19 +106,20 @@ def log_html(request, pk):
     if not isinstance(log, Log):
         return log
 
-    data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
-            'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None,
-            'delete_token': signer.dumps(f'log.{pk}') if log.owner == request.user else None}
-
-    msgs = [msg for msgs in [p.messages for p in log.pages.order_by('index')] for msg in msgs]
-    data['total_messages'] = len(msgs)
+    data = {'uuid': log.uuid}
     page = data['page'] = request.GET.get('page')
-    if not request.is_ajax() and page:
-        return redirect('log-html', pk=pk)
-
+    msgs = [msg for msgs in [p.messages for p in log.pages.order_by('index')] for msg in msgs]
     data = _paginate_logs(msgs, data)
     if page:
+        if not request.is_ajax():
+            return redirect('log-html', pk=pk)
         return render(request, 'discord_logview/messages.html', context={'log': LiteLogRenderer(data)})
+
+    data = {**data, 'created': log.created, 'users': log.users, 'raw_content': log.content, 'raw_type': log.type,
+            'type': all_types.get(log.type), 'user_id': None,
+            'delete_token': signer.dumps(f'log.{pk}') if log.owner == request.user else None,
+            'total_messages': len(msgs)}
+
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
 
@@ -166,21 +167,23 @@ def log_delete(request, pk):
 
 
 def log_preview(request, pk):
-    if not (data := request.session.get(pk)):
+    if not (session_data := request.session.get(pk)):
         raise Http404('That log could not be found!')
 
-    data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
-            'messages': data['data']['messages'], 'raw_content': data['content'], 'raw_type': data['type'],
-            'type': all_types.get(data['type']), 'user_id': None, 'is_preview': True,
-            'delete_token': signer.dumps(f'preview.{pk}')}
-
-    msgs = data['messages']
-    data['total_messages'] = len(msgs)
+    data = {'uuid': session_data['uuid']}
     page = data['page'] = request.GET.get('page')
-    if not request.is_ajax() and page:
-        return redirect('log-preview', pk=pk)
-
+    msgs = session_data['data']['messages']
     data = _paginate_logs(msgs, data)
+    if page:
+        if not request.is_ajax():
+            return redirect('log-preview', pk=pk)
+        return render(request, 'discord_logview/messages.html', context={'log': LiteLogRenderer(data)})
+
+    data = {**data, 'created': pendulum.now(), 'users': session_data['data']['users'],
+            'raw_content': session_data['content'], 'raw_type': session_data['type'],
+            'type': all_types.get(session_data['type']), 'user_id': None, 'is_preview': True,
+            'delete_token': signer.dumps(f'preview.{pk}'), 'total_messages': len(msgs)}
+
     messages.add_message(request, messages.INFO, 'This is a preview of what your log would look like. This URL cannot '
                                                  'be shared. If you like what you see, simply click the save icon. '
                                                  'If not, click the trash icon.')
