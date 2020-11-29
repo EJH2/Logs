@@ -72,22 +72,22 @@
                         progressBarMessageElement.innerHTML = "Success!";
                         callback();
                     },
-                    onError: function (progressBarElement, progressBarMessageElement) {
+                    onError: function (progressBarElement, progressBarMessageElement, excMessage) {
                         progressBarElement.style.backgroundColor = '#dc4f63';
                         progressBarMessageElement.innerHTML = `Uh-Oh, something went wrong!`;
-                        somethingBroke();
+                        somethingBroke(excMessage);
                     }
                 });
             }
 
-            function somethingBroke() {
+            function somethingBroke(message) {
                 let msgHtml = `<div class="message-2qnXI6 cozyMessage-3V1Y8y wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica"><div class="contents-2mQqc9"><span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i class="separator-2nZzUB" aria-hidden="true">[</i><span aria-label="{{ iso }}">${moment('{{ iso }}').format('LT')}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span><div class="markup-2BOw-j messageContent-2qWWxC">We broke something! Please send this to EJH2#0330 on <a href="https://discord.gg/3X8WwbU">Discord</a> so he can try and find the issue!</div></div></div>`;
                 const msgDiv = document.getElementsByClassName("messages-3amgkR");
                 msgDiv[0].innerHTML = msgDiv[0].innerHTML + msgHtml;
                 let pre = document.createElement('pre');
                 let code =  document.createElement('code');
                 code.classList.add('hljs');
-                code.innerHTML = 'Tasks:<br>{% for task_id in task_ids %}{{ task_id|first }}<br>{% endfor %}';
+                code.innerHTML = `Error:<br>${message}`;
                 pre.appendChild(code);
                 let msgs = document.getElementsByClassName('markup-2BOw-j messageContent-2qWWxC');
                 let lastMsg = msgs[msgs.length-1];
