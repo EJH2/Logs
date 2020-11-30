@@ -43,4 +43,7 @@ class Page(models.Model):
 
 class Whitelist(models.Model):
     log_type = models.CharField(max_length=40, help_text='Whitelisted log type.')
-    users = models.ManyToManyField('auth.User', related_name='whitelists', help_text='User whitelists.')
+    users = models.ManyToManyField('auth.User', related_name='whitelists', help_text='User whitelists.', blank=True)
+
+    def __str__(self):
+        return f'{self.log_type.capitalize()} Whitelist'
