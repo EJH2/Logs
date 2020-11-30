@@ -1,0 +1,29 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}{% endblock %}</title>
+        {% load static %}
+        <link rel="shortcut icon" href="{% static 'discord_logview/icons/favicon.png' %}">
+        <link rel="stylesheet" href="{% static 'discord_logview/css/social.css' %}">
+        <link rel="stylesheet" href="{% static 'discord_logview/css/alert.css' %}">
+        <script src="{% static 'discord_logview/js/alert.js' %}"></script>
+        {% block js %}<script src="{% static 'discord_logview/js/social.js' %}"></script>{% endblock %}
+    </head>
+    <body>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <div class="container" id="container">
+            {% block solidright %}{% endblock %}
+            {% block solidleft %}{% endblock %}
+            <div class="overlay-container">
+                <div class="overlay">
+                    {% block ghostleft %}{% endblock %}
+                    {% block ghostright %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

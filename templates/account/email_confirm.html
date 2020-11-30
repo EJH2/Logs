@@ -1,0 +1,38 @@
+{% extends "socialbase.html" %}
+{% load account %}
+
+{% block title %}Confirm E-mail Address{% endblock %}
+{% block js %}{% endblock %}
+
+{% block ghostright %}
+<div class="overlay-panel overlay-right">
+    {% if confirmation %}
+    {% user_display confirmation.email_address.user as user_display %}
+    <h1>Is This You?</h1>
+    <p>{% with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an e-mail address for user {{ user_display }}{% endwith %}</p>
+    {% else %}
+    <h1>Let's Try It Again...</h1>
+    <p>This e-mail confirmation link expired or is invalid. Please issue a new e-mail confirmation request</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block solidleft %}
+<div class="form-container sign-in-container">
+    {% if confirmation %}
+    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+    {% csrf_token %}
+        <h1>Confirm E-mail</h1>
+        <br>
+        <button>Confirm</button>
+    </form>
+    {% else %}
+    <form method="get" action="{{ email_url }}">
+    {% csrf_token %}
+        <h1>Confirm E-mail</h1>
+        <br>
+        <button>Send Email</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
