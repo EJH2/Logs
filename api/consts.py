@@ -90,7 +90,7 @@ form_privacy_types = [
     ('public', 'Public'),
     ('guild', 'Guild Only'),
     ('mods', 'Mods Only'),
-    ('invite', 'Invite Only'),
+    # ('invite', 'Invite Only'),
 ]
 
 privacy_types = [p[0] for p in form_privacy_types]
