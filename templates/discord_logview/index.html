@@ -27,87 +27,20 @@
     </div>
 {% endblock %}
 {% block messages %}
-    <div class="message-group">
-        <div class="author-avatar-container">
-            <img class="author-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
-        </div>
-        <div class="messages">
-            <div class="author-header">
-                <span>
-                    <span class="author-name" title="Discord Log Viewer#0000">Discord Log Viewer</span>
-                </span>
-                    <time class="message-timestamp" datetime="{{ iso }}"></time>
-            </div>
-            <div class="message-content">
-                Welcome to <b>Discord Log Viewer!</b><br><br>Format virtually any log file into an aesthetically pleasing and readable format. Currently, we support:<br>
-
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> Emojis <img class="emoji" title=":sunglasses:" src="https://twemoji.maxcdn.com/2/svg/1f60e.svg" alt="😎"> <img class="emoji" title=":ok_hand:" src="https://twemoji.maxcdn.com/2/svg/1f44c-1f3fd.svg" alt="👌🏽"><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <i>Italics</i> <br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <b>Bold</b><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <u>Underline</u><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <s>Strikethrough</s><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="pre pre--inline">Inline code</span><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="spoiler-box spoiler-hidden"><span class="spoiler-text">Spoilers</span></span><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> <span class="spoiler-box spoiler-hidden"><span class="spoiler-text"><b><i><u><s><span class="pre pre--inline">A combination of all of them</span></s></u></i></b></span></span><br>
-                <img class="emoji" title=":yes:" src="https://cdn.discordapp.com/emojis/487035217752752129.png" alt=":yes:"> Multi-line code<br>
-                <div class="pre pre--multiline hljs">Click the image below!</div>
-            </div>
-            <div class="message-attachment">
-                <a href="#0.png">
-                    <img class="message-attachment-thumbnail" style="max-height: 50px;max-width: 50px" src="https://cdn.discordapp.com/attachments/352443826473795585/557413456442163200/0.png" alt="attachment" data-id="0.png" onerror="this.src='{% static 'discord_logview/icons/dead_attachment.svg' %}'; this.title='attachment unavailable'; this.onerror = ''">
-                </a>
-            </div>
-            <div class="message-embed">
-                <div class="message-embed-color-pill" style="background-color: #14C941"></div>
-                <div class="message-embed-inner">
-                    <div class="message-embed-content">
-                        <div class="message-embed-content-inner message-content">
-                            <div class="message-embed-author">
-                                <img alt="" class="message-embed-author-icon" src="https://cdn.discordapp.com/embed/avatars/4.png">
-                                <a class="message-embed-author message-embed-author-name-link message-embed-link" href="https://discordapp.com">Embeds too!</a>
-                            </div>
-                            <div class="message-embed-description">Heck, even attachments are included...</div>
-                            <div class="message-embed-fields">
-                                <div class="message-embed-field ">
-                                    <div class="message-embed-field-name">How can I start using this? <img class="emoji" title=":thinking_face:" src="https://twemoji.maxcdn.com/2/svg/1f914.svg" alt="🤔"></div>
-                                    <div class="message-embed-field-value">Simply go <a href="{% url 'new' %}">here</a>!</div>
-                                </div>
-                                <div class="message-embed-field ">
-                                    <div class="message-embed-field-name">What can I use this with? <img class="emoji" title=":scream:" src="https://twemoji.maxcdn.com/2/svg/1f631.svg" alt="😱"></div>
-                                    <div class="message-embed-field-value"><div class="pre pre--multiline hljs"># Supported log types:
-<span class="hljs-addition">+ Auttaja</span>
-<span class="hljs-addition">+ CapnBot</span>
-<span class="hljs-addition">+ GearBot</span>
-<span class="hljs-addition">+ GiraffeDuck</span>
-<span class="hljs-addition">+ Invite Deleter</span>
-<span class="hljs-addition">+ Rosalina Bottings</span>
-<span class="hljs-addition">+ Rowboat</span>
-    - Aperture
-    - Flygbåt
-    - Heimdallr
-    - Jetski
-    - LMG Showboat
-    - Rawgoat
-    - Speedboat
-<span class="hljs-addition">+ SajuukBot</span>
-<span class="hljs-addition">+ Vortex</span></div></div>
-                                </div>
-                                <div class="message-embed-field ">
-                                    <div class="message-embed-field-name">Want to contact me?</div>
-                                    <div class="message-embed-field-value">If you find something we don't support, feel free to message me on <a href="https://discord.gg/3X8WwbU">Discord</a>!</div>
-                                </div>
-                                <div class="message-embed-field message-embed-field-inline">
-                                    <div class="message-embed-field-name">Feeling generous?</div>
-                                    <div class="message-embed-field-value">I created this as a hobby, but it has expanded to much more than that. If you enjoy this, please consider donating on my <a href="https://patreon.com/logview">Patreon</a>!</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="message-embed-footer">
-                        <time class="message-embed-footer-text" datetime="{{ iso }}"></time>
-                    </div>
-                </div>
-            </div>
+    <div id="message-container" class="messagesWrapper-3lZDfY group-spacing-0">
+        <div class="messages-3amgkR infinite-container">
+            <div class="message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica"><div class="contents-2mQqc9" role="document"><img src="https://cdn.discordapp.com/embed/avatars/0.png" aria-hidden="true" class="avatar-1BDn8e" alt=" "><h2 class="header-23xsNx"><span class="headerText-3Uvj1Y"><span class="username-1A8OIy">Discord Log Viewer</span></span><span class="timestamp-3ZCmNB"><span data-datetime="{{ iso }}">Today</span></span></h2><div class="markup-2BOw-j messageContent-2qWWxC">Welcome to <strong>Discord Log Viewer!</strong><br>Format logs file into an aesthetically pleasing and readable format. We support all Discord markdown, including:<br><div class="blockquoteContainer-U5TVEi"><div class="blockquoteDivider-2hH8H6"></div><blockquote>Quotes
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> Emojis <span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":sunglasses:" src="https://twemoji.maxcdn.com/2/svg/1f60e.svg" alt=":sunglasses:" draggable="false" class="emoji"></span>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <em>Italics</em>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <strong>Bold</strong>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <u>Underline</u>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <s>Strikethrough</s>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <code class="inline">Inline code</code>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <span class="spoilerText-3p6IlD hidden-HHr2R9" aria-label="Spoiler" aria-expanded="false" tabindex="0" role="button"><span aria-hidden="true" class="inlineContent-3ZjPuv">Spoilers</span></span>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> <span class="spoilerText-3p6IlD hidden-HHr2R9" aria-label="Spoiler" aria-expanded="false" tabindex="0" role="button"><span aria-hidden="true" class="inlineContent-3ZjPuv"><em><strong><u><s><code class="inline">A combination of all of them</code></s></u></strong></em></span></span>
+<span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":yes~1:" src="https://cdn.discordapp.com/emojis/487035217752752129.png?v=1" alt=":yes~1:" draggable="false" class="emoji"></span> Multi-line code
+</blockquote></div><pre><code class="hljs">Click the image below!</code></pre></div></div><div class="container-1ov-mD"><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L" tabindex="0" href="https://cdn.discordapp.com/attachments/352443826473795585/599656974430502912/0.png" rel="noreferrer noopener" target="_blank" role="button" style="width: 256px; height: 256px;"><img alt="" src="https://media.discordapp.net/attachments/352443826473795585/599656974430502912/0.png" style="width: 256px; height: 256px;"></a><div class="attachment-33OFj0 horizontal-2EEEnY flex-1O1GKY directionRow-3v3tfG alignCenter-1dQNNs embedWrapper-lXpS3L"><img class="icon-1kp3fr" src="{% static 'discord_logview/icons/attachment_icon.svg' %}" alt="Attachment file type: unknown" title="unknown"><div class="attachmentInner-3vEpKt"><div class="filenameLinkWrapper-1-14c5"><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB fileNameLink-9GuxCo" href="https://cdn.discordapp.com/attachments/352443826473795585/599656974430502914/gitignore" rel="noreferrer noopener" target="_blank">gitignore</a></div><div class="metadata-3WGS0M size12-3R0845 height16-2Lv3qA">2.76 KB</div></div><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB downloadWrapper-vhAtLx" href="https://cdn.discordapp.com/attachments/352443826473795585/599656974430502914/gitignore" rel="noreferrer noopener" target="_blank"><svg class="downloadButton-23tKQp" aria-hidden="false" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M16.293 9.293L17.707 10.707L12 16.414L6.29297 10.707L7.70697 9.293L11 12.586V2H13V12.586L16.293 9.293ZM18 20V18H20V20C20 21.102 19.104 22 18 22H6C4.896 22 4 21.102 4 20V18H6V20H18Z"></path></svg></a></div><div class="embedWrapper-lXpS3L embedFull-2tM8-- embed-IeVjo6 markup-2BOw-j" style="border-color: rgb(20, 201, 65);"><div class="grid-1nZz7S hasThumbnail-3FJf1w"><div class="embedAuthor-3l5luH embedMargin-UO5XwE"><img alt="" class="embedAuthorIcon--1zR3L" src="https://images-ext-2.discordapp.net/external/6tVaUxectogf8lZc5X8fWTGd2tbzlG6I5AtVbWYYLNI/https/cdn.discordapp.com/embed/avatars/4.png"><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB embedAuthorNameLink-1gVryT embedLink-1G1K1D embedAuthorName-3mnTWj" tabindex="0" href="https://discordapp.com" rel="noreferrer noopener" target="_blank" role="button">Embeds too!</a></div><div class="embedDescription-1Cuq9a embedMargin-UO5XwE">Heck, even attachments are included...</div><div class="embedFields-2IPs5Z"><div class="embedField-1v-Pnh" style="grid-column: 1 / 13;"><div class="embedFieldName-NFrena"><span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":thinking:" src="https://twemoji.maxcdn.com/2/svg/1f914.svg" alt=":thinking:" draggable="false" class="emoji"></span></div><div class="embedFieldValue-nELq2s">Is there anything this can't do?</div></div><div class="embedField-1v-Pnh" style="grid-column: 1 / 13;"><div class="embedFieldName-NFrena"><span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":scream:" src="https://twemoji.maxcdn.com/2/svg/1f631.svg" alt=":scream:" draggable="false" class="emoji"></span></div><div class="embedFieldValue-nELq2s">Not really...</div></div><div class="embedField-1v-Pnh" style="grid-column: 1 / 13;"><div class="embedFieldName-NFrena"><span class="emojiContainer-3X8SvE" role="button" tabindex="0"><img aria-label=":rolling_eyes:" src="https://twemoji.maxcdn.com/2/svg/1f644.svg" alt=":rolling_eyes:" draggable="false" class="emoji"></span></div><div class="embedFieldValue-nELq2s">If you find something we don't support, feel free to message me on <a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB" title="Discord" href="https://discord.gg/3X8WwbU" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">Discord</a>!</div></div><div class="embedField-1v-Pnh" style="grid-column: 1 / 7;"><div class="embedFieldName-NFrena">How do I use this?</div><div class="embedFieldValue-nELq2s">Simply go <a href="{% url 'new' %}">here</a>!</div></div><div class="embedField-1v-Pnh" style="grid-column: 7 / 13;"><div class="embedFieldName-NFrena">What happens then?</div><div class="embedFieldValue-nELq2s">You get your own unique log, looking just as cool as this!</div></div></div><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedWrapper-lXpS3L embedMedia-1guQoW embedImage-2W1cML" tabindex="0" href="https://cdn.discordapp.com/embed/avatars/3.png" rel="noreferrer noopener" target="_blank" role="button" style="width: 256px; height: 256px;"><img alt="" src="https://images-ext-2.discordapp.net/external/7kG8GvaAyFTW94FQsZCs8yiC3GDDqorEamYmQhePvI4/https/cdn.discordapp.com/embed/avatars/3.png" style="width: 256px; height: 256px;"></a><a class="anchor-3Z-8Bb anchorUnderlineOnHover-2ESHQB imageWrapper-2p5ogY imageZoom-1n-ADA clickable-3Ya1ho embedThumbnail-2Y84-K" tabindex="0" href="https://cdn.discordapp.com/embed/avatars/2.png" rel="noreferrer noopener" target="_blank" role="button" style="width: 80px; height: 80px;"><img alt="" src="https://images-ext-1.discordapp.net/external/vzl3NGWAEK1Te1Gad7T5iMDtCSNZctkSGApvhD6JoxM/https/cdn.discordapp.com/embed/avatars/2.png?width=160&amp;height=160" style="width: 80px; height: 80px;"></a><div class="embedFooter-3yVop- embedMargin-UO5XwE"><span class="embedFooterText-28V_Wb" data-datetime="{{ iso }}">Today</span></div></div></div></div></div>
         </div>
     </div>
+    <script>document.querySelectorAll('*[data-datetime]').forEach(node => node.innerHTML = moment(node.dataset.datetime).calendar())</script>
 {% endblock %}
