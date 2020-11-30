@@ -92,6 +92,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             append: '.infinite-item',
             status: '.infinite-scroll-status',
             hideNav: '.infinite-next',
+            scrollThreshold: 1000,
             history: false,
         });
         infScroll.on('append', function (response, path, items) {
