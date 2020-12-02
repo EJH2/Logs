@@ -3,7 +3,8 @@ import requests
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
+from django.http import Http404
+from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404, redirect
 from itsdangerous import BadSignature
@@ -16,6 +17,10 @@ from api.utils import signer
 from api.v1.parser import create_log
 from web.forms import LogCreateForm
 from web.parser import create_preview, save_preview
+
+
+class BadRequest(SuspiciousOperation):
+    pass
 
 
 # Create your views here.
@@ -70,7 +75,7 @@ def _get_privacy(log, request):
             if [g for g in social_user.extra_data.get('guilds') if g['id'] == guild and
                     bool((g['permissions'] >> 13) & 1)]:
                 return
-    raise ObjectDoesNotExist
+    raise Http404
 
 
 def _get_log(request, pk):
@@ -118,7 +123,7 @@ def log_html(request, pk):
     if log.expires:
         if log.expires < pendulum.now():
             log.delete()
-            raise ObjectDoesNotExist
+            raise Http404
         messages.info(request,
                       f'This log will expire on <time datetime="{log.expires.isoformat()}">'
                       f'{log.expires.strftime("%A, %B %d, %Y at %H:%M:%S UTC")}</time>')
@@ -155,18 +160,18 @@ def log_export(request, pk):
 
 def log_delete(request, pk):
     if 'token' not in request.GET:
-        raise SuspiciousOperation('Token not included in request!')
+        return handle400(request, exception='Token not included in request!')
     try:
         delete_type, _ = signer.loads(request.GET['token']).split('.')
     except BadSignature as e:
-        raise SuspiciousOperation('Invalid delete token!') from e
+        return handle400(request, exception='Invalid delete token!')
     if delete_type == 'preview':
         if request.session.get(pk):
             del request.session[pk]
             messages.add_message(request, messages.SUCCESS, 'Preview has been successfully deleted!')
             return redirect('index')
         else:
-            raise ObjectDoesNotExist
+            raise Http404
     else:
         if (log := get_object_or_404(Log, pk=pk)).owner == request.user:
             log.delete()
@@ -176,7 +181,7 @@ def log_delete(request, pk):
 
 def log_preview(request, pk):
     if not (session_data := request.session.get(pk)):
-        raise ObjectDoesNotExist
+        raise Http404
 
     data = {'uuid': session_data['uuid']}
     page = data['page'] = request.GET.get('page')
@@ -200,7 +205,7 @@ def log_preview(request, pk):
 
 def log_preview_save(request, pk):
     if not (data := request.session.get(pk)):
-        raise ObjectDoesNotExist
+        raise Http404
     if Log.objects.filter(pk=pk).exists():
         log = Log.objects.get(pk=pk)
     else:
@@ -211,7 +216,7 @@ def log_preview_save(request, pk):
 
 def log_preview_raw(request, pk):
     if not (data := request.session.get(pk)):
-        raise ObjectDoesNotExist
+        raise Http404
 
     return render(request, 'discord_logview/lograw.html', context={
         'content': data['content'], 'log': {'type': data['type']}
@@ -220,7 +225,7 @@ def log_preview_raw(request, pk):
 
 def log_preview_export(request, pk):
     if not (data := request.session.get(pk)):
-        raise ObjectDoesNotExist
+        raise Http404
 
     data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
             'messages': data['data']['messages'], 'raw_content': data['content'], 'raw_type': data['type'],
