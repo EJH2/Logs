@@ -3,9 +3,8 @@ import requests
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from itsdangerous import BadSignature
 from sentry_sdk import capture_exception
@@ -71,7 +70,7 @@ def _get_privacy(log, request):
             if [g for g in social_user.extra_data.get('guilds') if g['id'] == guild and
                     bool((g['permissions'] >> 13) & 1)]:
                 return
-    raise Http404('Log not found!')
+    raise ObjectDoesNotExist
 
 
 def _get_log(request, pk):
@@ -116,6 +115,14 @@ def log_html(request, pk):
             return redirect('log-html', pk=pk)
         return render(request, 'discord_logview/messages.html', context={'log': LiteLogRenderer(data)})
 
+    if log.expires:
+        if log.expires < pendulum.now():
+            log.delete()
+            raise ObjectDoesNotExist
+        messages.info(request,
+                      f'This log will expire on <time datetime="{log.expires.isoformat()}">'
+                      f'{log.expires.strftime("%A, %B %d, %Y at %H:%M:%S UTC")}</time>')
+
     data = {**data, 'created': log.created, 'users': log.users, 'raw_content': log.content, 'raw_type': log.type,
             'type': all_types.get(log.type), 'user_id': None,
             'delete_token': signer.dumps(f'log.{pk}') if log.owner == request.user else None,
@@ -159,7 +166,7 @@ def log_delete(request, pk):
             messages.add_message(request, messages.SUCCESS, 'Preview has been successfully deleted!')
             return redirect('index')
         else:
-            raise Http404('Log cannot be found!')
+            raise ObjectDoesNotExist
     else:
         if (log := get_object_or_404(Log, pk=pk)).owner == request.user:
             log.delete()
@@ -169,7 +176,7 @@ def log_delete(request, pk):
 
 def log_preview(request, pk):
     if not (session_data := request.session.get(pk)):
-        raise Http404('That log could not be found!')
+        raise ObjectDoesNotExist
 
     data = {'uuid': session_data['uuid']}
     page = data['page'] = request.GET.get('page')
@@ -193,7 +200,7 @@ def log_preview(request, pk):
 
 def log_preview_save(request, pk):
     if not (data := request.session.get(pk)):
-        raise Http404('That log could not be found!')
+        raise ObjectDoesNotExist
     if Log.objects.filter(pk=pk).exists():
         log = Log.objects.get(pk=pk)
     else:
@@ -204,7 +211,7 @@ def log_preview_save(request, pk):
 
 def log_preview_raw(request, pk):
     if not (data := request.session.get(pk)):
-        raise Http404('That log could not be found!')
+        raise ObjectDoesNotExist
 
     return render(request, 'discord_logview/lograw.html', context={
         'content': data['content'], 'log': {'type': data['type']}
@@ -213,7 +220,7 @@ def log_preview_raw(request, pk):
 
 def log_preview_export(request, pk):
     if not (data := request.session.get(pk)):
-        raise Http404('That log could not be found!')
+        raise ObjectDoesNotExist
 
     data = {'uuid': data['uuid'], 'created': pendulum.now(), 'users': data['data']['users'],
             'messages': data['data']['messages'], 'raw_content': data['content'], 'raw_type': data['type'],
