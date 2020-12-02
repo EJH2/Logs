@@ -7,4 +7,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }, 1000);
         }, 5000);
     });
+
+    document.querySelectorAll('.alert time').forEach((time) => {
+        time.innerHTML = moment(time.getAttribute('datetime')).format('dddd, MMMM DD, YYYY [at] HH:mm:ss');
+    })
 });
