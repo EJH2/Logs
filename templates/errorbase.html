@@ -7,24 +7,25 @@
     <link rel="stylesheet" href="{% static 'discord_logview/css/error.css' %}">
 </head>
 <body>
-      <div>
-          <div>
-              <div class="flex flex-horizontal flex-justify-center flex-align-center flex-wrap page-wrap">
-                  <div class="text-section">
-                      <div class="error">
-                          {% block error-code %}{% endblock %}
-                      </div>
-                      <div class="suggestion-text weight-light">{% block suggestion-text %}{% endblock %}</div>
-                      <ul class="links-section">
-                          {% block links %}
-                          <li>
-                              <a class="links" href="{% url 'index' %}">Take Me Home</a>
-                          </li>
-                          {% endblock %}
-                      </ul>
-                  </div>
-              </div>
-          </div>
-      </div>
+    <div>
+        <div>
+            <div class="flex flex-horizontal flex-justify-center flex-align-center flex-wrap page-wrap">
+                <div class="text-section">
+                    <div class="error">
+                        {% block error-code %}{% endblock %}
+                    </div>
+                    <div class="suggestion-text">{% block subtext %}{% endblock %}</div>
+                    <div class="suggestion-text weight-light">{% block suggestion-text %}{% endblock %}</div>
+                    <ul class="links-section">
+                        {% block links %}
+                        <li>
+                            <a class="links" href="{% url 'index' %}">Take Me Home</a>
+                        </li>
+                        {% endblock %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

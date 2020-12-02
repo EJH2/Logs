@@ -3,6 +3,7 @@ import requests
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
@@ -147,11 +148,11 @@ def log_export(request, pk):
 
 def log_delete(request, pk):
     if 'token' not in request.GET:
-        raise Http404('Token not included in request!')
+        raise SuspiciousOperation('Token not included in request!')
     try:
         delete_type, _ = signer.loads(request.GET['token']).split('.')
-    except BadSignature:
-        raise Http404('Invalid delete token!')
+    except BadSignature as e:
+        raise SuspiciousOperation('Invalid delete token!') from e
     if delete_type == 'preview':
         if request.session.get(pk):
             del request.session[pk]
@@ -227,7 +228,7 @@ def log_preview_export(request, pk):
 # ====================================
 
 def handle400(request, *args, **kwargs):
-    return render(request, '400.html', status=400)
+    return render(request, '400.html', status=400, context={'exception': kwargs.pop('exception')})
 
 
 def handle403(request, *args, **kwargs):
