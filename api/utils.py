@@ -36,9 +36,9 @@ def get_chain_tasks(node) -> list:
 def validate_expires(user, value):
     value = pendulum.instance(value)
     exp = {'weeks': 1}
-    if user.has_perm('log.extended_expiry'):
+    if user.has_perm('api.extended_expiry'):
         exp = {'months': 1}
-    if user.has_perm('log.no_expiry'):
+    if user.has_perm('api.no_expiry'):
         exp = None
     if exp and value > pendulum.now().add(**exp):
         raise serializers.ValidationError(
