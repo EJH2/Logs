@@ -402,7 +402,7 @@ input:checked ~ .toolbox-tools li {
     }
 }
 
-@media (min-width: 500px) and (any-pointer: coarse) {
+@media (min-width: 501px) and (any-pointer: coarse) {
     body {
         padding-left: 15%;
         padding-right: 15%;
