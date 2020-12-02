@@ -11,7 +11,7 @@ create_responses = {
         'application/json': {
             'owner': 'lorem',
             'uuid': '6kd6nYMuebE5yhwvGWohCQ',
-            'url': 'https://logs.discord.website/6kd6nYMuebE5yhwvGWohCQ',
+            'url': 'https://logs.discord.website/logs/6kd6nYMuebE5yhwvGWohCQ',
             'type': 'logger',
             'created': '1970-01-01T00:00:00.000000',
             'expires': now,
@@ -45,7 +45,7 @@ list_responses = {
             {
                 'owner': 'amet',
                 'uuid': '6kd6nYMuebE5yhwvGWohCQ',
-                'url': 'https://logs.discord.website/6kd6nYMuebE5yhwvGWohCQ',
+                'url': 'https://logs.discord.website/logs/6kd6nYMuebE5yhwvGWohCQ',
                 'type': 'logger',
                 'created': '1970-01-01T00:00:00.000000',
                 'expires': now,
@@ -55,7 +55,7 @@ list_responses = {
             {
                 'owner': 'ipsum',
                 'uuid': 'DHYCLTzjqREHg2ttnWvbYk',
-                'url': 'https://logs.discord.website/DHYCLTzjqREHg2ttnWvbYk',
+                'url': 'https://logs.discord.website/logs/DHYCLTzjqREHg2ttnWvbYk',
                 'type': 'rawgoat',
                 'created': '1970-01-01T00:00:00.000000',
                 'expires': now,
@@ -65,7 +65,7 @@ list_responses = {
             {
                 'owner': 'foobar',
                 'uuid': '8hx7t3SPLJD2Zom5ZCYRb2',
-                'url': 'https://logs.discord.website/8hx7t3SPLJD2Zom5ZCYRb2',
+                'url': 'https://logs.discord.website/logs/8hx7t3SPLJD2Zom5ZCYRb2',
                 'type': 'rosalina_bottings',
                 'created': '1970-01-01T00:00:00.000000',
                 'expires': now,
@@ -81,7 +81,7 @@ read_responses = {
         'application/json': {
             'owner': 'ipsum',
             'uuid': 'DHYCLTzjqREHg2ttnWvbYk',
-            'url': 'https://logs.discord.website/DHYCLTzjqREHg2ttnWvbYk',
+            'url': 'https://logs.discord.website/logs/DHYCLTzjqREHg2ttnWvbYk',
             'type': 'rowboat',
             'created': '1970-01-01T00:00:00.000000',
             'expires': now,
@@ -97,7 +97,7 @@ partial_update_responses = {
         'application/json': {
             'owner': 'foobar',
             'uuid': '8hx7t3SPLJD2Zom5ZCYRb2',
-            'url': 'https://logs.discord.website/8hx7t3SPLJD2Zom5ZCYRb2',
+            'url': 'https://logs.discord.website/logs/8hx7t3SPLJD2Zom5ZCYRb2',
             'type': 'rosalina_bottings',
             'created': '1970-01-01T00:00:00.000000',
             'expires': now,
