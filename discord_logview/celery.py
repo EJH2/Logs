@@ -48,8 +48,8 @@ app.autodiscover_tasks()
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(60 * 10, clean_expired_logs.s(), name='clean expired logs')
-    sender.add_periodic_task(60 * 5, clean_old_tasks.s(), name='clean old tasks')
+    sender.add_periodic_task(60 * 60, clean_expired_logs.s(), name='clean expired logs')
+    sender.add_periodic_task(60 * 60, clean_old_tasks.s(), name='clean old tasks')
 
 
 @app.task
