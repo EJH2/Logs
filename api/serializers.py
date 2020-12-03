@@ -68,14 +68,14 @@ class AttachmentSerializer(serializers.Serializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['type'] = 'file'
+        ext = ret.get('filename').rsplit('.', 1)[-1]
+        if ext in ['png', 'jpg', 'jpeg']:
+            ret['type'] = 'image'
+        elif ext in 'gifv':
+            ret['type'] = 'gif'
+        else:
+            ret['type'] = 'video'
         if ret.get('height') is not None or ret.get('width') is not None:
-            ext = ret.get('filename').rsplit('.', 1)[-1]
-            if ext in ['png', 'jpg', 'jpeg']:
-                ret['type'] = 'image'
-            elif ext in 'gifv':
-                ret['type'] = 'gif'
-            else:
-                ret['type'] = 'video'
             ret['height'], ret['width'] = scale_image(ret['height'], ret['width'], 300, 400)
         ret['size'] = filesize(ret['size'] or 0)
         return ret
