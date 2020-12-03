@@ -61,7 +61,7 @@ class AttachmentSerializer(serializers.Serializer):
     filename = serializers.CharField()
     url = serializers.CharField()
     proxy_url = serializers.CharField(default=None, allow_null=True)
-    size = serializers.IntegerField(default=0)
+    size = serializers.IntegerField(default=0, allow_null=True)
     width = serializers.IntegerField(default=None, allow_null=True)
     height = serializers.IntegerField(default=None, allow_null=True)
 
@@ -77,7 +77,7 @@ class AttachmentSerializer(serializers.Serializer):
             else:
                 ret['type'] = 'video'
             ret['height'], ret['width'] = scale_image(ret['height'], ret['width'], 300, 400)
-        ret['size'] = filesize(ret['size'])
+        ret['size'] = filesize(ret['size'] or 0)
         return ret
 
     def update(self, instance, validated_data):
