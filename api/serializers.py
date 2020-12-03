@@ -57,7 +57,7 @@ class AuthorSerializer(serializers.Serializer):
 
 
 class AttachmentSerializer(serializers.Serializer):
-    id = serializers.IntegerField(default=None)
+    id = serializers.IntegerField(default=None, allow_null=True)
     filename = serializers.CharField()
     url = serializers.CharField()
     proxy_url = serializers.CharField(default=None, allow_null=True)
