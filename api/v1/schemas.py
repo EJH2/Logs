@@ -29,7 +29,7 @@ create_responses = {
                     'Expiry time must be an iso-8601 timestamp of a date less than 1 week from now!'
                 ],
                 'privacy': [
-                    'Privacy value must be one of public, guild, mods, invite!'
+                    'Privacy value must be one of public, guild, mods!'
                 ],
                 'guild': [
                     'A guild must be set if the privacy type is set to guild, mods!'
@@ -112,7 +112,7 @@ partial_update_responses = {
                     'Expiry time must be an iso-8601 timestamp of a date less than 1 week from now!'
                 ],
                 'privacy': [
-                    'Privacy value must be one of public, guild, mods, invite!'
+                    'Privacy value must be one of public, guild, mods!'
                 ],
                 'guild': [
                     'A guild must be set if the privacy type is set to guild, mods!'
