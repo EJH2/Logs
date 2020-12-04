@@ -47,7 +47,7 @@ class LogCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['privacy'] in ['public', 'invite']:
+        if ret['privacy'] == 'public':
             ret['guild'] = None
         return ret
 
@@ -135,7 +135,7 @@ class LogArchiveCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['privacy'] in ['public', 'invite']:
+        if ret['privacy'] == 'public':
             ret['guild'] = None
         return ret
 
