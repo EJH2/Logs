@@ -60,13 +60,10 @@ def new(request):
 
 
 def _get_privacy(log, request):
-    if log.owner == request.user or request.user.is_staff:
-        return
-    if (privacy := log.privacy) in ['public', 'invite']:
-        # TODO: Add invite setting logic
-        return
     if not request.user.is_authenticated:
         return redirect('/accounts/login/?next=%s' % request.path)
+    if (privacy := log.privacy) == 'public' or log.owner == request.user or request.user.is_staff:
+        return
     if (social_user := SocialAccount.objects.filter(user=request.user).first()) and \
             social_user.extra_data.get('guilds'):
         if (guild := log.guild) in [g['id'] for g in social_user.extra_data.get('guilds')]:
