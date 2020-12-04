@@ -89,8 +89,7 @@ form_expiry_times = list((k, re.sub(r'(\d+|)(\w+)', lambda m: (m.group(1) + ' ' 
 form_privacy_types = [
     ('public', 'Public'),
     ('guild', 'Guild Only'),
-    ('mods', 'Mods Only'),
-    # ('invite', 'Invite Only'),
+    ('mods', 'Mods Only')
 ]
 
 privacy_types = [p[0] for p in form_privacy_types]
