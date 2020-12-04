@@ -78,7 +78,7 @@ class LogCreateForm(forms.Form):
             self.add_error('url', 'You must specify either a URL or file to parse!')
         if cleaned_data.get('expires'):
             cleaned_data['expires'] = pendulum.now().add(seconds=expiry_times[cleaned_data['expires']]).isoformat()
-        if cleaned_data['privacy'] not in ['public', 'invite'] and not cleaned_data.get('guild'):
+        if cleaned_data['privacy'] != 'public' and not cleaned_data.get('guild'):
             self.add_error('guild', 'You must specify a guild to link to!')
         else:
             cleaned_data['guild'] = None
