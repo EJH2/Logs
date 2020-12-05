@@ -19,10 +19,6 @@ from web.forms import LogCreateForm
 from web.parser import create_preview, save_preview
 
 
-class BadRequest(SuspiciousOperation):
-    pass
-
-
 # Create your views here.
 def index(request):
     return render(request, 'discord_logview/index.html', context={'iso': pendulum.now().isoformat()})
