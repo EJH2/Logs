@@ -9,7 +9,7 @@ class LiteLogRenderer:
     def __init__(self, data):
         self.uuid = data['uuid']
         self.page = data.get('page')
-        self.messages = [Message(**m) for m in data['messages']]
+        self.messages = [Message(**m) for m in self.page.object_list]
 
     @property
     def message_groups(self):

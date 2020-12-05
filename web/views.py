@@ -99,7 +99,6 @@ def _paginate_logs(msgs, data):
     except EmptyPage:
         msg_page = paginator.page(paginator.num_pages)
     data['page'] = msg_page
-    data['messages'] = msg_page.object_list
     return data
 
 
