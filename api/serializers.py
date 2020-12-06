@@ -12,11 +12,6 @@ def sort_null(_ret):
     return ret
 
 
-def mention_sub(match, mentions):
-    m = next((item for item in mentions if str(item["id"]) == match.group(1)), None)
-    return f'<@{m["username"]}#{m["discriminator"]} ({m["id"]})>'
-
-
 def scale_image(height, width, max_height, max_width):
     if min(height,  width) == 0:
         return min(height, max_height), min(width, max_width)
