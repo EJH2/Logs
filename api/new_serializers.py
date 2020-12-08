@@ -12,8 +12,8 @@ class BaseSerializer(serializers.Serializer):
 
 class UserSerializer(BaseSerializer):
     id = serializers.IntegerField()
-    username = serializers.CharField(min_length=2, max_length=32)
-    discriminator = serializers.CharField(min_length=4, max_length=4)
+    username = serializers.CharField()
+    discriminator = serializers.CharField()
     avatar = serializers.CharField(allow_null=True)
     bot = serializers.BooleanField(required=False, default=False)
     system = serializers.BooleanField(required=False, default=False)
