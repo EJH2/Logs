@@ -187,7 +187,7 @@ class MessageSerializer(BaseSerializer):
     mention_channels = ChannelSerializer(many=True, required=False)
     attachments = AttachmentSerializer(many=True)
     embeds = EmbedSerializer(many=True)
-    reactions = ReactionSerializer(many=True)
+    reactions = ReactionSerializer(many=True, required=False)
     nonce = serializers.CharField(required=False)
     pinned = serializers.BooleanField()
     webhook_id = serializers.IntegerField(required=False)
