@@ -62,3 +62,63 @@ class AttachmentSerializer(BaseSerializer):
     proxy_url = serializers.URLField()
     height = serializers.IntegerField(allow_null=True)
     width = serializers.IntegerField(allow_null=True)
+
+
+class EmbedFooterSerializer(BaseSerializer):
+    text = serializers.CharField()
+    icon_url = serializers.URLField(required=False)
+    proxy_icon_url = serializers.URLField(required=False)
+
+
+class EmbedImageSerializer(BaseSerializer):
+    url = serializers.URLField(required=False)
+    proxy_url = serializers.URLField(required=False)
+    height = serializers.IntegerField(required=False)
+    width = serializers.IntegerField(required=False)
+
+
+class EmbedThumbnailSerializer(BaseSerializer):
+    url = serializers.URLField(required=False)
+    proxy_url = serializers.URLField(required=False)
+    height = serializers.IntegerField(required=False)
+    width = serializers.IntegerField(required=False)
+
+
+class EmbedVideoSerializer(BaseSerializer):
+    url = serializers.URLField(required=False)
+    height = serializers.IntegerField(required=False)
+    width = serializers.IntegerField(required=False)
+
+
+class EmbedProviderSerializer(BaseSerializer):
+    name = serializers.CharField(required=False)
+    url = serializers.URLField(required=False)
+
+
+class EmbedAuthorSerializer(BaseSerializer):
+    name = serializers.CharField(required=False)
+    url = serializers.URLField(required=False)
+    icon_url = serializers.URLField(required=False)
+    proxy_icon_url = serializers.URLField(required=False)
+
+
+class EmbedFieldSerializer(BaseSerializer):
+    name = serializers.CharField()
+    value = serializers.CharField()
+    inline = serializers.BooleanField(required=False)
+
+
+class EmbedSerializer(BaseSerializer):
+    title = serializers.CharField(required=False)
+    type = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    url = serializers.URLField(required=False)
+    timestamp = serializers.DateTimeField(required=False)
+    color = serializers.IntegerField(required=False)
+    footer = EmbedFooterSerializer(required=False)
+    image = EmbedImageSerializer(required=False)
+    thumbnail = EmbedThumbnailSerializer(required=False)
+    video = EmbedVideoSerializer(required=False)
+    provider = EmbedProviderSerializer(required=False)
+    author = EmbedAuthorSerializer(required=False)
+    fields = EmbedFieldSerializer(required=False, many=True)
