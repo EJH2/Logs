@@ -133,3 +133,9 @@ class EmojiSerializer(BaseSerializer):
     managed = serializers.BooleanField(required=False)
     animated = serializers.BooleanField(required=False)
     available = serializers.BooleanField(required=False)
+
+
+class ReactionSerializer(BaseSerializer):
+    count = serializers.IntegerField()
+    me = serializers.BooleanField()
+    emoji = EmojiSerializer()
