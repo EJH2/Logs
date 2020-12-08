@@ -144,3 +144,11 @@ class ReactionSerializer(BaseSerializer):
 class ActivitySerializer(BaseSerializer):
     type = serializers.IntegerField()
     party_id = serializers.CharField(required=False)
+
+
+class ApplicationSerializer(BaseSerializer):
+    id = serializers.IntegerField()
+    cover_image = serializers.CharField(required=False)
+    description = serializers.CharField()
+    icon = serializers.CharField(allow_null=True)
+    name = serializers.CharField()
