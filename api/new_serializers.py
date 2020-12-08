@@ -25,3 +25,12 @@ class UserSerializer(BaseSerializer):
     premium_type = serializers.IntegerField(required=False)
     public_flags = serializers.IntegerField(required=False)
 
+
+class MemberSerializer(BaseSerializer):
+    user = UserSerializer(required=False)
+    nick = serializers.CharField(allow_null=True)
+    roles = serializers.ListSerializer(child=serializers.IntegerField())
+    joined_at = serializers.DateTimeField()
+    premium_since = serializers.DateTimeField(required=False, allow_null=True)
+    deaf = serializers.BooleanField(default=False)
+    mute = serializers.BooleanField(default=False)
