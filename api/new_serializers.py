@@ -169,3 +169,36 @@ class StickerSerializer(BaseSerializer):
     asset = serializers.CharField()
     preview_asset = serializers.CharField(allow_null=True)
     format_type = serializers.IntegerField()
+
+
+class MessageSerializer(BaseSerializer):
+    id = serializers.IntegerField()
+    channel_id = serializers.IntegerField()
+    guild_id = serializers.IntegerField(required=False)
+    author = UserSerializer()
+    member = MemberSerializer(required=False)
+    content = serializers.CharField()
+    timestamp = serializers.DateTimeField()
+    edited_timestamp = serializers.DateTimeField(allow_null=True)
+    tts = serializers.BooleanField()
+    mention_everyone = serializers.BooleanField()
+    mentions = UserSerializer(many=True)
+    mention_roles = RoleSerializer(many=True)
+    mention_channels = ChannelSerializer(many=True, required=False)
+    attachments = AttachmentSerializer(many=True)
+    embeds = EmbedSerializer(many=True)
+    reactions = ReactionSerializer(many=True)
+    nonce = serializers.CharField(required=False)
+    pinned = serializers.BooleanField()
+    webhook_id = serializers.IntegerField(required=False)
+    type = serializers.IntegerField()
+    activity = ActivitySerializer(required=False)
+    application = ApplicationSerializer(required=False)
+    message_reference = MessageReferenceSerializer(required=False)
+    flags = serializers.IntegerField()
+    stickers = StickerSerializer(many=True, required=False)
+    referenced_message = serializers.SerializerMethodField(required=False, allow_null=True)
+
+    @staticmethod
+    def get_referenced_message(obj):
+        return MessageSerializer(obj.referenced_message).data if obj.referenced_message else None
