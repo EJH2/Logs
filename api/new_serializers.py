@@ -158,3 +158,14 @@ class MessageReferenceSerializer(BaseSerializer):
     message_id = serializers.IntegerField(required=False)
     channel_id = serializers.IntegerField(required=False)
     guild_id = serializers.IntegerField(required=False)
+
+
+class StickerSerializer(BaseSerializer):
+    id = serializers.IntegerField()
+    pack_id = serializers.IntegerField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    tags = serializers.CharField(required=False)
+    asset = serializers.CharField()
+    preview_asset = serializers.CharField(allow_null=True)
+    format_type = serializers.IntegerField()
