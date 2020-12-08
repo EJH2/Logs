@@ -45,3 +45,10 @@ class RoleSerializer(BaseSerializer):
     permissions = serializers.CharField()
     managed = serializers.BooleanField()
     mentionable = serializers.BooleanField()
+
+
+class ChannelSerializer(BaseSerializer):
+    id = serializers.IntegerField()
+    guild_id = serializers.IntegerField()
+    type = serializers.IntegerField()
+    name = serializers.CharField()
