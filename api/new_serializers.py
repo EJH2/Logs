@@ -139,3 +139,8 @@ class ReactionSerializer(BaseSerializer):
     count = serializers.IntegerField()
     me = serializers.BooleanField()
     emoji = EmojiSerializer()
+
+
+class ActivitySerializer(BaseSerializer):
+    type = serializers.IntegerField()
+    party_id = serializers.CharField(required=False)
