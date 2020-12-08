@@ -152,3 +152,9 @@ class ApplicationSerializer(BaseSerializer):
     description = serializers.CharField()
     icon = serializers.CharField(allow_null=True)
     name = serializers.CharField()
+
+
+class MessageReferenceSerializer(BaseSerializer):
+    message_id = serializers.IntegerField(required=False)
+    channel_id = serializers.IntegerField(required=False)
+    guild_id = serializers.IntegerField(required=False)
