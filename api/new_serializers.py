@@ -52,3 +52,13 @@ class ChannelSerializer(BaseSerializer):
     guild_id = serializers.IntegerField()
     type = serializers.IntegerField()
     name = serializers.CharField()
+
+
+class AttachmentSerializer(BaseSerializer):
+    id = serializers.IntegerField()
+    filename = serializers.CharField()
+    size = serializers.IntegerField()
+    url = serializers.URLField()
+    proxy_url = serializers.URLField()
+    height = serializers.IntegerField(allow_null=True)
+    width = serializers.IntegerField(allow_null=True)
