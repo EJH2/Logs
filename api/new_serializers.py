@@ -34,3 +34,14 @@ class MemberSerializer(BaseSerializer):
     premium_since = serializers.DateTimeField(required=False, allow_null=True)
     deaf = serializers.BooleanField()
     mute = serializers.BooleanField()
+
+
+class RoleSerializer(BaseSerializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    color = serializers.IntegerField()
+    hoist = serializers.BooleanField()
+    position = serializers.IntegerField()
+    permissions = serializers.CharField()
+    managed = serializers.BooleanField()
+    mentionable = serializers.BooleanField()
