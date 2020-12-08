@@ -122,3 +122,14 @@ class EmbedSerializer(BaseSerializer):
     provider = EmbedProviderSerializer(required=False)
     author = EmbedAuthorSerializer(required=False)
     fields = EmbedFieldSerializer(required=False, many=True)
+
+
+class EmojiSerializer(BaseSerializer):
+    id = serializers.IntegerField(allow_null=True)
+    name = serializers.CharField(allow_null=True)
+    roles = RoleSerializer(many=True, required=False)
+    user = UserSerializer(required=False)
+    require_colons = serializers.BooleanField(required=False)
+    managed = serializers.BooleanField(required=False)
+    animated = serializers.BooleanField(required=False)
+    available = serializers.BooleanField(required=False)
