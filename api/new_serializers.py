@@ -183,7 +183,7 @@ class MessageSerializer(BaseSerializer):
     tts = serializers.BooleanField()
     mention_everyone = serializers.BooleanField()
     mentions = UserSerializer(many=True)
-    mention_roles = RoleSerializer(many=True)
+    mention_roles = serializers.ListSerializer(child=serializers.IntegerField())
     mention_channels = ChannelSerializer(many=True, required=False)
     attachments = AttachmentSerializer(many=True)
     embeds = EmbedSerializer(many=True)
