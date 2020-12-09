@@ -6,18 +6,13 @@ from rest_framework import serializers
 signer = URLSafeSerializer(settings.SECRET_KEY)
 
 
-def add_task_messages(task_list: list, messages: list = None) -> list:
+def add_task_messages(task_list: list, messages: list) -> list:
     """
     Add messages to tasks for use in Job template.
     :param task_list: List of task IDs.
     :param messages: List of messages to be connected to tasks.
     """
-    if not messages:
-        messages = [''] * len(task_list)
-    if len(messages) == len(task_list):
-        for count, task in enumerate(task_list):
-            task_list[count] = (task, messages[count])
-    return task_list
+    return list(zip(task_list, messages))
 
 
 def validate_expires(user, value):
