@@ -20,19 +20,6 @@ def add_task_messages(task_list: list, messages: list = None) -> list:
     return task_list
 
 
-def get_chain_tasks(node) -> list:
-    """
-    Get task IDs from a Redis job.
-    :param node: Redis job.
-    """
-    id_chain = []
-    while node.parent:
-        id_chain.insert(0, node.id)
-        node = node.parent
-    id_chain.insert(0, node.id)
-    return id_chain
-
-
 def validate_expires(user, value):
     value = pendulum.instance(value)
     exp = {'weeks': 1}
