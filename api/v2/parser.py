@@ -34,7 +34,7 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
     messages = ['{current}/{total} messages formatted... ({percent}%)', 'Saving messages... ({percent}%)']
     result = celery.chain(tasks.parse_json.s(content) | tasks.create_pages.s(uuid))()
 
-    task_ids = utils.get_chain_tasks(result)
+    task_ids = list(reversed(result.as_list()))
     data['data'] = {'tasks': utils.add_task_messages(task_ids, messages=messages), **kwargs}
 
     return Log.objects.create(**data)

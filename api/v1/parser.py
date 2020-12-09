@@ -35,7 +35,7 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
         v1_tasks.parse_text.s(log_type, content), tasks.parse_json.s() | tasks.create_pages.s(uuid)
     )()
 
-    task_ids = utils.get_chain_tasks(result)
+    task_ids = list(reversed(result.as_list()))
     data['data'] = {'tasks': utils.add_task_messages(task_ids, messages=messages), **kwargs}
 
     return Log.objects.create(**data)
