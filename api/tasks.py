@@ -6,6 +6,13 @@ from celery_progress.websockets.backend import WebSocketProgressRecorder
 from api.models import Log, Page
 from api.serializers import MessageSerializer
 
+# Sample author dictionary if author isn't supplied
+unknown_author = {
+    'id': 0,
+    'username': 'Unknown User',
+    'discriminator': '0000'
+}
+
 
 @shared_task(bind=True)
 def parse_json(self, json_data: dict):
@@ -19,7 +26,9 @@ def parse_json(self, json_data: dict):
     bad_messages = []
     data = {}
 
-    _users = {a['id'] or f'{a["username"]}#{a["discriminator"]}': a for a in [msg['author'] for msg in json_data]}
+    _users = {a['id'] or f'{a["username"]}#{a["discriminator"]}': a for a in [
+        msg.get('author', unknown_author) for msg in json_data
+    ]}
 
     total = len(json_data)
     progress = WebSocketProgressRecorder(self)
