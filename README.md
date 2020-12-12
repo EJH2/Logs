@@ -1,11 +1,10 @@
 # Logs
 
 ### Overview
-This is the successor to the legacy branch of this project. The name didn't really fit for what it
-was, and the old code was really bad. For now, the old code will be running on my main site 
-[here](https://logs.discord.website), until such time when a merger can be safely made. If you want to see this in
-action before it goes live, feel free to check out [my staging site](https://logstaging.discord.website). If something breaks,
-please message me on my [Discord server](https://discord.gg/3X8WwbU)!
+Tired of having to deal with Discord text logs that are boring and hard to read? Well, 
+[Logs](https://logs.discord.website) aims to solve that problem by giving bot developers an alternative solution to
+export their logs. No longer will you have to squint at small text, or have to manually copy attachment links to figure
+out what someone said. Instead, you'll be able to view it as if you were still in Discord!
 
 ### Installation Instructions
 There are currently no installation instructions, as this code is extremely volatile and not guaranteed to run for
