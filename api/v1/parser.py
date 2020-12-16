@@ -29,13 +29,10 @@ def create_log(content, log_type, owner, expires, privacy, guild, **kwargs) -> L
 
     data['expires'] = pendulum.parse(expires) if expires else None
 
-    messages = ['{current}/{total} messages parsed... ({percent}%)',
-                '{current}/{total} messages formatted... ({percent}%)', 'Saving messages... ({percent}%)']
     result = celery.chain(
         v1_tasks.parse_text.s(log_type, content), tasks.parse_json.s() | tasks.create_pages.s(uuid)
     )()
 
-    task_ids = list(reversed(result.as_list()))
-    data['data'] = {'tasks': utils.add_task_messages(task_ids, messages=messages), **kwargs}
+    data['data'] = {'tasks': list(reversed(result.as_list())), **kwargs}
 
     return Log.objects.create(**data)
