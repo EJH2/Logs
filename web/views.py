@@ -72,17 +72,13 @@ def _get_privacy(log, request):
 
 def _get_log(request, pk):
     log = get_object_or_404(Log, pk=pk)
-    task_data = log.data.get('tasks')
-    if isinstance(task_data[0], list):
-        tasks = task_data
-    else:
-        tasks = list(zip(task_data, task_messages[-len(task_data):]))
     if error := _get_privacy(log, request):
         return error
 
     if not log.pages.count() > 0:
+        task_data = log.data.get('tasks')
         return render(request, 'discord_logview/loading.html', context={
-            'task_ids': tasks,
+            'task_ids': list(zip(task_data, task_messages[-len(task_data):])),
             'iso': pendulum.now().isoformat()
         })
 
