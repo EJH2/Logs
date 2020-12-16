@@ -94,3 +94,10 @@ form_privacy_types = [
 ]
 
 privacy_types = [p[0] for p in form_privacy_types]
+
+
+task_messages = [
+    '{current}/{total} messages parsed... ({percent}%)',
+    '{current}/{total} messages formatted... ({percent}%)',
+    'Saving messages... ({percent}%)'
+]

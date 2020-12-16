@@ -9,7 +9,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from itsdangerous import BadSignature
 from sentry_sdk import capture_exception
 
-from api.consts import all_types
+from api.consts import all_types, task_messages
 from api.models import Log
 from api.objects import LogRenderer, LiteLogRenderer
 from api.utils import signer
@@ -72,12 +72,17 @@ def _get_privacy(log, request):
 
 def _get_log(request, pk):
     log = get_object_or_404(Log, pk=pk)
+    task_data = log.data.get('tasks')
+    if isinstance(task_data[0], list):
+        tasks = task_data
+    else:
+        tasks = list(zip(task_data, task_messages[-len(task_data):]))
     if error := _get_privacy(log, request):
         return error
 
-    if log.data.get('tasks') and not log.pages.count() > 0:
+    if not log.pages.count() > 0:
         return render(request, 'discord_logview/loading.html', context={
-            'task_ids': log.data.get('tasks'),
+            'task_ids': tasks,
             'iso': pendulum.now().isoformat()
         })
 

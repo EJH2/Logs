@@ -40,7 +40,7 @@ def save_preview(data, owner) -> Log:
     result = tasks.create_pages.delay(pages_data, data['uuid'])
 
     data['data'] = {
-        'tasks': utils.add_task_messages([result.id], messages=['Saving messages... ({percent}%)']), **log_data
+        'tasks': [result.id], **log_data
     }
 
     return Log.objects.get_or_create(uuid=data['uuid'], defaults=data)[0]
