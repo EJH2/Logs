@@ -65,7 +65,8 @@ class LogViewSet(viewsets.ViewSet):
     @swagger_auto_schema(manual_parameters=[schemas.url_parameter])
     def destroy(self, request, pk=None):
         """Delete a log that you own."""
-        queryset = self.get_queryset()
-        log = get_object_or_404(queryset, pk=pk)
-        log.delete()
+        queryset = self.get_queryset().filter(pk=pk)
+        if not len(queryset) > 0:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        queryset.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
