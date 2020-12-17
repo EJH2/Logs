@@ -155,7 +155,7 @@ def log_delete(request, pk):
         return handle400(request, exception='Token not included in request!')
     try:
         delete_type, _ = signer.loads(request.GET['token']).split('.')
-    except BadSignature as e:
+    except BadSignature:
         return handle400(request, exception='Invalid delete token!')
     if delete_type == 'preview':
         if request.session.get(pk):
