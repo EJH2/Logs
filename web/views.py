@@ -100,8 +100,6 @@ def _paginate_logs(msgs, data):
 @login_required
 def log_html(request, pk):
     log = _get_log(request, pk)
-    if not isinstance(log, Log):
-        return log
 
     data = {'uuid': log.uuid}
     page = data['page'] = request.GET.get('page')
@@ -130,9 +128,7 @@ def log_html(request, pk):
 
 @login_required
 def log_raw(request, pk):
-    log = get_object_or_404(Log, pk=pk)
-    if error := _get_privacy(log, request):
-        return error
+    log = _get_log(request, pk)
 
     return render(request, 'discord_logview/lograw.html', context={'content': log.content, 'log': {'type': log.type}})
 
@@ -140,8 +136,6 @@ def log_raw(request, pk):
 @login_required
 def log_export(request, pk):
     log = _get_log(request, pk)
-    if not isinstance(log, Log):
-        return log
 
     data = {'uuid': log.uuid, 'created': log.created, 'users': log.users, 'raw_content': log.content,
             'raw_type': log.type, 'type': all_types.get(log.type), 'user_id': None}
