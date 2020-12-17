@@ -56,7 +56,7 @@ def new(request):
 
 def _get_privacy(log, request):
     if not request.user.is_authenticated:
-        return redirect('/accounts/login/?next=%s' % request.path)
+        return redirect(f'/accounts/login/?next={request.path}')
     if (privacy := log.privacy) == 'public' or log.owner == request.user or request.user.is_staff:
         return
     if (social_user := SocialAccount.objects.filter(user=request.user).first()) and \
