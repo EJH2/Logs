@@ -133,7 +133,7 @@ def log_delete(request, pk):
     if 'token' not in request.GET:
         return handle400(request, exception='Token not included in request!')
     try:
-        delete_type, token_pk, _ = signer.loads(request.GET['token']).split('.')
+        delete_type, token_pk, _ = signer.loads(request.GET['token']).split('.', 2)
     except BadSignature:
         return handle400(request, exception='Invalid delete token!')
     if pk != token_pk:
