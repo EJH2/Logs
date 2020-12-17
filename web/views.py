@@ -101,7 +101,8 @@ def log_html(request, pk):
 
     data = {**data, 'created': log.created, 'users': log.users, 'raw_content': log.content, 'raw_type': log.type,
             'type': all_types.get(log.type), 'user_id': None,
-            'delete_token': signer.dumps(f'log.{pendulum.now().isoformat()}') if log.owner == request.user else None,
+            'delete_token': signer.dumps(f'log.{pk}.{pendulum.now().isoformat()}') if log.owner == request.user
+            else None,
             'total_messages': len(msgs)}
 
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
@@ -132,8 +133,10 @@ def log_delete(request, pk):
     if 'token' not in request.GET:
         return handle400(request, exception='Token not included in request!')
     try:
-        delete_type, _ = signer.loads(request.GET['token']).split('.')
+        delete_type, token_pk, _ = signer.loads(request.GET['token']).split('.')
     except BadSignature:
+        return handle400(request, exception='Invalid delete token!')
+    if pk != token_pk:
         return handle400(request, exception='Invalid delete token!')
     if delete_type == 'preview':
         if request.session.get(pk):
@@ -166,7 +169,7 @@ def log_preview_html(request, pk):
     data = {**data, 'created': pendulum.now(), 'users': session_data['data']['users'],
             'raw_content': session_data['content'], 'raw_type': session_data['type'],
             'type': all_types.get(session_data['type']), 'user_id': None, 'is_preview': True,
-            'delete_token': signer.dumps(f'preview.{pendulum.now().isoformat()}'), 'total_messages': len(msgs)}
+            'delete_token': signer.dumps(f'preview.{pk}.{pendulum.now().isoformat()}'), 'total_messages': len(msgs)}
 
     messages.add_message(request, messages.INFO, 'This is a preview of what your log would look like. This URL cannot '
                                                  'be shared. If you like what you see, simply click the save icon. '
