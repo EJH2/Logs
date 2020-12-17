@@ -98,6 +98,7 @@ def _paginate_logs(msgs, data):
     return data
 
 
+@login_required
 def log_html(request, pk):
     log = _get_log(request, pk)
     if not isinstance(log, Log):
@@ -128,6 +129,7 @@ def log_html(request, pk):
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
 
+@login_required
 def log_raw(request, pk):
     log = get_object_or_404(Log, pk=pk)
     if error := _get_privacy(log, request):
@@ -136,6 +138,7 @@ def log_raw(request, pk):
     return render(request, 'discord_logview/lograw.html', context={'content': log.content, 'log': {'type': log.type}})
 
 
+@login_required
 def log_export(request, pk):
     log = _get_log(request, pk)
     if not isinstance(log, Log):
@@ -150,6 +153,7 @@ def log_export(request, pk):
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data), 'export': True})
 
 
+@login_required
 def log_delete(request, pk):
     if 'token' not in request.GET:
         return handle400(request, exception='Token not included in request!')
@@ -171,6 +175,7 @@ def log_delete(request, pk):
         return redirect('index')
 
 
+@login_required
 def log_preview_html(request, pk):
     if not (session_data := request.session.get(pk)):
         raise Http404
@@ -195,6 +200,7 @@ def log_preview_html(request, pk):
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
 
+@login_required
 def log_preview_save(request, pk):
     if not (data := request.session.get(pk)):
         raise Http404
@@ -206,6 +212,7 @@ def log_preview_save(request, pk):
     return redirect('log-html', pk=log.pk)
 
 
+@login_required
 def log_preview_raw(request, pk):
     if not (data := request.session.get(pk)):
         raise Http404
@@ -215,6 +222,7 @@ def log_preview_raw(request, pk):
     })
 
 
+@login_required
 def log_preview_export(request, pk):
     if not (data := request.session.get(pk)):
         raise Http404
