@@ -55,16 +55,7 @@ def new(request):
 
 
 def _get_log(request, pk):
-    log = get_object_or_404(filter_view_queryset(request, Log.objects.all()), pk=pk)
-
-    if not log.pages.count() > 0:
-        task_data = log.data.get('tasks')
-        return render(request, 'discord_logview/loading.html', context={
-            'task_ids': list(zip(task_data, task_messages[-len(task_data):])),
-            'iso': pendulum.now().isoformat()
-        })
-
-    return log
+    return get_object_or_404(filter_view_queryset(request, Log.objects.all()), pk=pk)
 
 
 def _paginate_logs(msgs, data):
@@ -83,6 +74,13 @@ def _paginate_logs(msgs, data):
 @login_required
 def log_html(request, pk):
     log = _get_log(request, pk)
+
+    if not log.pages.count():
+        task_data = log.data.get('tasks')
+        return render(request, 'discord_logview/loading.html', context={
+            'task_ids': list(zip(task_data, task_messages[-len(task_data):])),
+            'iso': pendulum.now().isoformat()
+        })
 
     data = {'uuid': log.uuid}
     page = data['page'] = request.GET.get('page')
