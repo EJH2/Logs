@@ -113,7 +113,7 @@ class DiscordHere(md.classes['discord_here']):
 
 
 def _parse_emoji(emoji: str):
-    title = UNICODE_LIST.get(emoji, demoji.findall(emoji)[emoji])
+    title = UNICODE_LIST.get(emoji) or demoji._CODE_TO_DESC.get(emoji, '')
     if '\u200d' not in emoji:  # If there isn't a zero width joiner, strip out variation selectors
         emoji = re.sub(r'[\U0000FE00-\U0000FE0F]$', '', emoji)
     return {
