@@ -12,6 +12,7 @@ from sentry_sdk import capture_exception
 from api.consts import all_types, task_messages
 from api.models import Log
 from api.objects import LogRenderer, LiteLogRenderer
+from api.permissions import filter_view_queryset
 from api.utils import signer
 from api.v1.parser import create_log
 from web.forms import LogCreateForm
@@ -71,9 +72,7 @@ def _get_privacy(log, request):
 
 
 def _get_log(request, pk):
-    log = get_object_or_404(Log, pk=pk)
-    if error := _get_privacy(log, request):
-        return error
+    log = get_object_or_404(filter_view_queryset(request, Log.objects.all()), pk=pk)
 
     if not log.pages.count() > 0:
         task_data = log.data.get('tasks')
