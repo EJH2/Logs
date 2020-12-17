@@ -45,7 +45,7 @@ def new(request):
                 return redirect('log-html', pk=log.pk)
             data = create_preview(**data)
             request.session[data['uuid']] = data
-            return redirect('log-preview', pk=data['uuid'])
+            return redirect('log-preview-html', pk=data['uuid'])
     else:
         form = LogCreateForm(user=request.user)
     return render(request, 'discord_logview/new.html', context={
@@ -171,7 +171,7 @@ def log_delete(request, pk):
         return redirect('index')
 
 
-def log_preview(request, pk):
+def log_preview_html(request, pk):
     if not (session_data := request.session.get(pk)):
         raise Http404
 
@@ -181,7 +181,7 @@ def log_preview(request, pk):
     data = _paginate_logs(msgs, data)
     if page:
         if not request.is_ajax():
-            return redirect('log-preview', pk=pk)
+            return redirect('log-preview-html', pk=pk)
         return render(request, 'discord_logview/messages.html', context={'log': LiteLogRenderer(data)})
 
     data = {**data, 'created': pendulum.now(), 'users': session_data['data']['users'],
