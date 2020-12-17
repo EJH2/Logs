@@ -1,6 +1,5 @@
 import pendulum
 import requests
-from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -53,22 +52,6 @@ def new(request):
         'form': form,
         'iso': pendulum.now().isoformat()
     })
-
-
-def _get_privacy(log, request):
-    if not request.user.is_authenticated:
-        return redirect(f'/accounts/login/?next={request.path}')
-    if (privacy := log.privacy) == 'public' or log.owner == request.user or request.user.is_staff:
-        return
-    if (social_user := SocialAccount.objects.filter(user=request.user).first()) and \
-            social_user.extra_data.get('guilds'):
-        if (guild := log.guild) in [g['id'] for g in social_user.extra_data.get('guilds')]:
-            if not privacy == 'mods':
-                return
-            if [g for g in social_user.extra_data.get('guilds') if g['id'] == guild and
-                    bool((g['permissions'] >> 13) & 1)]:
-                return
-    raise Http404
 
 
 def _get_log(request, pk):
