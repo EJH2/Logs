@@ -9,7 +9,8 @@ class LiteLogRenderer:
     def __init__(self, data):
         self.uuid = data['uuid']
         self.page = data.get('page')
-        self.messages = [Message(**m) for m in self.page.object_list]
+        self._messages = self.page.object_list if self.page else data['messages']
+        self.messages = [Message(**m) for m in self._messages]
 
     @property
     def message_groups(self):
