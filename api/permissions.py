@@ -39,6 +39,6 @@ def filter_view_queryset(request, queryset):
             int(g['id']) for g in _guilds if g['owner'] or (g['permissions'] >> 13) & 1
         ]
         return queryset.filter(owner=request.user) | queryset.filter(guild__in=guilds, privacy='guild') | \
-            queryset.filter(guilds__in=mod_guilds, privacy='mods')
+            queryset.filter(guild__in=mod_guilds, privacy='mods')
     except SocialAccount.DoesNotExist:
         return queryset.filter(owner=request.user)
