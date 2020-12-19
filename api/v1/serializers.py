@@ -29,7 +29,7 @@ class LogCreateSerializer(serializers.Serializer):
     @staticmethod
     def validate_url(value):
         """Check if url content type is text/plain"""
-        if not requests.head(value).headers['content-type'] == 'text/plain':
+        if 'text/plain' not in requests.head(value).headers['content-type']:
             raise serializers.ValidationError('URL Content-Type must be text/plain!')
         return value
 
