@@ -38,7 +38,7 @@ def filter_view_queryset(request, queryset):
             # Check if user is owner of guild or has manage messages perm
             int(g['id']) for g in _guilds if g['owner'] or (g['permissions'] >> 13) & 1
         ]
-        return queryset.filter(owner=request.user) | queryset.filter(guild__in=guilds, privacy='guild') | \
+        return queryset.filter(privacy='public') | queryset.filter(guild__in=guilds, privacy='guild') | \
             queryset.filter(guild__in=mod_guilds, privacy='mods')
     except SocialAccount.DoesNotExist:
-        return queryset.filter(owner=request.user)
+        return queryset.filter(privacy='public')
