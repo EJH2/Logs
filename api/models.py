@@ -21,7 +21,7 @@ class Log(models.Model):
             ('extended_expiry', 'Can set an expiry time of up to two weeks'),
             ('no_expiry', 'Can set an infinite expiry time, or none at all')
         ]
-        ordering = ['created']
+        ordering = ['-created']
 
     @classmethod
     def generate_uuid(cls, content):
