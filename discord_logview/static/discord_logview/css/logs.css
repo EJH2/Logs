@@ -207,11 +207,11 @@ nav .toolbox-tools {
 
 /* === NO JS === */
 
-.no-js .users {
+.no-js ul#users {
     max-height: initial;
 }
 
-.no-js .copyall {
+.no-js #copyall {
     display: none;
 }
 
