@@ -42,6 +42,18 @@ function loadJS(page) {
         h.textContent = moment(date).format('LT')
     }
 
+    for (let i of page.getElementsByClassName('attachmentImage')) {
+        i.addEventListener('onerror', function () {
+            i.src='static/discord_logview/icons/dead_attachment.png';
+            i.title='attachment unavailable'
+            i.style.height = '208px'
+            i.style.width = '400px'
+            i.parentElement.href='static/discord_logview/icons/dead_attachment.png';
+            i.parentElement.style.height = '208px'
+            i.parentElement.style.width = '400px'
+        })
+    }
+
     for (let s of page.getElementsByClassName('spoilerText-3p6IlD')) {
         s.onclick = function () {
             s.classList.toggle('hidden-HHr2R9');
