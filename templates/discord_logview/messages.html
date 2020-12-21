@@ -13,7 +13,7 @@
                                 <span class="latin24CompactTimeStamp-2V7XIQ timestamp-3ZCmNB timestampVisibleOnHover-2bQeI4 alt-1uNpEt"><i class="separator-2nZzUB" aria-hidden="true">[</i><span datetime="{{ message.timestamp }}">{{ message.timestamp_|time:"H:i A" }}</span><i class="separator-2nZzUB" aria-hidden="true">] </i></span>
                             {% endif %}
                             {% if message.content %}
-                                <div class="markup-2BOw-j messageContent-2qWWxC{% if message.error %} error{% endif %}">{{ message.content|safe }}{% if message.edited_timestamp %}<span class="edited-3sfAzf" aria-label="{{ message.edited_timestamp }}">(edited)</span>{% endif %}</div>
+                                <div class="markup-2BOw-j messageContent-2qWWxC{% if message.error %} message-error{% endif %}">{{ message.content|safe }}{% if message.edited_timestamp %}<span class="edited-3sfAzf" aria-label="{{ message.edited_timestamp }}">(edited)</span>{% endif %}</div>
                             {% endif %}
                         </div>
                         {% if message.attachments or message.embeds %}
