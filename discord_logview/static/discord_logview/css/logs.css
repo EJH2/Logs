@@ -362,7 +362,7 @@ input:checked ~ .toolbox-tools li {
 
 /* Show the tooltip text when you mouse over the tooltip container */
 .material-icons.tool:hover + .tooltiptext,
-.info__user-name:hover + .tooltiptext {
+.user-name:hover + .tooltiptext {
     opacity: 1;
     display: inline-block;
 }
@@ -499,7 +499,7 @@ a.material-icons {
     font-size: 36px;
 }
 
-.info__user-name:hover {
+.user-name:hover {
     cursor: pointer;
 }
 

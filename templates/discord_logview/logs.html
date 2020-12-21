@@ -33,7 +33,7 @@
                 </li>
                 {% for user in log.users %}
                     <li class="user tooltip">
-                        <span class="info__user-name"{% if user.id %} onclick="return copyID(this.parentElement)"{% endif %}>
+                        <span{% if not user.id %} class="user-name error"{% else %} class="user-name" onclick="return copyID(this.parentElement)"{% endif %}>
                             <b>{{ user.username|escape }}</b>#{{ user.discriminator }}
                             {% if user.bot %}
                                 <span class="botTagCozy-1fFsZk botTag-1un5a6 botTagRegular-2HEhHi botTag-2WPJ74 rem-2m9HGf"><span class="botText-1526X_">BOT</span></span>
