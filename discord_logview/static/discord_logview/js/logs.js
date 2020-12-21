@@ -179,31 +179,26 @@ function toggleUsers() {
     check.classList.toggle('rotated');
 }
 
-function copyID(element) {
-    let copyText = element.children[1];
+function copyText(element, text) {
     let textArea = document.createElement('textarea');
-    textArea.value = copyText.textContent;
+    textArea.value = text;
     document.body.appendChild(textArea);
-    copyText.classList.toggle('copied');
-    setTimeout(function () {
-        copyText.classList.toggle('copied');
-    }, 1000);
-    textArea.select();
-    document.execCommand('Copy');
-    textArea.remove();
-}
-
-function copyIDMention(element) {
-    let textArea = document.createElement('textarea');
-    textArea.value = element.getAttribute('title');
-    document.body.appendChild(textArea);
-    element.classList.toggle('copied');
     setTimeout(function () {
         element.classList.toggle('copied');
     }, 1000);
     textArea.select();
-    document.execCommand("Copy");
+    document.execCommand('Copy');
     textArea.remove();
+    element.classList.toggle('copied');
+}
+
+function copyID(element) {
+    let copyElement = element.children[1];
+    copyText(copyElement, copyElement.textContent);
+}
+
+function copyIDMention(element) {
+    copyText(element, element.getAttribute('title'));
 }
 
 function copyAllMenu(element) {
@@ -218,14 +213,5 @@ function copyAll(element) {
     for (let c of users) {
         ids.push(c.getElementsByClassName('id')[0].innerText);
     }
-    let textArea = document.createElement('textarea');
-    textArea.value = (ids).join(' ');
-    document.body.appendChild(textArea);
-    setTimeout(function () {
-        element.classList.toggle('copied');
-    }, 1000);
-    textArea.select();
-    document.execCommand('Copy');
-    textArea.remove();
-    element.classList.toggle('copied');
+    copyText(element, (ids).join(' '));
 }
