@@ -209,6 +209,7 @@ nav .toolbox-tools {
 
 .no-js ul#users {
     max-height: initial;
+    list-style: inside;
 }
 
 .no-js #copyall {
