@@ -381,6 +381,10 @@ input:checked ~ .toolbox-tools li {
         top: 80px;
     }
 
+    input:checked ~ .toolbox-tools li:nth-child(4) {
+        top: 105px;
+    }
+
     .tooltip .tooltiptext.tool-text {
         width: 100px;
         position: absolute;
