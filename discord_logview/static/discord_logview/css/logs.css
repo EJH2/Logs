@@ -152,7 +152,7 @@ nav .toolbox-tools {
     top: -12px;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 700px) {
     nav {
         padding-right: 0;
         padding-left: 0;
@@ -403,7 +403,7 @@ input:checked ~ .toolbox-tools li {
     }
 }
 
-@media (min-width: 501px) and (any-pointer: coarse) {
+@media (min-width: 701px) and (any-pointer: coarse) {
     body {
         padding-left: 15%;
         padding-right: 15%;
@@ -439,7 +439,7 @@ input:checked ~ .toolbox-tools li {
     }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 700px) {
     body {
         font-size: 85%
     }

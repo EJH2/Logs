@@ -24,7 +24,7 @@ nav span>div {
     color: #FFF;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 700px) {
     nav .tooltip .tooltiptext.tool-text {
         background-color: #282B30;
         border-top: 1px solid rgba(245, 245, 245, 0.08);
