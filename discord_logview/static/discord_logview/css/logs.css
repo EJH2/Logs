@@ -207,7 +207,7 @@ nav .toolbox-tools {
 
 /* === NO JS === */
 
-.no-js ul#users {
+.no-js #users {
     max-height: initial;
     list-style: inside;
 }
