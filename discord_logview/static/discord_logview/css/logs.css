@@ -216,6 +216,10 @@ nav .toolbox-tools {
     display: none;
 }
 
+.no-js .toolbox {
+    display: none;
+}
+
 .no-js .material-icons:not(.tooltip):not(.icon-large) {
     display: none;
 }
