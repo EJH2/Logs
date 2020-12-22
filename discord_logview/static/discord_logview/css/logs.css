@@ -158,10 +158,6 @@ nav .toolbox-tools {
         padding-left: 0;
     }
 
-    nav .toolbox {
-        margin-right: 0;
-    }
-
     nav input:checked ~ .toolbox-tools li:nth-child(1) {
         top: 45px;
     }
