@@ -364,7 +364,7 @@ input:checked ~ .toolbox-tools li {
     display: inline-block;
 }
 
-@media not (any-pointer: coarse) {
+@media (hover: none) {
     .tooltiptext.id {
         opacity: 1;
     }
@@ -403,7 +403,7 @@ input:checked ~ .toolbox-tools li {
     }
 }
 
-@media (min-width: 701px) and (any-pointer: coarse) {
+@media (min-width: 701px) and (hover: hover) {
     body {
         padding-left: 15%;
         padding-right: 15%;
