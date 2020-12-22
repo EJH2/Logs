@@ -178,14 +178,8 @@ def vortex(content, progress):
 
 def modmailbot(content, progress):
     content = '────────────────\n'.join(content.split('────────────────\n')[1:])  # Gets rid of useless header
-    _matches = list()
-    for text in content.split('\n'):
-        if re.match(consts.modmailbot_re, text):
-            _matches.append(text)
-        else:
-            _matches[-1] += f'\n{text}'
 
-    matches = (re.match(consts.modmailbot_re, m) for m in _matches)
+    matches = _rough_match(consts.modmailbot_re, content.split('\n'), '\n')
     match_data = list(m.groupdict() for m in matches if not m.group('bot_content'))
     message_array = []
 
