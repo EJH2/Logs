@@ -206,3 +206,32 @@ def modmailbot(content, progress):
         progress.set_progress(count + 1, total)
 
     return message_array
+
+
+def yggdrasil(content, progress):
+    content = re.sub(r'-- Phone Report --\nReport By : .*\nReason : [\S\s]+?\nConnected Parties :\n=> .*\n<= .*\n\n',
+                     '', content)  # Remove unneeded header data
+
+    matches = _rough_match(consts.yggdrasil_re, content.split('\n\n'), '\n\n')
+    match_data = list(m.groupdict() for m in matches)
+    message_array = []
+
+    total = len(match_data)
+
+    for count, match in enumerate(match_data):
+        message_array.append({
+            'id': match['message_id'],
+            'author': {
+                'id': match['user_id'],
+                'username': match['username'],
+                'discriminator': match['discriminator'],
+            },
+            'content': match['content'],
+            'timestamp': pendulum.from_timestamp(
+                ((int(match['message_id']) >> 22) + 1420070400000)/1000, tz=pendulum.UTC
+            ).isoformat()
+        })
+
+        progress.set_progress(count + 1, total)
+
+    return message_array
