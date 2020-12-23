@@ -101,6 +101,8 @@ body {
     line-height: inherit;
     width: auto;
     height: auto;
+    padding-left: 15%;
+    padding-right: 15%;
 }
 
 nav+* {
@@ -157,7 +159,98 @@ nav .toolbox-tools {
     top: -12px;
 }
 
-@media screen and (max-width: 700px) {
+/* Show the tooltip text when you mouse over the tooltip container */
+.material-icons.tool:hover + .tooltiptext,
+.user-name:hover + .tooltiptext {
+    opacity: 1;
+    display: inline-block;
+}
+
+.toolbox {
+    width: 36px;
+    height: 36px;
+    position: relative;
+    left: 8px;
+}
+
+#toolbox-toggle-label.rotated {
+    -webkit-transform: rotate(-180deg);
+    -moz-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
+    -o-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+}
+
+#toolbox-toggle-label {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    z-index: 10;
+    display: block;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+input[type=checkbox] {
+    display: none;
+}
+
+.toolbox-tools li {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    list-style-type: none;
+    opacity: 0;
+    transition: all 0.25s ease-in-out;
+}
+
+input:checked ~ .toolbox-tools li {
+    opacity: 1;
+}
+
+@media (hover: none) {
+
+    .tooltip .tooltiptext.id {
+        opacity: 1;
+    }
+}
+
+@media (min-width: 701px) {
+
+    input:checked ~ .toolbox-tools li:nth-child(1) {
+        left: -40px;
+    }
+
+    input:checked ~ .toolbox-tools li:nth-child(2) {
+        left: -80px;
+    }
+
+    input:checked ~ .toolbox-tools li:nth-child(3) {
+        left: -120px;
+    }
+
+    input:checked ~ .toolbox-tools li:nth-child(4) {
+        left: -160px;
+    }
+
+    .tooltip .tooltiptext.tool-text {
+        width: 100px;
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        left: 50%;
+        margin-left: -60px;
+    }
+}
+
+@media (max-width: 700px) {
+    body {
+        font-size: 85%;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
     nav {
         padding-right: 0;
         padding-left: 0;
@@ -179,12 +272,7 @@ nav .toolbox-tools {
         top: 158px;
     }
 
-    nav input:checked ~ .toolbox-tools li:nth-child(3) .tooltiptext {
-        border-bottom-right-radius: 5px;
-        border-bottom-left-radius: 5px;
-    }
-
-    nav .tooltip .tooltiptext.tool-text {
+    .tooltip .tooltiptext.tool-text {
         width: 175px;
         z-index: -1;
         top: -6px;
@@ -194,10 +282,12 @@ nav .toolbox-tools {
         height: 27px;
         line-height: 2;
         border-radius: 0;
+        position: absolute;
+        opacity: 1;
     }
 
-    nav .toolbox-tools {
-        top: -19px;
+    .material-icons.tool {
+        margin-left: 6px;
     }
 }
 
@@ -289,49 +379,6 @@ nav .toolbox-tools {
     display: none;
 }
 
-.toolbox {
-    width: 36px;
-    height: 36px;
-    position: relative;
-    left: 8px;
-}
-
-#toolbox-toggle-label.rotated {
-    -webkit-transform: rotate(-180deg);
-    -moz-transform: rotate(-180deg);
-    -ms-transform: rotate(-180deg);
-    -o-transform: rotate(-180deg);
-    transform: rotate(-180deg);
-}
-
-#toolbox-toggle-label {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    z-index: 10;
-    display: block;
-    border-radius: 25px;
-    cursor: pointer;
-}
-
-input[type=checkbox] {
-    display: none;
-}
-
-.toolbox-tools li {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    list-style-type: none;
-    opacity: 0;
-    transition: all 0.25s ease-in-out;
-}
-
-input:checked ~ .toolbox-tools li {
-    opacity: 1;
-}
-
 .tooltip {
     max-width: fit-content;
 }
@@ -355,131 +402,6 @@ input:checked ~ .toolbox-tools li {
     border-radius: 6px;
     position: relative;
     transition: opacity .1s ease-in-out;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.material-icons.tool:hover + .tooltiptext,
-.user-name:hover + .tooltiptext {
-    opacity: 1;
-    display: inline-block;
-}
-
-@media (hover: none) {
-    .tooltiptext.id {
-        opacity: 1;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(1) {
-        top: 30px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(2) {
-        top: 55px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(3) {
-        top: 80px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(4) {
-        top: 105px;
-    }
-
-    .tooltip .tooltiptext.tool-text {
-        width: 100px;
-        position: absolute;
-        z-index: 1;
-        top: 8px;
-        right: 105%;
-        opacity: 1;
-    }
-
-    .toolbox {
-        left: -11px;
-    }
-
-    .material-icons.tool {
-        margin-left: 6px;
-    }
-}
-
-@media (min-width: 701px) and (hover: hover) {
-    body {
-        padding-left: 15%;
-        padding-right: 15%;
-    }
-
-    .copyall {
-        transform: translateX(-15px);
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(1) {
-        left: -40px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(2) {
-        left: -80px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(3) {
-        left: -120px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(4) {
-        left: -160px;
-    }
-
-    .tooltip .tooltiptext.tool-text {
-        width: 100px;
-        position: absolute;
-        z-index: 1;
-        top: 100%;
-        left: 50%;
-        margin-left: -60px;
-    }
-}
-
-@media (max-width: 700px) {
-    body {
-        font-size: 85%
-    }
-
-    ul.users {
-        padding: 0;
-    }
-
-    .tooltiptext.id {
-        opacity: 1;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(1) {
-        top: 30px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(2) {
-        top: 55px;
-    }
-
-    input:checked ~ .toolbox-tools li:nth-child(3) {
-        top: 80px;
-    }
-
-    .tooltip .tooltiptext.tool-text {
-        width: 90px;
-        position: absolute;
-        z-index: 1;
-        top: 8px;
-        right: 105%;
-        opacity: 1;
-    }
-
-    .toolbox {
-        left: -11px;
-    }
-
-    .material-icons.tool {
-        margin-left: 6px;
-    }
 }
 
 a.material-icons {
