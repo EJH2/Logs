@@ -32,6 +32,8 @@ modmailbot_re = r'\[(?P<timestamp>[\d :-]{19})\](?:(?: \[(?:(?:(?:FROM|TO) USER)
 vortex_re = r'\[(?P<timestamp>[\w, :]{28,29})\] (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,19})' \
             r'\) : (?P<content>[\S\s]*?)(?P<attachments>(?:\n(?:http(?:|s):.*)|)*?)$'
 
+yggdrasil_re = r'\[Author ID: (?P<user_id>\d{16,19}) \| Message ID: (?P<message_id>\d{16,19})\] (?:<=|=>) ' \
+               r'(?P<username>.*?)#(?P<discriminator>\d{4}) : (?P<content>[\S\s]*?)?$'
 
 
 _private_types = {
@@ -48,6 +50,7 @@ _public_types = {
     'rosalina_bottings': 'Rosalina Bottings',
     'rowboat': 'Rowboat',
     'vortex': 'Vortex',
+    'yggdrasil': 'Yggdrasil',
 }
 
 
