@@ -32,14 +32,6 @@ modmailbot_re = r'\[(?P<timestamp>[\d :-]{19})\](?:(?: \[(?:(?:(?:FROM|TO) USER)
 vortex_re = r'\[(?P<timestamp>[\w, :]{28,29})\] (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,19})' \
             r'\) : (?P<content>[\S\s]*?)(?P<attachments>(?:\n(?:http(?:|s):.*)|)*?)$'
 
-regexps = {
-    'auttaja': auttaja_re,
-    'gearbot': gearbot_re,
-    'modmailbot': modmailbot_re,
-    'rowboat': rowboat_re,
-    'rosalina_bottings': rosalina_bottings_re,
-    'vortex': vortex_re
-}
 
 
 _private_types = {
