@@ -43,7 +43,7 @@ function loadJS(page) {
     }
 
     for (let i of page.getElementsByClassName('attachmentImage')) {
-        i.addEventListener('onerror', function () {
+        i.addEventListener('error', function () {
             i.src='static/discord_logview/icons/dead_attachment.png';
             i.title='attachment unavailable'
             i.style.height = '208px'
