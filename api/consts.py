@@ -60,7 +60,6 @@ rowboat_types = {
     'jetski': 'Jetski',
     'lmg_showboat': 'LMG Showboat',
     'rawgoat': 'Rawgoat',
-    'speedboat': 'Speedboat',
 }
 
 all_types = {**_public_types, **_private_types, **rowboat_types}
