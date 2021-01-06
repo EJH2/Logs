@@ -217,17 +217,35 @@ def log_preview_export(request, pk):
 # ====================================
 
 def handle400(request, *args, **kwargs):
-    return render(request, '400.html', status=400, context={'exception': kwargs.pop('exception')})
+    return render(request, 'error.html', status=400, context={
+        'status': 400,
+        'subtext': kwargs.pop('exception'),
+        'suggestion': 'It looks like you\'ve got some bad data. For your safety and ours, we\'re gonna stop it here. '
+                      'If you are the owner of this data, and know it isn\'t bad, come have a '
+                      '<a href="https://discord.gg/3X8WwbU">chat</a>'
+    })
 
 
 def handle403(request, *args, **kwargs):
-    return render(request, '403.html', status=403)
+    return render(request, 'error.html', status=403, context={
+        'status': 403,
+        'suggestion': 'It looks like you don\'t have the right permissions to access this... whatever it may be. '
+                      'I don\'t really know, but what I do know is you can\'t see it!'
+    })
 
 
 def handle404(request, *args, **kwargs):
-    return render(request, '404.html', status=404)
+    return render(request, 'error.html', status=404, context={
+        'status': 404,
+        'suggestion': 'Whatever you were looking for, it looks like it\'s lost. If you know for sure it <i>should</i>'
+                      ' exist, contact me on <a href="https://discord.gg/3X8WwbU">Discord</a>. Sorry about that!'
+    })
 
 
 def handle500(request):
     capture_exception()
-    return render(request, '500.html', status=500)
+    return render(request, 'error.html', status=500, context={
+        'status': 500,
+        'suggestion': 'It looks like something broke on our end, but never fear. We are probably already scrambling to'
+                      ' fix it as you read this, and will have it in tip-top shape in no time... hopefully!'
+    })

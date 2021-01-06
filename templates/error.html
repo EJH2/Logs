@@ -2,7 +2,7 @@
 {% load static %}
 <html lang="en-US">
 <head>
-    <title>{% block title %}{% endblock %}</title>
+    <title>{{ status }}</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="{% static 'discord_logview/css/error.css' %}">
 </head>
@@ -11,17 +11,13 @@
         <div>
             <div class="flex flex-horizontal flex-justify-center flex-align-center flex-wrap page-wrap">
                 <div class="text-section">
-                    <div class="error">
-                        {% block error-code %}{% endblock %}
-                    </div>
-                    <div class="suggestion-text">{% block subtext %}{% endblock %}</div>
-                    <div class="suggestion-text weight-light">{% block suggestion-text %}{% endblock %}</div>
+                    <div class="error">{{ status }}</div>
+                    {% if subtext %}<div class="suggestion-text">{{ subtext }}</div>{% endif %}
+                    <div class="suggestion-text weight-light">{{ suggestion | safe }}</div>
                     <ul class="links-section">
-                        {% block links %}
                         <li>
                             <a class="links" href="{% url 'index' %}">Take Me Home</a>
                         </li>
-                        {% endblock %}
                     </ul>
                 </div>
             </div>
