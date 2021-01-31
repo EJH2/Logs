@@ -43,9 +43,13 @@ def new(request):
             if request.POST['submit_type'] == 'Convert':
                 log = create_log(**data, owner=request.user)
                 return redirect('log-html', pk=log.pk)
-            data = create_preview(**data)
-            request.session[data['uuid']] = data
-            return redirect('log-preview-html', pk=data['uuid'])
+            try:
+                data = create_preview(**data)
+            except IndexError as e:
+                form.add_error('type', str(e))
+            else:
+                request.session[data['uuid']] = data
+                return redirect('log-preview-html', pk=data['uuid'])
     else:
         form = LogCreateForm(user=request.user)
     return render(request, 'discord_logview/new.html', context={
