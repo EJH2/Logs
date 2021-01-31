@@ -56,6 +56,12 @@ div, span, a, input {
     font-size: 0.9em;
 }
 
+.errorlist {
+    list-style: initial;
+    margin: 0 0 8px 15px;
+    color: red;
+}
+
 .option-hint {
     margin: 0.5em 0;
     color: #888;
