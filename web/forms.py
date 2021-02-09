@@ -80,6 +80,6 @@ class LogCreateForm(forms.Form):
             cleaned_data['expires'] = pendulum.now().add(seconds=expiry_times[cleaned_data['expires']]).isoformat()
         if cleaned_data['privacy'] != 'public' and not cleaned_data.get('guild'):
             self.add_error('guild', 'You must specify a guild to link to!')
-        else:
+        if cleaned_data['privacy'] == 'public' and cleaned_data.get('guild'):
             cleaned_data['guild'] = None
         return cleaned_data
