@@ -35,6 +35,8 @@ def save_preview(data, owner) -> Log:
     data['expires'] = pendulum.parse(data['expires']) if data['expires'] else None
     data['owner'] = owner
     log_data = data.get('data')
+    data['privacy'] = log_data.pop('privacy')
+    data['guild'] = log_data.pop('guild')
     pages_data = {'messages': log_data.pop('messages'), 'users': log_data.pop('users')}
 
     result = tasks.create_pages.delay(pages_data, data['uuid'])
