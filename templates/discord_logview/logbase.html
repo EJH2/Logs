@@ -11,7 +11,7 @@
     <meta name="og:image" content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% static 'discord_logview/icons/black_file.png' %}">
 
     <!-- General Discord Styling !-->
-    <link rel="stylesheet" href="https://canary.discordapp.com/assets/0.ac72fa632985bb1ede44.css">
+    <link rel="stylesheet" href="{% static 'discord_logview/css/discord.css' %}">
     <script>
         if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
             document.documentElement.style.display = 'none';
