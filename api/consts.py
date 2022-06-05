@@ -39,7 +39,8 @@ yggdrasil_re = r'\[Author ID: (?P<user_id>\d{16,19}) \| Message ID: (?P<message_
 _private_types = {
     'giraffeduck': 'GiraffeDuck',
     'logger': 'Logger',
-    'throttle-bot': 'Throttle-Bot'
+    'throttle-bot': 'Throttle-Bot',
+    'scheggia': 'Scheggia Services'
 }
 
 
