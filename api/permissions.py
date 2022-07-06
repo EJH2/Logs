@@ -8,7 +8,7 @@ class HasAPIAccess(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return all([request.user, request.user.is_authenticated, request.user.has_perm('api.api_access')])
+        return all([request.user, request.user.is_authenticated])
 
 
 def filter_queryset(request, queryset):
