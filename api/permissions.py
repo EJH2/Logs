@@ -27,7 +27,7 @@ def filter_queryset(request, queryset):
 
 def filter_view_queryset(request, queryset):
     if not request.user.is_authenticated:
-        return queryset.none()
+        return queryset.filter(privacy='public')
     if request.user.is_staff:
         return queryset.all()
     try:

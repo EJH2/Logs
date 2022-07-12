@@ -75,7 +75,6 @@ def _paginate_logs(msgs, data):
     return data
 
 
-@login_required
 def log_html(request, pk):
     log = _get_log(request, pk)
 
@@ -112,14 +111,12 @@ def log_html(request, pk):
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
 
-@login_required
 def log_raw(request, pk):
     log = _get_log(request, pk)
 
     return render(request, 'discord_logview/lograw.html', context={'content': log.content, 'log': {'type': log.type}})
 
 
-@login_required
 def log_export(request, pk):
     log = _get_log(request, pk)
 
