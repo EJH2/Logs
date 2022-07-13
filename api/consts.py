@@ -40,7 +40,8 @@ _private_types = {
     'giraffeduck': 'GiraffeDuck',
     'logger': 'Logger',
     'throttle-bot': 'Throttle-Bot',
-    'scheggia': 'Scheggia Services'
+    'scheggia': 'Scheggia Services',
+    'melanie': 'Melanie',
 }
 
 
