@@ -4,7 +4,12 @@
 {% block header-icon %}
     <img id="header-icon"
         {% if log.raw_type %}
-            {% with 'discord_logview/images/'|add:log.raw_type|lower|add:'.png' as image_static %} src="{% static image_static %}" {% endwith %}
+            {# By patron request #}
+            {% if log.raw_type != 'melanie' %}
+                {% with 'discord_logview/images/'|add:log.raw_type|lower|add:'.png' as image_static %} src="{% static image_static %}" {% endwith %}
+            {% else %}
+                {% with 'discord_logview/images/melanie.gif' as image_static %} src="{% static image_static %}" {% endwith %}
+            {% endif %}
         {% else %}
             src="{% static 'discord_logview/icons/white_file.png' %}"
         {% endif %}
