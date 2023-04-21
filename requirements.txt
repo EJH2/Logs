@@ -4,7 +4,7 @@ channels==2.3.0
 channels-redis==3.0.1
 demoji==0.3.0
 git+https://github.com/EJH2/dispy-markdown.git
-Django==3.1
+Django==3.1.14
 django-allauth==0.42.0
 djangorestframework==3.11.1
 drf-yasg==1.17.1
