@@ -37,8 +37,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
   redis:
     image: redis:4.0.9
+    volumes:
+      - redis_data:/data
     expose:
       - 6379
 
 volumes:
   postgres_data:
+  redis_data:
