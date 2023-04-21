@@ -13,7 +13,7 @@ natural==0.2.0
 pendulum==2.1.2
 psycopg2==2.9.6
 python-decouple==3.3
-redis==3.5.3
+redis==4.4.4
 ruamel.yaml==0.16.10
 sentry-sdk==0.17.0
 shortuuid==1.0.1
