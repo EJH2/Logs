@@ -8,6 +8,8 @@ signer = URLSafeSerializer(settings.SECRET_KEY)
 
 def validate_expires(user, value):
     value = pendulum.instance(value) if value else None
+    if value and value < pendulum.now():
+        raise serializers.ValidationError(f'Expiry time must not be in the past!')
     exp = {'weeks': 1}
     if user.has_perm('api.extended_expiry'):
         exp = {'months': 1}
