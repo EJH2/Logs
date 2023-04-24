@@ -1,4 +1,4 @@
-const baguetteSettings = {animation: 'fadeIn', noScrollbars: true, buttons: false};
+const baguetteSettings = {animation: 'fadeIn', noScrollbars: true, buttons: false, filter: /^(?!data:).+\.(gif|jpe?g|png|webp)/i};
 
 let lastDate = moment(0);
 
