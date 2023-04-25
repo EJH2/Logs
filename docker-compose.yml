@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   web:
+    container_name: web
     build: .
     image: discord_logview/web
     command: >
@@ -15,17 +16,20 @@ services:
     depends_on:
       - db
   celery_worker:
+    container_name: celery_worker
     image: discord_logview/web
     command: celery -A discord_logview worker -l warning
     depends_on:
       - redis
       - web
   celery_beat:
+    container_name: celery_beat
     image: discord_logview/web
     command: celery -A discord_logview beat --max-interval 3600
     depends_on:
       - celery_worker
   db:
+    container_name: db
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -37,6 +41,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
   redis:
+    container_name: redis
     image: redis:4.0.9
     volumes:
       - redis_data:/data
