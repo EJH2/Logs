@@ -84,7 +84,7 @@ class User:
     @property
     def default_avatar_url(self):
         return "https://cdn.discordapp.com/embed/avatars/{}.png".format(
-            int(self.discriminator) % 5
+            (int(self.id) >> 22) % 5
         )
 
     def __str__(self):

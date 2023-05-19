@@ -63,7 +63,7 @@ def rosalina_bottings(content, progress):
             'author': {
                 'id': match['user_id'],
                 'username': match['username'],
-                'discriminator': '0000'
+                'discriminator': '0'
             },
             'content': match['content'],
             'timestamp': pendulum.parse(match['timestamp']),
@@ -190,7 +190,7 @@ def modmailbot(content, progress):
             'author': {
                 'id': 0,
                 'username': match['username'],
-                'discriminator': match.get('discriminator') or '0000'
+                'discriminator': match.get('discriminator') or '0'
             },
             'content': match['content'],
             'timestamp': pendulum.from_format(match['timestamp'], 'YYYY-MM-DD HH:mm:ss').isoformat(),

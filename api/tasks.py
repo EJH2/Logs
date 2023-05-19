@@ -10,7 +10,7 @@ from api.serializers import MessageSerializer
 unknown_author = {
     'id': 0,
     'username': 'Unknown User',
-    'discriminator': '0000'
+    'discriminator': '0'
 }
 
 

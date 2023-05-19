@@ -28,7 +28,7 @@ def scale_image(height, width, max_height, max_width):
 class AuthorSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField(min_length=2, max_length=32)
-    discriminator = serializers.CharField(min_length=4, max_length=4)
+    discriminator = serializers.CharField(min_length=0, max_length=4)
     avatar = serializers.CharField(default=None, allow_null=True)
     bot = serializers.BooleanField(default=False)
     color = serializers.IntegerField(default=None)
@@ -38,7 +38,7 @@ class AuthorSerializer(serializers.Serializer):
         if ret.get('color'):
             ret['color'] = f'#{ret["color"]:06X}'
         if not ret.get('avatar'):
-            ret['avatar'] = f'https://cdn.discordapp.com/embed/avatars/{int(ret["discriminator"]) % 5}.png'
+            ret['avatar'] = f'https://cdn.discordapp.com/embed/avatars/{(int(ret["id"]) >> 22) % 5}.png'
         else:
             ending = 'gif' if ret['avatar'].startswith('a_') else 'png'
             ret['avatar'] = f'https://cdn.discordapp.com/avatars/{ret["id"]}/{ret["avatar"]}.{ending}'

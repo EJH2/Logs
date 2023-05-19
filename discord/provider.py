@@ -7,7 +7,7 @@ class DiscordAccount(provider.DiscordAccount):
         user_id = self.account.extra_data.get('id')
         avatar_hash = self.account.extra_data.get('avatar')
         if not avatar_hash:
-            return f'https://cdn.discordapp.com/embed/avatars/{int(self.account.extra_data["discriminator"]) % 5}.png'
+            return f'https://cdn.discordapp.com/embed/avatars/{(int(user_id) >> 22) % 5}.png'
         ending = 'gif' if avatar_hash.startswith('a_') else 'png'
         return f'https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.{ending}'
 

@@ -19,7 +19,7 @@ def create_message(content):
             'author': {
                 'id': 0,
                 'username': 'test',
-                'discriminator': '0000',
+                'discriminator': '0',
                 'avatar': None
             },
             'mentions': [],

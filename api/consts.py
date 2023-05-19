@@ -10,7 +10,7 @@ class OptionalSlashRouter(DefaultRouter):
 
 
 rowboat_re = r'(?P<timestamp>(?:[\d-]+) (?:[\d:.]+)) \((?P<message_id>[\d]{16,19}) \/ (?P<guild_id>[\d]{16,19}) \/ ' \
-             r'(?P<user_id>[\d]{16,19})\) (?P<username>.*?)#(?P<discriminator>\d{4}): (?P<content>[\S\s]*?)? \(' \
+             r'(?P<user_id>[\d]{16,19})\) (?P<username>.*?)#(?P<discriminator>\d{4}|\d): (?P<content>[\S\s]*?)? \(' \
              r'(?P<attachments>(?:http(?:|s):.*))?\)$'
 
 rosalina_bottings_re = r'(?P<timestamp>(?:[\d-]{10})T(?:[\d:.]{8,15}))(?:\+[\d:]{5}|Z) \| (?P<guild_name>.*?)\[(?P' \
@@ -18,22 +18,22 @@ rosalina_bottings_re = r'(?P<timestamp>(?:[\d-]{10})T(?:[\d:.]{8,15}))(?:\+[\d:]
                        r'(?P<username>.*?)\[(?P<user_id>\d{16,19})\] \| said: (?P<content>[\S\s]*?)(?:\nAttachment: ' \
                        r'(?P<attachments>(?:http(?:|s):.*)))?\nMessage ID: (?P<message_id>\d{16,19})$'
 
-auttaja_re = r'\[(?P<timestamp>[\w :]{24,25})\] \((?P<username>.*?)#(?P<discriminator>\d{4}) - (?P<user_id>\d{16,19' \
+auttaja_re = r'\[(?P<timestamp>[\w :]{24,25})\] \((?P<username>.*?)#(?P<discriminator>\d{4}|\d) - (?P<user_id>\d{16,19' \
              r'})\) \[(?P<message_id>\d{16,19})\]: (?P<content>[\S\s]*?)(?: (?P<attachments>(?:http(?:|s):.*))?)?$'
 
 gearbot_re = r'(?P<timestamp>[\w\-. :]{26}) (?P<guild_id>\d{16,19}) - (?P<channel_id>\d{16,19}) - (?P<message_id' \
-             r'>\d{16,19}) \| (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,19})\) \| (?P<content>' \
+             r'>\d{16,19}) \| (?P<username>.*?)#(?P<discriminator>\d{4}|\d) \((?P<user_id>\d{16,19})\) \| (?P<content>' \
              r'[\S\s]*?)? \|(?: ?(?P<attachments>(?:http(?:|s):.*))?)?$'
 
 modmailbot_re = r'\[(?P<timestamp>[\d :-]{19})\](?:(?: \[(?:(?:(?:FROM|TO) USER)|CHAT|COMMAND)\]) \[(?P<username>.*?)' \
-                r'(?:#(?P<discriminator>\d{4}))?\]( \(Anonymous\) [^:]+?:)? (?P<content>[\S\s]*?)(?:\n{2}\*\*' \
+                r'(?:#(?P<discriminator>\d{4}|\d))?\]( \(Anonymous\) [^:]+?:)? (?P<content>[\S\s]*?)(?:\n{2}\*\*' \
                 r'Attachment:\*\* (?P<attachments>(?:http(?:|s):.*)))?$| (?P<bot_content>[^\n]+))'
 
-vortex_re = r'\[(?P<timestamp>[\w, :]{28,29})\] (?P<username>.*?)#(?P<discriminator>\d{4}) \((?P<user_id>\d{16,19})' \
+vortex_re = r'\[(?P<timestamp>[\w, :]{28,29})\] (?P<username>.*?)#(?P<discriminator>\d{4}|\d) \((?P<user_id>\d{16,19})' \
             r'\) : (?P<content>[\S\s]*?)(?P<attachments>(?:\n(?:http(?:|s):.*)|)*?)$'
 
 yggdrasil_re = r'\[Author ID: (?P<user_id>\d{16,19}) \| Message ID: (?P<message_id>\d{16,19})\] (?:<=|=>) ' \
-               r'(?P<username>.*?)#(?P<discriminator>\d{4}) : (?P<content>[\S\s]*?)?$'
+               r'(?P<username>.*?)#(?P<discriminator>\d{4}|\d) : (?P<content>[\S\s]*?)?$'
 
 
 _private_types = {
