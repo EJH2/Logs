@@ -9,6 +9,7 @@ urlpatterns = [
     re_path(r'^previews/(?P<pk>\w{22})/export/?$', views.log_preview_export, name='log-preview-export'),
     re_path(r'^previews/(?P<pk>\w{22})/save/?$', views.log_preview_save, name='log-preview-save'),
     re_path(r'^logs/(?P<pk>\w{22})/?$', views.log_html, name='log-html'),
+    re_path(r'^logs/(?P<pk>\w{22})/rerun/?$', views.log_rerun, name='log-rerun'),
     re_path(r'^logs/(?P<pk>\w{22})/raw/?$', views.log_raw, name='log-raw'),
     re_path(r'^logs/(?P<pk>\w{22})/export/?$', views.log_export, name='log-export'),
     re_path(r'^logs/(?P<pk>\w{22})/delete/?$', views.log_delete, name='log-delete'),

@@ -1,3 +1,6 @@
+import json
+
+import celery
 import pendulum
 import requests
 from django.contrib import messages
@@ -8,6 +11,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from itsdangerous import BadSignature
 from sentry_sdk import capture_exception
 
+from api import tasks
 from api.consts import all_types, task_messages
 from api.models import Log
 from api.objects import LogRenderer, LiteLogRenderer
@@ -110,6 +114,23 @@ def log_html(request, pk):
 
     return render(request, 'discord_logview/logs.html', context={'log': LogRenderer(data)})
 
+def log_rerun(request, pk):
+    log = _get_log(request, pk)
+
+    num_reruns = log.data.get('reruns', 0)
+    if log.pages.count() != 0 or (num_reruns > 5 and not request.user.is_superuser):
+        messages.add_message(request, messages.ERROR, 'This log cannot be reran!')
+        return redirect('log-html', pk=log.pk)
+
+    content = json.loads(log.content)
+    result = celery.chain(tasks.parse_json.s(content) | tasks.create_pages.s(log.uuid))()
+
+    log.data['tasks'] = list(reversed(result.as_list()))
+    log.data['reruns'] = log.data.get('reruns', 0) + 1
+    log.save()
+
+    messages.add_message(request, messages.SUCCESS, 'The log is being rerun...')
+    return redirect('log-html', pk=log.pk)
 
 def log_raw(request, pk):
     log = _get_log(request, pk)
