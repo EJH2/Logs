@@ -28,7 +28,7 @@ def scale_image(height, width, max_height, max_width):
 class AuthorSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField(min_length=2, max_length=32)
-    discriminator = serializers.CharField(min_length=0, max_length=4)
+    discriminator = serializers.CharField(min_length=0, max_length=4, allow_null=True, default="0")
     avatar = serializers.CharField(default=None, allow_null=True)
     bot = serializers.BooleanField(default=False)
     color = serializers.IntegerField(default=None)
